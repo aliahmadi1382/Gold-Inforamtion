@@ -1,13 +1,15 @@
 # Master Data & Research Specification
 
-Version 1.2.0 · reviewed 2026-10-05 · implementation release 0.3.0.
+Version 1.3.0 · reviewed 2026-10-05 · implementation release 0.7.0.
 The supplied brief is preserved verbatim in `original-brief.md` as an input artifact, not a verified factual source or a promise of working integrations. This specification and the source audit take precedence for implementation status.
 
 ## Objective and scope
 
 Build an evidence-grounded Gold Market Intelligence & Decision System in four independently validated stages. The delivered release supports research acquisition. Daily XAU/USD is the initial target; a provider's date-labeled gold closes and a FRED macro sample have been acquired locally with documented limitations. No broker or current market opinion is assumed. Historical coverage means the earliest defensible evidence **per series and monetary regime**, not a continuous tick history extending back to 1919.
 
-| Layer | Required observations and grain | Candidate acquisition | Release 0.3 |
+The table records the release-0.3 baseline; later additions are listed in the acceptance history below. The [coverage matrix](coverage-matrix.md) and [execution phases](../phases.fa.md) record current feature status.
+
+| Layer | Required observations and grain | Candidate acquisition | Release 0.3 baseline |
 | --- | --- | --- | --- |
 | 1 Price | Instrument × venue × contract × price type × bar end or declared date label; OHLC where actually provided | Alpha Vantage gold closes, entitled spot/benchmark providers | Alpha Vantage date-only close adapter and separate contract; canonical OHLC importer; instruments kept separate |
 | 2 Structure | Stream × as-of × feature version; trend, range, pivots, momentum, volatility | Derived only from eligible price observations | SMA, momentum, ATR, realized volatility, prior range breakout, delayed confirmed pivots |
@@ -56,3 +58,5 @@ Release 0.3 adds successful account-specific acquisition, a distinct daily-close
 Release 0.4 adds seven metadata-checked FRED histories, conservative cutoff-aware macro selection, a three-period vintage example, a distinct monthly World Bank gold reference and monthly comparison. All acquired records reconcile to saved rows/cells. The monthly comparison does not establish daily price accuracy or upstream supplier independence. Source-defined gold units/session/weekend methodology and verified historical release timestamps remain acceptance gates before daily return/backtest research. See [phase-3 evidence](../source-methodology/history-acquisition.fa.md).
 
 Release 0.5 progresses independent calendar/reporting work while daily price methodology remains open. Reviewed BLS timing notes and archived embargo headers never create actual values or first-release availability. The Persian data-status brief is an initial reporting capability, not a completed analyst or decision system. See [timing evidence and limits](../source-methodology/release-evidence.fa.md).
+
+Release 0.6 adds descriptive monthly gold/macro relationships with fixed transformations, explicit samples, missingness gates, methodology-break separation and rolling windows. Release 0.7 adds reviewed economic values tied to specific BLS documents and exact-date FRED vintages. Reissued documents and current revisions remain explicit. Neither delivery establishes causation, profitable strategy behavior or intraday first-delivery times. See [monthly research](../source-methodology/monthly-research.fa.md) and [release-value evidence](../source-methodology/release-values.fa.md).

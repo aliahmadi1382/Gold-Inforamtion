@@ -130,6 +130,25 @@ The report contains pairwise and common-sample Pearson/Spearman coefficients, ex
 
 The independent inspection script recomputes selected monthly levels, coverage, adjacent changes, sample membership and reported Pearson/Spearman coefficients from the SQLite inputs. It does not certify provider definitions or causality. Preserve the code version, configuration, cutoff, local store/raw bytes and JSON fingerprint for reproduction. The output includes current revisions known at the cutoff, not what was known during each historical month. Keep real derived outputs under ignored `local/`. See the [method note](source-methodology/monthly-research.fa.md) and [Persian lesson](education/07-monthly-relationships.fa.md).
 
+## Archive values and exact-date vintages (0.7)
+
+```powershell
+uv run gold import-release-values local/release-research/cpi-2020-02-values-reviewed.json --reviewed
+uv run gold --credentials-file local/credentials.env fetch-fred CPIAUCSL --start 2019-12-01 --end 2020-02-01 --vintage 2020-03-11
+$valueCutoff = (Get-Date).ToUniversalTime().ToString('o')
+uv run gold release-value-report --as-of $valueCutoff --output-dir local/reports
+```
+
+The input above is a locally reviewed document, not a distributed vendor-data example. `ReleaseValueEvidence` records an official dated BLS archive URL, release number, headline period, New York embargo clock, capture time, document/reissue status, revision note and one or two values with units and table locators. Supported metrics are `cpi_all_items_sa_mom` (unit `percent_change_mom_sa`) and `unemployment_rate_sa` (unit `percent_sa`). The headline period is required; only the immediately preceding period may accompany it. Review the entire column header and reissue notice before using `--reviewed`. Contracts and hashes do not independently verify a transcription.
+
+Import creates separate BLS macro observations and an acquisition manifest. It does not populate calendar actuals, invent consensus or modify FRED availability. Reissued documents require a reissue date; archive copies without a reissue notice still do not claim verified first release. Availability remains at local ingestion. A report selects whole documents by latest capture, so an older reimport cannot restore dropped rows. Incomplete or conflicting bundles, source/metric mismatches and raw/normalized discrepancies fail.
+
+The report writes `release-values.fa.md` and `release-values.json`. It compares the document values with the exact FRED vintage on the header's New York date, and separately with current revisions known at the cutoff. Fetch three adjacent CPI index months to compare a headline month's MoM and the preceding month's MoM; fetch two UNRATE months for the equivalent rate comparison. CPI uses native index levels from one vintage, not mixed versions; both response-level realtime dates and raw rows are checked. A missing exact vintage is reported, never replaced with a nearby vintage or current values.
+
+Display consistency means less than 0.05 percentage-point difference from a one-decimal published number; the exact boundary is marked uncertain. Native CPI levels are also rounded, so this is not a claim about unrounded BLS internals. FRED and BLS share the statistical origin. Date-only vintage agreement and a header clock do not establish actual intraday delivery. Current minus archive values are revision comparisons, not release surprises.
+
+Exit code 0 (`compared`) means all selected archive values have historical display consistency and nonmissing current counterparts, within this deliberately narrow comparison scope. Code 3 (`incomplete` or `no_evidence`) accompanies a written report with missing or discrepant comparisons. Invalid input/integrity failures return 2. A successful comparison always retains `intraday_replay_ready: false` and `first_release_verified: false`. Preserve raw extracts, acquisition manifests, record IDs and code version along with the report. See [method and live evidence](source-methodology/release-values.fa.md) and [lesson eight](education/08-release-values-and-vintages.fa.md).
+
 ## CFTC positioning
 
 Use the official [compressed archive](https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm). Choose **Legacy / Futures Only / Text**, unzip locally, then:

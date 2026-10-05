@@ -27,6 +27,13 @@ from .monthly_research import (
 from .quality import QualityPolicy, QualityReport, assess, load_policy
 from .registry import Registry, export_public, load_registry
 from .release_calendar import CalendarContext, ReleaseEvidence, calendar_context, import_evidence
+from .release_values import (
+    ReleaseValueEvidence,
+    ReleaseValueReport,
+    import_release_values,
+    release_value_report,
+    render_release_values,
+)
 from .snapshot import MarketSnapshot, snapshot
 from .storage import Store
 from .world_bank import ingest_monthly_gold
@@ -49,6 +56,16 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    c = sub.add_parser(
+        "import-release-values", help="import reviewed archive values with document identity"
+    )
+    c.add_argument("path", type=Path)
+    c.add_argument("--reviewed", action="store_true", required=True)
+    c = sub.add_parser(
+        "release-value-report", help="compare document values with exact-date FRED vintages"
+    )
+    c.add_argument("--as-of", type=timestamp, required=True)
+    c.add_argument("--output-dir", type=Path, default=Path("local/reports"))
     c = sub.add_parser("monthly-research", help="local descriptive gold/macro relationships")
     c.add_argument("--as-of", type=timestamp, required=True)
     c.add_argument("--plan", type=Path, default=Path("config/monthly_research.yaml"))
@@ -172,6 +189,8 @@ def run(args) -> dict:
             "research_brief": ResearchBrief,
             "monthly_research_plan": MonthlyResearchPlan,
             "monthly_research": MonthlyResearch,
+            "release_value_evidence": ReleaseValueEvidence,
+            "release_value_report": ReleaseValueReport,
         }
         for name, model in models.items():
             schema = {
@@ -185,6 +204,21 @@ def run(args) -> dict:
     if args.command == "demo":
         return demo(args.output, registry)
     with Store(args.store) as store:
+        if args.command == "release-value-report":
+            report = release_value_report(store, registry, args.as_of)
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+            (args.output_dir / "release-values.json").write_text(
+                report.model_dump_json(indent=2) + "\n", encoding="utf-8"
+            )
+            output = args.output_dir / "release-values.fa.md"
+            output.write_text(render_release_values(report), encoding="utf-8")
+            return {
+                "status": report.status,
+                "report": str(output),
+                "documents": len(report.documents),
+                "fingerprint": report.fingerprint,
+                "intraday_replay_ready": False,
+            }
         if args.command == "monthly-research":
             report = monthly_research(store, load_research_plan(args.plan), args.as_of)
             args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -274,6 +308,7 @@ def run(args) -> dict:
             "fetch-alpha-gold",
             "fetch-worldbank-gold",
             "import-release-evidence",
+            "import-release-values",
         }:
             parameters = {
                 k: v if isinstance(v, bool) or v is None else str(v)
@@ -330,6 +365,8 @@ def run(args) -> dict:
 
 
 def perform_ingestion(args, store, registry) -> int:
+    if args.command == "import-release-values":
+        return import_release_values(store, args.path, registry.get("bls"), reviewed=args.reviewed)
     if args.command == "import-release-evidence":
         return import_evidence(store, args.path, registry.get("bls"), reviewed=args.reviewed)
     if args.command == "fetch-worldbank-gold":
@@ -389,6 +426,8 @@ def main(argv=None) -> int:
         if args.command == "fetch-fred-core" and result["status"] != "succeeded":
             return 3
         if args.command == "monthly-research" and result["status"] == "insufficient_data":
+            return 3
+        if args.command == "release-value-report" and result["status"] != "compared":
             return 3
         return (
             3 if args.command in {"quality", "research-brief"} and result["status"] == "fail" else 0

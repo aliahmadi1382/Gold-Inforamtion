@@ -51,6 +51,7 @@ class AcquisitionRun(Contract):
         "fetch-fred-reviewed",
         "fetch-worldbank-gold",
         "import-release-evidence",
+        "import-release-values",
     ]
     application_version: NonEmpty
     started_at: Timestamp

@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "PublishedValue": {
+      "additionalProperties": false,
+      "properties": {
+        "reference_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "percent_change_mom_sa",
+            "percent_sa"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "decimal_places": {
+          "const": 1,
+          "default": 1,
+          "title": "Decimal Places",
+          "type": "integer"
+        },
+        "locator": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "review_note": {
+          "maxLength": 1500,
+          "minLength": 1,
+          "title": "Review Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reference_period",
+        "value",
+        "unit",
+        "locator",
+        "review_note"
+      ],
+      "title": "PublishedValue",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_url": {
+      "format": "uri",
+      "maxLength": 2083,
+      "minLength": 1,
+      "title": "Source Url",
+      "type": "string"
+    },
+    "captured_at": {
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "capture_method": {
+      "const": "reviewed_web_extract",
+      "default": "reviewed_web_extract",
+      "title": "Capture Method",
+      "type": "string"
+    },
+    "metric": {
+      "enum": [
+        "cpi_all_items_sa_mom",
+        "unemployment_rate_sa"
+      ],
+      "title": "Metric",
+      "type": "string"
+    },
+    "release_id": {
+      "pattern": "^USDL-\\d{2}-\\d{4}$",
+      "title": "Release Id",
+      "type": "string"
+    },
+    "headline_period": {
+      "pattern": "^\\d{4}-\\d{2}$",
+      "title": "Headline Period",
+      "type": "string"
+    },
+    "announced_at": {
+      "format": "date-time",
+      "title": "Announced At",
+      "type": "string"
+    },
+    "timing_basis": {
+      "const": "archive_embargo_header",
+      "default": "archive_embargo_header",
+      "title": "Timing Basis",
+      "type": "string"
+    },
+    "timezone_evidence": {
+      "minLength": 1,
+      "title": "Timezone Evidence",
+      "type": "string"
+    },
+    "document_status": {
+      "enum": [
+        "archive_as_captured",
+        "reissued"
+      ],
+      "title": "Document Status",
+      "type": "string"
+    },
+    "reissued_on": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reissued On"
+    },
+    "revision_note": {
+      "minLength": 1,
+      "title": "Revision Note",
+      "type": "string"
+    },
+    "caveats": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Caveats",
+      "type": "array"
+    },
+    "values": {
+      "items": {
+        "$ref": "#/$defs/PublishedValue"
+      },
+      "maxItems": 2,
+      "minItems": 1,
+      "title": "Values",
+      "type": "array"
+    }
+  },
+  "required": [
+    "source_url",
+    "captured_at",
+    "metric",
+    "release_id",
+    "headline_period",
+    "announced_at",
+    "timezone_evidence",
+    "document_status",
+    "revision_note",
+    "values"
+  ],
+  "title": "ReleaseValueEvidence",
+  "type": "object"
+}

@@ -1,3 +1,3 @@
 """Gold market research; no broker connections or executable trading signals."""
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"

@@ -134,7 +134,7 @@ sources:
     implementation: manual_import
     coverage: CPI, employment, wages, JOLTS and release schedules; series dependent
     frequency: Monthly and scheduled events
-    notes: Reviewed timing-evidence import for CPI and Employment Situation. Captures are explicit web extracts, not original downloaded pages. Announced/embargo clocks never promote FRED values to historical availability. Direct BLS downloads returned HTTP 403 in this environment. America/New_York offsets are validated against daylight-saving rules.
+    notes: Reviewed timing and archive-value imports for CPI and Employment Situation. Value evidence retains metric units, document identity, capture and reissue status; comparisons use explicit FRED vintages. Captures are web extracts, not original downloaded pages. Embargo clocks never promote values to historical availability. Direct BLS downloads returned HTTP 403. America/New_York offsets are validated against daylight-saving rules.
   - source_id: bea
     provider: US Bureau of Economic Analysis
     url: https://www.bea.gov/data

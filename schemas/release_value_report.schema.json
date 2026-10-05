@@ -1,0 +1,312 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "ReleaseDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "source_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "release_id": {
+          "title": "Release Id",
+          "type": "string"
+        },
+        "metric": {
+          "enum": [
+            "cpi_all_items_sa_mom",
+            "unemployment_rate_sa"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "headline_period": {
+          "title": "Headline Period",
+          "type": "string"
+        },
+        "announced_at": {
+          "format": "date-time",
+          "title": "Announced At",
+          "type": "string"
+        },
+        "tehran_time": {
+          "format": "date-time",
+          "title": "Tehran Time",
+          "type": "string"
+        },
+        "captured_at": {
+          "format": "date-time",
+          "title": "Captured At",
+          "type": "string"
+        },
+        "document_status": {
+          "enum": [
+            "archive_as_captured",
+            "reissued"
+          ],
+          "title": "Document Status",
+          "type": "string"
+        },
+        "reissued_on": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reissued On"
+        },
+        "revision_note": {
+          "title": "Revision Note",
+          "type": "string"
+        },
+        "caveats": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Caveats",
+          "type": "array"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/$defs/ReleaseValueLink"
+          },
+          "title": "Values",
+          "type": "array"
+        },
+        "first_release_verified": {
+          "const": false,
+          "default": false,
+          "title": "First Release Verified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source_url",
+        "release_id",
+        "metric",
+        "headline_period",
+        "announced_at",
+        "tehran_time",
+        "captured_at",
+        "document_status",
+        "reissued_on",
+        "revision_note",
+        "caveats",
+        "values"
+      ],
+      "title": "ReleaseDocument",
+      "type": "object"
+    },
+    "ReleaseValueLink": {
+      "additionalProperties": false,
+      "properties": {
+        "reference_period": {
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "period_role": {
+          "enum": [
+            "headline",
+            "previous_in_document"
+          ],
+          "title": "Period Role",
+          "type": "string"
+        },
+        "document_value": {
+          "title": "Document Value",
+          "type": "number"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "locator": {
+          "title": "Locator",
+          "type": "string"
+        },
+        "document_record_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Document Record Id",
+          "type": "string"
+        },
+        "release_date_vintage": {
+          "$ref": "#/$defs/ValueComparison"
+        },
+        "current_revision": {
+          "$ref": "#/$defs/ValueComparison"
+        }
+      },
+      "required": [
+        "reference_period",
+        "period_role",
+        "document_value",
+        "unit",
+        "locator",
+        "document_record_id",
+        "release_date_vintage",
+        "current_revision"
+      ],
+      "title": "ReleaseValueLink",
+      "type": "object"
+    },
+    "ValueComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "matches_display",
+            "differs_display",
+            "rounding_boundary",
+            "missing_period",
+            "missing_value"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "difference_from_document": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Difference From Document"
+        },
+        "record_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Record Ids",
+          "type": "array"
+        },
+        "vintage_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Vintage Date"
+        },
+        "transformation": {
+          "enum": [
+            "native_unemployment_rate",
+            "100*(current_CPI/prior_CPI-1)"
+          ],
+          "title": "Transformation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "vintage_date",
+        "transformation"
+      ],
+      "title": "ValueComparison",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "software_version": {
+      "title": "Software Version",
+      "type": "string"
+    },
+    "fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Fingerprint",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "compared",
+        "incomplete",
+        "no_evidence"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "documents": {
+      "items": {
+        "$ref": "#/$defs/ReleaseDocument"
+      },
+      "title": "Documents",
+      "type": "array"
+    },
+    "intraday_replay_ready": {
+      "const": false,
+      "default": false,
+      "title": "Intraday Replay Ready",
+      "type": "boolean"
+    },
+    "limitations": {
+      "default": [
+        "Official archive values are manually reviewed extracts, not original HTML bytes.",
+        "An archive may have been reissued; the capture date identifies the inspected version.",
+        "An embargo header and a date-only FRED vintage do not prove intraday delivery time.",
+        "Same-day FRED consistency is not independent confirmation or proof of first release.",
+        "CPI MoM uses two index levels from the same vintage and compares at display precision.",
+        "Current-revision differences are not release surprises; no consensus input is present.",
+        "Historical availability is not backdated; replay remains retrieval bounded."
+      ],
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "generated_at",
+    "as_of",
+    "software_version",
+    "fingerprint",
+    "status",
+    "documents"
+  ],
+  "title": "ReleaseValueReport",
+  "type": "object"
+}

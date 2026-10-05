@@ -10,17 +10,22 @@ flowchart LR
     T --> F[Causal technical features]
     F --> M[Evidence-linked research snapshot]
     S --> E[Descriptive event windows]
+    S --> Q[As-of coverage and quality report]
+    R --> I[Acquisition run manifest]
+    S --> I
     S --> L[Explicit rights check]
     L --> X[Public export]
 ```
 
-`src/gold_intelligence` groups actual code by responsibility: contracts (`models`), rights (`registry`), immutable raw/transactional normalization (`storage`), adapters (`ingestion`), features and event research (`analysis`), market state (`snapshot`), and executable commands (`cli`). This replaces empty `ingestion/lbma`, `agents/*` and similar directories in the original sketch with an installable package. Future integrations belong here or in documented services when they exist.
+`src/gold_intelligence` groups actual code by responsibility: contracts (`models`), rights (`registry`), immutable raw/transactional normalization (`storage`), adapters (`ingestion`), operation manifests (`acquisition`), coverage checks (`quality`), scoped key loading (`credentials`), features and event research (`analysis`), market state (`snapshot`), and executable commands (`cli`). This replaces empty `ingestion/lbma`, `agents/*` and similar directories in the original sketch with an installable package. Future integrations belong here or in documented services when they exist.
 
 ## Storage and reproducibility
 
 Default runtime path is `local/market`, ignored by Git. Raw filenames equal their SHA-256. SQLite rows contain a content hash ID, record kind and canonical JSON; input metadata and retrieval time form part of identity. Inserting the exact same record is idempotent. A later retrieval is a new provenance version; snapshot selection collapses price revisions by bar time. A conflicting same-time revision fails instead of selecting arbitrarily. One import validates the complete batch before a single database transaction. Failed imports may retain raw bytes for inspection but no partial normalized batch.
 
-Logical zones are raw (original bytes), bronze (parsed provider records), silver (normalized contracts), gold (snapshots), derived (versioned features/research) and events (cited metadata). Release 0.1 materializes raw blobs and silver records in the local store; bronze parsing is in memory and snapshot output is explicit. It does not pretend to operate a distributed lakehouse. Large data later moves to partitioned Parquet/object storage with manifest hashes and migrations.
+Logical zones are raw (original bytes), bronze (parsed provider records), silver (normalized contracts), gold (snapshots), derived (versioned features/research) and events (cited metadata). Release 0.2 materializes raw blobs, silver records and acquisition manifests in the local store; bronze parsing is in memory and snapshot/quality output is explicit. It does not operate a distributed lakehouse. Large data later moves to partitioned Parquet/object storage with manifest hashes and migrations.
+
+CLI acquisition records start and terminal status with atomic manifest replacement. Store instrumentation captures raw hashes and normalized IDs, including exact duplicates, without serializing API keys or exception messages. A process crash can leave a `running` manifest; manifests and SQLite are not a distributed transaction. Quality checks inspect all stored record/raw integrity while computing coverage only from as-of eligible versions. Separate venue, contract, unit, vintage and source identities are not pooled to satisfy coverage. The [quality guide](quality-operations.md) defines the limits.
 
 Each snapshot records every contributing price/observation record ID, feature version and parameters. IDs link to SQLite payloads, then raw hash and row locator, then source URL. `gold audit` verifies referenced bytes. Data and derived exports outside the repo must preserve these references and source rights. Feature configuration/code changes require a feature-version bump and regression checks.
 

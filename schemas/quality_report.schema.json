@@ -1,0 +1,263 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "QualityIssue": {
+      "additionalProperties": false,
+      "properties": {
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "stream_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stream Id"
+        },
+        "record_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Record Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "severity",
+        "code",
+        "message"
+      ],
+      "title": "QualityIssue",
+      "type": "object"
+    },
+    "StreamInventory": {
+      "additionalProperties": false,
+      "properties": {
+        "stream_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Stream Id",
+          "type": "string"
+        },
+        "identity": {
+          "additionalProperties": true,
+          "title": "Identity",
+          "type": "object"
+        },
+        "record_versions": {
+          "minimum": 1,
+          "title": "Record Versions",
+          "type": "integer"
+        },
+        "unique_observations": {
+          "minimum": 1,
+          "title": "Unique Observations",
+          "type": "integer"
+        },
+        "extra_versions": {
+          "minimum": 0,
+          "title": "Extra Versions",
+          "type": "integer"
+        },
+        "first_observed_at": {
+          "format": "date-time",
+          "title": "First Observed At",
+          "type": "string"
+        },
+        "last_observed_at": {
+          "format": "date-time",
+          "title": "Last Observed At",
+          "type": "string"
+        },
+        "last_available_at": {
+          "format": "date-time",
+          "title": "Last Available At",
+          "type": "string"
+        },
+        "age_hours": {
+          "title": "Age Hours",
+          "type": "number"
+        },
+        "freshness_limit_hours": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Freshness Limit Hours"
+        },
+        "missing_values": {
+          "minimum": 0,
+          "title": "Missing Values",
+          "type": "integer"
+        },
+        "missing_fraction": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Missing Fraction",
+          "type": "number"
+        },
+        "retrieval_time_only_versions": {
+          "minimum": 0,
+          "title": "Retrieval Time Only Versions",
+          "type": "integer"
+        },
+        "daily_gap_count": {
+          "minimum": 0,
+          "title": "Daily Gap Count",
+          "type": "integer"
+        },
+        "largest_gap_hours": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Largest Gap Hours"
+        }
+      },
+      "required": [
+        "stream_id",
+        "identity",
+        "record_versions",
+        "unique_observations",
+        "extra_versions",
+        "first_observed_at",
+        "last_observed_at",
+        "last_available_at",
+        "age_hours",
+        "freshness_limit_hours",
+        "missing_values",
+        "missing_fraction",
+        "retrieval_time_only_versions",
+        "daily_gap_count",
+        "largest_gap_hours"
+      ],
+      "title": "StreamInventory",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "replay_mode": {
+      "enum": [
+        "system",
+        "source"
+      ],
+      "title": "Replay Mode",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "warning",
+        "fail"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "data_mode": {
+      "enum": [
+        "empty",
+        "synthetic",
+        "real",
+        "mixed"
+      ],
+      "title": "Data Mode",
+      "type": "string"
+    },
+    "policy_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Policy Sha256",
+      "type": "string"
+    },
+    "total_records": {
+      "title": "Total Records",
+      "type": "integer"
+    },
+    "valid_records": {
+      "title": "Valid Records",
+      "type": "integer"
+    },
+    "eligible_records": {
+      "title": "Eligible Records",
+      "type": "integer"
+    },
+    "excluded_by_time": {
+      "title": "Excluded By Time",
+      "type": "integer"
+    },
+    "streams": {
+      "items": {
+        "$ref": "#/$defs/StreamInventory"
+      },
+      "title": "Streams",
+      "type": "array"
+    },
+    "issues": {
+      "items": {
+        "$ref": "#/$defs/QualityIssue"
+      },
+      "title": "Issues",
+      "type": "array"
+    },
+    "interpretation": {
+      "default": "Operational checks only. No guarantee of source accuracy, market completeness, historical release correctness or trading fitness.",
+      "title": "Interpretation",
+      "type": "string"
+    }
+  },
+  "required": [
+    "as_of",
+    "replay_mode",
+    "status",
+    "data_mode",
+    "policy_sha256",
+    "total_records",
+    "valid_records",
+    "eligible_records",
+    "excluded_by_time",
+    "streams",
+    "issues"
+  ],
+  "title": "QualityReport",
+  "type": "object"
+}

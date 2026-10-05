@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "RequiredStream": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "price_bar",
+            "observation",
+            "positioning",
+            "news_event",
+            "calendar_release"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        },
+        "dataset": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset"
+        },
+        "instrument": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instrument"
+        },
+        "series_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Id"
+        },
+        "timeframe": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timeframe"
+        },
+        "min_observations": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Min Observations",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "RequiredStream",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "max_age_hours": {
+      "additionalProperties": {
+        "exclusiveMinimum": 0,
+        "type": "number"
+      },
+      "title": "Max Age Hours",
+      "type": "object"
+    },
+    "daily_gap_warning_hours": {
+      "default": 96,
+      "exclusiveMinimum": 0,
+      "title": "Daily Gap Warning Hours",
+      "type": "number"
+    },
+    "missing_fraction_warning_above": {
+      "default": 0,
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Missing Fraction Warning Above",
+      "type": "number"
+    },
+    "required_streams": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/RequiredStream"
+      },
+      "title": "Required Streams",
+      "type": "array"
+    }
+  },
+  "title": "QualityPolicy",
+  "type": "object"
+}

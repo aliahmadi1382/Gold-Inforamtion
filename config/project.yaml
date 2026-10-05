@@ -7,10 +7,18 @@ architecture: hybrid_data_models_and_evidence_grounded_reasoning
 default_replay_mode: system
 live_execution: false
 broker: null
-data_budget: null
-# Design defaults, not hidden runtime flags. CLI parameters are explicit in v0.1.
+data_budget: free_public_only
+owner_decisions:
+  confirmed_on: '2026-10-05'
+  initial_instrument: XAUUSD
+  initial_timeframe: 1d
+  expansion: shorter_timeframes_after_daily
+  sources: free_and_public_only
+  acquisition_route: free_personal_apis
+  selected_providers: [alpha_vantage, fred]
+  education_language: fa
+# Design defaults, not hidden runtime flags. CLI parameters are explicit.
 pending_owner_decisions:
-  - Multi-timeframe and additional instrument priorities
-  - Provider entitlements, commercial data budget and actual price feed
+  - Local availability of personal Alpha Vantage and FRED API keys
   - Broker and execution venue if execution is later commissioned
   - Risk limits and validation criteria before any paper/live strategy

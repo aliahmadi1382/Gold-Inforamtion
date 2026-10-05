@@ -1,0 +1,17 @@
+schema_version: 1.0.0
+# Operational reference-age thresholds, not trading signals or exchange calendars.
+# Explicit series overrides take precedence over kind defaults.
+max_age_hours:
+  price_bar: 96
+  positioning: 336
+  series:DFII10: 168
+  series:DGS10: 168
+  series:DFF: 168
+  series:CPIAUCSL: 1440
+daily_gap_warning_hours: 96
+missing_fraction_warning_above: 0.0
+required_streams:
+  - kind: price_bar
+    instrument: XAUUSD
+    timeframe: 1d
+    min_observations: 50

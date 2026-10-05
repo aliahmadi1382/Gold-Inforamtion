@@ -3,6 +3,8 @@
 import hashlib
 import json
 import sqlite3
+from contextlib import contextmanager
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
@@ -19,9 +21,26 @@ def record_id(record: Record) -> str:
     return hashlib.sha256(canonical(record.model_dump(mode="json")).encode()).hexdigest()
 
 
+def decode_record(identifier: str, kind: str, payload: str) -> Record:
+    if kind not in RECORD_TYPES:
+        raise ValueError("unknown stored record kind")
+    record = RECORD_TYPES[kind].model_validate_json(payload)
+    if record_id(record) != identifier:
+        raise ValueError("normalized record content hash mismatch")
+    return record
+
+
+@dataclass
+class IngestionEvidence:
+    raw_sha256: set[str] = field(default_factory=set)
+    record_ids: set[str] = field(default_factory=set)
+    inserted_records: int = 0
+
+
 class Store:
     def __init__(self, root: Path):
         self.root = Path(root)
+        self._capture = None
         (self.root / "raw").mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(self.root / "market.sqlite3")
         self.db.execute("""CREATE TABLE IF NOT EXISTS records (
@@ -34,6 +53,19 @@ class Store:
     def __exit__(self, *_):
         self.db.close()
 
+    @contextmanager
+    def capture_ingestion(self):
+        if self._capture is not None:
+            raise ValueError("nested acquisition runs are not supported")
+        self._capture = evidence = IngestionEvidence()
+        try:
+            yield evidence
+        finally:
+            self._capture = None
+
+    def entries(self):
+        return self.db.execute("SELECT id, kind, payload FROM records ORDER BY id")
+
     def put_raw(self, content: bytes) -> str:
         digest = hashlib.sha256(content).hexdigest()
         path = self.root / "raw" / digest
@@ -43,6 +75,8 @@ class Store:
         except FileExistsError:
             if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
                 raise ValueError("existing raw blob failed integrity check") from None
+        if self._capture is not None:
+            self._capture.raw_sha256.add(digest)
         return digest
 
     def put(self, records: list[Record]) -> int:
@@ -61,7 +95,12 @@ class Store:
         before = self.db.total_changes
         with self.db:
             self.db.executemany("INSERT OR IGNORE INTO records VALUES (?, ?, ?)", rows)
-        return self.db.total_changes - before
+        inserted = self.db.total_changes - before
+        if self._capture is not None:
+            self._capture.raw_sha256.update(checked)
+            self._capture.record_ids.update(row[0] for row in rows)
+            self._capture.inserted_records += inserted
+        return inserted
 
     def read(self, kind: str, as_of: datetime | None = None, mode: str = "system") -> list:
         if kind not in RECORD_TYPES or mode not in {"system", "source"}:
@@ -72,9 +111,7 @@ class Store:
         for identifier, payload in self.db.execute(
             "SELECT id, payload FROM records WHERE kind = ?", (kind,)
         ):
-            item = RECORD_TYPES[kind].model_validate_json(payload)
-            if record_id(item) != identifier:
-                raise ValueError("normalized record content hash mismatch")
+            item = decode_record(identifier, kind, payload)
             p = item.provenance
             if as_of and (p.available_at > as_of or (mode == "system" and p.retrieved_at > as_of)):
                 continue
@@ -83,10 +120,14 @@ class Store:
 
     def audit(self) -> dict:
         count = 0
-        for kind in RECORD_TYPES:
-            for item in self.read(kind):
-                path = self.root / "raw" / item.provenance.raw_sha256
-                if not path.exists() or hashlib.sha256(path.read_bytes()).hexdigest() != path.name:
+        checked = set()
+        for identifier, kind, payload in self.entries():
+            item = decode_record(identifier, kind, payload)
+            digest = item.provenance.raw_sha256
+            if digest not in checked:
+                path = self.root / "raw" / digest
+                if not path.exists() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
                     raise ValueError("lineage audit failed: missing or corrupt raw blob")
-                count += 1
+                checked.add(digest)
+            count += 1
         return {"records": count, "raw_lineage": "verified"}

@@ -22,8 +22,10 @@
 | Four agent phases | Master spec, roadmap | Research foundation implemented; agent orchestration and LLM integration planned |
 | Risk controls, kill switch and broker isolation | `docs/trading-methodology/` | Execution acceptance requirements; no live order code |
 | Source, timestamp, unit, license, confidence, lineage | `models.Provenance`, `storage.py`, `registry.py` | Validated contracts and raw-to-record audit |
+| Acquisition history and coverage | `acquisition.py`, `quality.py`, `config/quality_policy.yaml` | Per-run manifests and per-stream as-of inventories; revision, missingness, integrity and age checks |
+| Phased development and owner education | `docs/phases.fa.md`, `docs/education/` | Ordered delivery gates, three Persian chapters, glossary and exercises |
 | Raw/bronze/silver/gold/derived architecture | `docs/architecture.md`, `data/*/README.md` | Local store materializes raw and normalized; logical future zones documented |
 | Public/licensed/restricted data | Registry, `export-public`, Git ignore and publication check | Default-deny export and tracked data guard; no commercial datasets committed |
-| Seven initial questions | `config/project.yaml`, master spec | Defaults explicit; instruments/broker/budget need owner selection |
+| Seven initial questions | `config/project.yaml`, master spec | Daily XAU/USD and free personal APIs confirmed; keys pending locally; broker/risk choices deferred |
 
 “Contract” means a validated schema, not an operational data feed. “Planned” means there is no working implementation claimed for that feature. The repo intentionally uses one installable Python package instead of empty top-level directories for every future service.

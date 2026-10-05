@@ -9,6 +9,7 @@ uv sync --frozen
 uv run gold validate-registry
 uv run gold demo
 uv run gold --store local/demo audit
+uv run gold --store local/demo quality --as-of 2024-04-22T22:00:00Z --allow-synthetic
 uv run pytest
 uv run ruff check .
 uv run ruff format --check .
@@ -36,7 +37,14 @@ Use `--price-type futures --contract-expiry YYYY-MM-DD` for individual futures, 
 
 ## FRED macro data
 
-Obtain your own API key from FRED. Set it in the environment; `.env.example` is a template and no automatic dotenv loading occurs. In PowerShell:
+Obtain your own API key from FRED. The preferred local setup is documented in the [Persian source guide](education/03-free-data-setup.fa.md): copy `.env.example` to `local/credentials.env`, fill it locally, and load it explicitly:
+
+```sh
+uv run gold --credentials-file local/credentials.env fetch-fred DFII10 --start 2003-01-01 --end 2026-10-02
+uv run gold runs
+```
+
+There is no automatic dotenv loading. Alternatively, set the key in the environment. In PowerShell:
 
 ```powershell
 $env:FRED_API_KEY = 'YOUR_OWN_KEY'
@@ -77,6 +85,8 @@ Event windows require complete observations; dates with only a research-candidat
 
 ## Failure handling and maintenance
 
-Commands return exit code 2 for invalid input, network failure or rejected rights. HTTP errors never print the request URL containing the FRED key. Check the provider schema after a header error; do not silently map a different report family. `gold audit` detects corrupt or missing raw bytes. Back up the entire local directory together with acquisition metadata; copying just the SQLite file loses raw lineage. Close writers before copying SQLite or use its backup API.
+Commands return exit code 2 for invalid input, network failure or rejected rights. A completed `quality` report with status `fail` returns 3; `pass` and `warning` return 0. HTTP errors never print the request URL containing the FRED key. Check the provider schema after a header error; do not silently map a different report family. `gold audit` detects corrupt or missing raw bytes. Back up the entire local directory together with acquisition metadata; copying just the SQLite file loses raw lineage. Close writers before copying SQLite or use its backup API.
 
-There is no automatic refresh scheduler. Monitor/retry orchestration, persistent quarantine manifests, database migrations, calendar-specific gaps and distributed/concurrent ingestion are follow-up work. Never delete raw records solely to make a quality check pass. Tests are offline; live FRED verification requires an actual key and is not claimed by passing fixtures.
+CLI ingestion commands write per-run manifests under the store's `runs/` directory. `gold runs` lists their status, raw/normalized references and counts. `gold quality` evaluates stream coverage, revisions, missing values, reference age and raw/source integrity at an explicit cutoff. See [quality operations](quality-operations.md) for policy, failure and crash semantics.
+
+There is no automatic refresh scheduler. Monitor/retry orchestration, per-row quarantine/recovery, database migrations, calendar-specific gaps and distributed/concurrent ingestion are follow-up work. Run manifests record failures but do not provide a quarantine or rollback service. Never delete raw records solely to make a quality check pass. Tests are offline; live FRED verification requires an actual key and is not claimed by passing fixtures.

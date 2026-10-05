@@ -25,4 +25,5 @@ jobs:
       - run: uv run gold validate-registry
       - run: uv run gold demo
       - run: uv run gold --store local/demo audit
+      - run: uv run gold --store local/demo quality --as-of 2024-04-22T22:00:00Z --allow-synthetic --output local/demo/quality.json
       - run: uv run python scripts/check_publication.py

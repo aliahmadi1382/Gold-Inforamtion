@@ -1,0 +1,11 @@
+# Data rights and publication policy
+
+Access classes are `OPEN_PUBLIC`, `LICENSED` and `RESTRICTED`. Public visibility does not establish reuse rights. Dataset licenses are distinct from code licensing; the owner has not selected a project software license. Do not infer an MIT or other open-source grant from the public repository.
+
+Every registry entry has a terms link, license reference, redistribution flag and training flag. All real-data redistribution and training flags default to false pending an explicit review. `LICENSED` denotes a source requiring a contract; it does not assert this project holds one. A terms URL is a review pointer, not a verified permission grant. The only approved public records in the initial version are fictional project-generated demonstration fixtures. They must remain clearly marked synthetic and are not authorized training market truth.
+
+The `export-public` command checks all selected observations before writing. It refuses unregistered sources, mismatched record licenses and absent redistribution grants. It cannot certify legal rights merely because an operator changed a YAML flag. Document the actual contract/permission, scope, expiry, attribution, derived-data treatment, caching and ML-training restrictions in a local rights review before any change.
+
+Raw downloads, SQLite databases, normalized market observations and derived real-data results belong under ignored `local/`. The tracked-data CI guard blocks populated data zones and non-allowlisted event/example artifacts; it supplements Git ignore, not a comprehensive DLP or legal audit. Public documents contain original summaries, short factual references and source links rather than copied news corpora or commercial price histories. The supplied user brief is retained as their input, clearly distinguished from validated evidence.
+
+For LBMA/IBA, CME, WGC, news, SGE and other vendors, obtain the relevant dataset terms and owner entitlement before live ingestion or public distribution. Government series also need series-specific checks, particularly when redistributed through a third-party aggregator. Provider availability, coverage and terms can change; record the review date and recheck when acquisition changes.

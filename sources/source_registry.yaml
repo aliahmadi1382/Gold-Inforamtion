@@ -1,0 +1,161 @@
+schema_version: 1.0.0
+reviewed_on: '2026-10-05'
+sources:
+  - source_id: synthetic_demo
+    provider: Gold Market Intelligence test generator
+    url: https://github.com/aliahmadi1382/Gold-Inforamtion
+    layers: [price, macro, positioning]
+    access: public
+    license_status: OPEN_PUBLIC
+    license_id: synthetic-project-fixtures
+    terms_url: https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/sources/licenses.md
+    redistribution_allowed: true
+    training_allowed: false
+    implementation: synthetic
+    coverage: Deterministic fictional observations for software verification only
+    frequency: 1d
+    notes: Never combine with real observations or represent as market history.
+  - source_id: user_price_csv
+    provider: User supplied price provider; configure before real use
+    url: https://github.com/aliahmadi1382/Gold-Inforamtion
+    layers: [price]
+    access: manual
+    license_status: RESTRICTED
+    license_id: unreviewed-user-import
+    terms_url: https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/sources/licenses.md
+    implementation: manual_import
+    coverage: Provider and series specific; no historical coverage claimed
+    frequency: As supplied
+    notes: Copy this entry into a local registry with the actual provider URL and entitlement.
+  - source_id: fred
+    provider: Federal Reserve Bank of St. Louis / upstream series owner
+    url: https://fred.stlouisfed.org/
+    layers: [macro]
+    access: api_key
+    license_status: OPEN_PUBLIC
+    license_id: FRED-series-specific-terms
+    terms_url: https://fred.stlouisfed.org/legal/
+    implementation: implemented
+    coverage: Series dependent; ALFRED vintages where available
+    frequency: Daily, weekly, monthly or quarterly by series
+    notes: Public access is not a blanket redistribution or ML-training license. API key required.
+  - source_id: cftc_legacy
+    provider: Commodity Futures Trading Commission
+    url: https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm
+    layers: [positioning]
+    access: public
+    license_status: OPEN_PUBLIC
+    license_id: CFTC-public-data-review-required
+    terms_url: https://www.cftc.gov/WebPolicy/index.htm
+    implementation: manual_import
+    coverage: Legacy futures only archives from 1986; early frequency differs
+    frequency: Weekly in modern reports; pre-1992 archives include mid/month-end
+    notes: Gold code 088691. Annual CSV parser implemented. Release time defaults to retrieval.
+  - source_id: cftc_disaggregated
+    provider: Commodity Futures Trading Commission
+    url: https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalViewable/index.htm
+    layers: [positioning]
+    access: public
+    license_status: OPEN_PUBLIC
+    license_id: CFTC-public-data-review-required
+    terms_url: https://www.cftc.gov/WebPolicy/index.htm
+    implementation: planned
+    coverage: Published since September 2009; historical backfill includes June 2006 onward
+    frequency: Weekly
+    notes: Keep producer, swap dealer, managed money and other reportable categories separate.
+  - source_id: lbma_iba
+    provider: ICE Benchmark Administration / LBMA
+    url: https://www.lbma.org.uk/prices-and-data/lbma-gold-price
+    layers: [price]
+    access: licensed
+    license_status: LICENSED
+    license_id: IBA-contract-required
+    terms_url: https://www.ice.com/iba/lbma-gold-price
+    implementation: planned
+    coverage: Contract dependent; 1919 is a historical milestone, not an API coverage claim
+    frequency: Auction benchmarks; AM and PM must remain separate
+    notes: No entitlement configured. No automatic benchmark scraping or redistribution.
+  - source_id: wgc
+    provider: World Gold Council and attributed data suppliers
+    url: https://www.gold.org/goldhub/data
+    layers: [price, central_banks, etf, physical]
+    access: manual
+    license_status: RESTRICTED
+    license_id: WGC-dataset-specific-review
+    terms_url: https://www.gold.org/terms-and-conditions
+    implementation: planned
+    coverage: Price averages from 1978; each demand, reserve and ETF dataset has its own coverage
+    frequency: Dataset dependent; weekly updates or monthly/quarterly releases
+    notes: Historical LBMA data access changed on 2025-03-18. Do not infer redistribution rights.
+  - source_id: cme
+    provider: CME Group / COMEX
+    url: https://www.cmegroup.com/markets/metals/precious/gold-futures.html
+    layers: [price, options]
+    access: licensed
+    license_status: LICENSED
+    license_id: CME-market-data-contract-required
+    terms_url: https://www.cmegroup.com/market-data/license-data.html
+    implementation: planned
+    coverage: Product and purchased dataset dependent
+    frequency: Tick, book, intraday and settlement by contract
+    notes: GC 100 troy ounces; MGC 10. No live, options-chain or order-book adapter installed.
+  - source_id: bls
+    provider: US Bureau of Labor Statistics
+    url: https://www.bls.gov/schedule/news_release/
+    layers: [macro, calendar]
+    access: public
+    license_status: OPEN_PUBLIC
+    license_id: BLS-public-data-review-required
+    terms_url: https://www.bls.gov/bls/linksite.htm
+    implementation: planned
+    coverage: CPI, employment, wages, JOLTS and release schedules; series dependent
+    frequency: Monthly and scheduled events
+    notes: America/New_York release times require daylight-saving-aware UTC conversion.
+  - source_id: bea
+    provider: US Bureau of Economic Analysis
+    url: https://www.bea.gov/data
+    layers: [macro, calendar]
+    access: public
+    license_status: OPEN_PUBLIC
+    license_id: BEA-public-data-review-required
+    terms_url: https://www.bea.gov/about/policies-and-information
+    implementation: planned
+    coverage: GDP and PCE; release and vintage dependent
+    frequency: Monthly and quarterly
+    notes: Preserve advance, second, third estimates and benchmark revisions.
+  - source_id: federal_reserve
+    provider: Board of Governors of the Federal Reserve System
+    url: https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm
+    layers: [macro, calendar, news]
+    access: public
+    license_status: OPEN_PUBLIC
+    license_id: Federal-Reserve-public-content-review
+    terms_url: https://www.federalreserve.gov/disclaimer.htm
+    implementation: planned
+    coverage: Policy releases, FOMC schedules and statements; document dependent
+    frequency: Scheduled and unscheduled releases
+    notes: Policy rate observations are not market-implied future rate probabilities.
+  - source_id: sge
+    provider: Shanghai Gold Exchange
+    url: https://en.sge.com.cn/
+    layers: [price, physical]
+    access: manual
+    license_status: RESTRICTED
+    license_id: SGE-terms-review-required
+    terms_url: https://en.sge.com.cn/
+    implementation: planned
+    coverage: Product and regional series dependent
+    frequency: Trading-day dependent
+    notes: Preserve CNY/gram units, local timezone, purity and FX conversion provenance.
+  - source_id: news_vendor
+    provider: News provider to be selected
+    url: https://www.reuters.com/
+    layers: [news]
+    access: licensed
+    license_status: LICENSED
+    license_id: news-feed-contract-required
+    terms_url: https://www.reuters.com/info-pages/terms-of-use/
+    implementation: planned
+    coverage: Contract dependent; no licensed feed configured
+    frequency: Event driven
+    notes: Link to stories; retain publication and event times. No full-text corpus committed.

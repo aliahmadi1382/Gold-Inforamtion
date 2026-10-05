@@ -1,0 +1,16 @@
+schema_version: 1.0.0
+phase: research
+history: earliest_reliable_evidence_partitioned_by_regime
+initial_instrument: XAUUSD
+initial_timeframe: 1d
+architecture: hybrid_data_models_and_evidence_grounded_reasoning
+default_replay_mode: system
+live_execution: false
+broker: null
+data_budget: null
+# Design defaults, not hidden runtime flags. CLI parameters are explicit in v0.1.
+pending_owner_decisions:
+  - Multi-timeframe and additional instrument priorities
+  - Provider entitlements, commercial data budget and actual price feed
+  - Broker and execution venue if execution is later commissioned
+  - Risk limits and validation criteria before any paper/live strategy

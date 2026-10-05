@@ -1,0 +1,25 @@
+# FRED series identifiers; an acquisition shortlist, not a claim of downloaded coverage.
+# Units are the untransformed units (units=lin). Verify metadata when adding series.
+series:
+  DFF: {unit: percent, currency: null, concept: effective_fed_funds, frequency: daily}
+  DGS2: {unit: percent, currency: null, concept: treasury_2y, frequency: daily}
+  DGS5: {unit: percent, currency: null, concept: treasury_5y, frequency: daily}
+  DGS10: {unit: percent, currency: null, concept: treasury_10y, frequency: daily}
+  DGS30: {unit: percent, currency: null, concept: treasury_30y, frequency: daily}
+  DFII10: {unit: percent, currency: null, concept: real_yield_10y, frequency: daily}
+  T10YIE: {unit: percent, currency: null, concept: breakeven_inflation_10y, frequency: daily}
+  DTWEXBGS: {unit: index_jan2006_100, currency: null, concept: broad_trade_weighted_usd_not_DXY, frequency: daily}
+  DEXUSEU: {unit: usd_per_eur, currency: USD, concept: eurusd, frequency: daily}
+  DEXJPUS: {unit: jpy_per_usd, currency: JPY, concept: usdjpy, frequency: daily}
+  DEXCHUS: {unit: cny_per_usd, currency: CNY, concept: usdcny, frequency: daily}
+  CPIAUCSL: {unit: index_1982_1984_100_sa, currency: null, concept: cpi, frequency: monthly}
+  CPILFESL: {unit: index_1982_1984_100_sa, currency: null, concept: core_cpi, frequency: monthly}
+  PCEPI: {unit: index_2017_100_sa, currency: null, concept: pce_prices, frequency: monthly}
+  PCEPILFE: {unit: index_2017_100_sa, currency: null, concept: core_pce_prices, frequency: monthly}
+  PAYEMS: {unit: thousands_persons_sa, currency: null, concept: payroll_level_not_monthly_change, frequency: monthly}
+  UNRATE: {unit: percent_sa, currency: null, concept: unemployment, frequency: monthly}
+  ICSA: {unit: persons_sa, currency: null, concept: initial_claims, frequency: weekly}
+  CES0500000003: {unit: usd_per_hour_sa, currency: USD, concept: average_hourly_earnings_private, frequency: monthly}
+  JTSJOL: {unit: thousands_sa, currency: null, concept: job_openings, frequency: monthly}
+  GDPC1: {unit: billions_chained_2017_usd_saar, currency: USD, concept: real_gdp_level, frequency: quarterly}
+  RSAFS: {unit: millions_usd_sa, currency: USD, concept: retail_sales, frequency: monthly}

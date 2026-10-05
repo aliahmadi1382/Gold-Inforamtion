@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "minLength": 1,
+      "title": "Event Id",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "start_date": {
+      "format": "date",
+      "title": "Start Date",
+      "type": "string"
+    },
+    "end_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "End Date"
+    },
+    "date_precision": {
+      "enum": [
+        "day",
+        "month",
+        "year",
+        "range"
+      ],
+      "title": "Date Precision",
+      "type": "string"
+    },
+    "regime": {
+      "minLength": 1,
+      "title": "Regime",
+      "type": "string"
+    },
+    "source_urls": {
+      "items": {
+        "format": "uri",
+        "maxLength": 2083,
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Urls",
+      "type": "array"
+    },
+    "verification": {
+      "enum": [
+        "verified",
+        "research_candidate"
+      ],
+      "title": "Verification",
+      "type": "string"
+    },
+    "notes": {
+      "minLength": 1,
+      "title": "Notes",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "title",
+    "start_date",
+    "date_precision",
+    "regime",
+    "source_urls",
+    "verification",
+    "notes"
+  ],
+  "title": "HistoricalEvent",
+  "type": "object"
+}

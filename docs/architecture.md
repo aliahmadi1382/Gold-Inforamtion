@@ -1,0 +1,29 @@
+# Architecture
+
+```mermaid
+flowchart LR
+    P[Provider / entitled local file] --> R[Raw bytes + SHA-256]
+    R --> A[Adapter and normalization]
+    A --> V[Typed validation]
+    V --> S[SQLite versioned records]
+    S --> T[As-of eligibility and revision selection]
+    T --> F[Causal technical features]
+    F --> M[Evidence-linked research snapshot]
+    S --> E[Descriptive event windows]
+    S --> L[Explicit rights check]
+    L --> X[Public export]
+```
+
+`src/gold_intelligence` groups actual code by responsibility: contracts (`models`), rights (`registry`), immutable raw/transactional normalization (`storage`), adapters (`ingestion`), features and event research (`analysis`), market state (`snapshot`), and executable commands (`cli`). This replaces empty `ingestion/lbma`, `agents/*` and similar directories in the original sketch with an installable package. Future integrations belong here or in documented services when they exist.
+
+## Storage and reproducibility
+
+Default runtime path is `local/market`, ignored by Git. Raw filenames equal their SHA-256. SQLite rows contain a content hash ID, record kind and canonical JSON; input metadata and retrieval time form part of identity. Inserting the exact same record is idempotent. A later retrieval is a new provenance version; snapshot selection collapses price revisions by bar time. A conflicting same-time revision fails instead of selecting arbitrarily. One import validates the complete batch before a single database transaction. Failed imports may retain raw bytes for inspection but no partial normalized batch.
+
+Logical zones are raw (original bytes), bronze (parsed provider records), silver (normalized contracts), gold (snapshots), derived (versioned features/research) and events (cited metadata). Release 0.1 materializes raw blobs and silver records in the local store; bronze parsing is in memory and snapshot output is explicit. It does not pretend to operate a distributed lakehouse. Large data later moves to partitioned Parquet/object storage with manifest hashes and migrations.
+
+Each snapshot records every contributing price/observation record ID, feature version and parameters. IDs link to SQLite payloads, then raw hash and row locator, then source URL. `gold audit` verifies referenced bytes. Data and derived exports outside the repo must preserve these references and source rights. Feature configuration/code changes require a feature-version bump and regression checks.
+
+## Current operational boundaries
+
+Offline CI has no credentials. FRED is the only network adapter; bounded requests, finite response size and explicit errors keep failures visible. CFTC accepts an official locally acquired CSV. No cron service, broker, API server, LLM, vector store or dashboard is running. SQLite reads are intended for research-sized batches; scalable indexing/partitioning and a migration framework belong to later releases.

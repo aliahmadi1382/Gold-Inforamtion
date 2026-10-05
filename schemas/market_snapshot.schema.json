@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "replay_mode": {
+      "enum": [
+        "system",
+        "source"
+      ],
+      "title": "Replay Mode",
+      "type": "string"
+    },
+    "instrument": {
+      "title": "Instrument",
+      "type": "string"
+    },
+    "timeframe": {
+      "title": "Timeframe",
+      "type": "string"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "price_status": {
+      "enum": [
+        "fresh",
+        "stale"
+      ],
+      "title": "Price Status",
+      "type": "string"
+    },
+    "technical": {
+      "additionalProperties": true,
+      "title": "Technical",
+      "type": "object"
+    },
+    "context": {
+      "additionalProperties": true,
+      "title": "Context",
+      "type": "object"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "evidence_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "feature_version": {
+      "const": "technical_v1",
+      "default": "technical_v1",
+      "title": "Feature Version",
+      "type": "string"
+    },
+    "analysis_scope": {
+      "const": "research_only",
+      "default": "research_only",
+      "title": "Analysis Scope",
+      "type": "string"
+    },
+    "decision": {
+      "const": "NO_TRADE",
+      "default": "NO_TRADE",
+      "title": "Decision",
+      "type": "string"
+    },
+    "decision_reason": {
+      "default": "No validated trading strategy or execution adapter is installed.",
+      "title": "Decision Reason",
+      "type": "string"
+    },
+    "parameters": {
+      "additionalProperties": true,
+      "title": "Parameters",
+      "type": "object"
+    }
+  },
+  "required": [
+    "as_of",
+    "replay_mode",
+    "instrument",
+    "timeframe",
+    "synthetic",
+    "price_status",
+    "technical",
+    "context",
+    "warnings",
+    "evidence_ids"
+  ],
+  "title": "MarketSnapshot",
+  "type": "object"
+}

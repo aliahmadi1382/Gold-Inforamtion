@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "dataset": {
+          "minLength": 1,
+          "title": "Dataset",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "availability_basis": {
+          "enum": [
+            "verified_release",
+            "retrieval_time",
+            "synthetic"
+          ],
+          "title": "Availability Basis",
+          "type": "string"
+        },
+        "original_timestamp": {
+          "minLength": 1,
+          "title": "Original Timestamp",
+          "type": "string"
+        },
+        "original_timezone": {
+          "minLength": 1,
+          "title": "Original Timezone",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "transformations": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Transformations",
+          "type": "array"
+        },
+        "version": {
+          "default": "1.0.0",
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        },
+        "license_status": {
+          "enum": [
+            "OPEN_PUBLIC",
+            "LICENSED",
+            "RESTRICTED"
+          ],
+          "title": "License Status",
+          "type": "string"
+        },
+        "license_id": {
+          "minLength": 1,
+          "title": "License Id",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "raw_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Raw Sha256",
+          "type": "string"
+        },
+        "raw_record_id": {
+          "minLength": 1,
+          "title": "Raw Record Id",
+          "type": "string"
+        },
+        "synthetic": {
+          "default": false,
+          "title": "Synthetic",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source_id",
+        "source_url",
+        "provider",
+        "dataset",
+        "observed_at",
+        "available_at",
+        "retrieved_at",
+        "availability_basis",
+        "original_timestamp",
+        "original_timezone",
+        "unit",
+        "license_status",
+        "license_id",
+        "confidence",
+        "raw_sha256",
+        "raw_record_id"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "kind": {
+      "const": "news_event",
+      "default": "news_event",
+      "title": "Kind",
+      "type": "string"
+    },
+    "event_id": {
+      "minLength": 1,
+      "title": "Event Id",
+      "type": "string"
+    },
+    "headline": {
+      "minLength": 1,
+      "title": "Headline",
+      "type": "string"
+    },
+    "event_time": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Event Time"
+    },
+    "published_at": {
+      "format": "date-time",
+      "title": "Published At",
+      "type": "string"
+    },
+    "entities": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Entities",
+      "type": "array"
+    },
+    "channels": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Channels",
+      "type": "array"
+    },
+    "verification": {
+      "enum": [
+        "unverified",
+        "primary_source",
+        "corroborated"
+      ],
+      "title": "Verification",
+      "type": "string"
+    },
+    "related_story_urls": {
+      "default": [],
+      "items": {
+        "format": "uri",
+        "maxLength": 2083,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Related Story Urls",
+      "type": "array"
+    },
+    "summary": {
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    }
+  },
+  "required": [
+    "provenance",
+    "event_id",
+    "headline",
+    "event_time",
+    "published_at",
+    "verification",
+    "summary"
+  ],
+  "title": "NewsEvent",
+  "type": "object"
+}

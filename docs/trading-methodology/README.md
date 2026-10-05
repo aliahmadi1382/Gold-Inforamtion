@@ -1,0 +1,9 @@
+# Validation and phase gates
+
+The current output is research-only and `NO_TRADE`; it has no entry, stop, target, calibrated trade confidence or position-size recommendation. Trend heuristics are not a validated strategy. No broker credentials are consumed by this code.
+
+Before a decision engine, define the exact instrument, signal and holding period; split time chronologically; fit preprocessing/models on training data only; use walk-forward validation and purge overlapping labels; measure costs, spread, slippage, funding, contract rolls and latency. Compare to explicit baselines, report drawdowns and uncertainty, and record failed experiments and selection bias. Synthetic fixture success verifies software behavior only.
+
+Before execution, require independently reviewed paper and shadow results, signed/versioned strategy configuration, instrument-aware tick/lot/contract arithmetic, account state reconciliation, stale-feed handling and duplicate-order protection. A deterministic risk engine must reject excessive per-trade risk, total exposure, concentration, leverage or daily loss; support an operator kill switch; fail closed on missing account state; and monitor pending orders and exits. Thresholds must come from the owner, not arbitrary numbers invented during scaffolding.
+
+An LLM may summarize evidence and propose a structured research hypothesis. It must not hold order credentials, choose unchecked size, bypass limits or turn unverified news into broker instructions. Actual LONG/SHORT decisions, calibrated confidence and execution services remain later phases in the roadmap.

@@ -1,0 +1,275 @@
+[
+  {
+    "event_id": "first-london-fixing-1919",
+    "title": "First post-war London gold fixing",
+    "start_date": "1919-09-12",
+    "end_date": null,
+    "date_precision": "day",
+    "regime": "london_fixing",
+    "source_urls": [
+      "https://www.lbma.org.uk/wonders-of-gold/items/the-first-gold-fixing"
+    ],
+    "verification": "verified",
+    "notes": "Historical benchmark milestone; no price reaction is inferred or stored."
+  },
+  {
+    "event_id": "two-tier-gold-1968",
+    "title": "Two-tier gold market transition",
+    "start_date": "1968-03-01",
+    "end_date": "1968-03-31",
+    "date_precision": "month",
+    "regime": "two_tier_transition",
+    "source_urls": [
+      "https://www.lbma.org.uk/wonders-of-gold/items/march-1968-and-the-london-gold-fixing"
+    ],
+    "verification": "verified",
+    "notes": "Month precision only; first day is a period label, not an event-study instant."
+  },
+  {
+    "event_id": "nixon-convertibility-1971",
+    "title": "US dollar-gold convertibility suspended",
+    "start_date": "1971-08-15",
+    "end_date": null,
+    "date_precision": "day",
+    "regime": "convertibility_transition",
+    "source_urls": [
+      "https://www.federalreservehistory.org/essays/gold-convertibility-ends"
+    ],
+    "verification": "verified",
+    "notes": "Date established by primary historical account; intraday announcement time and reactions require separate evidence."
+  },
+  {
+    "event_id": "candidate-oil-crisis-1973",
+    "title": "Oil crisis",
+    "start_date": "1973-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-inflation-volcker-1979",
+    "title": "Inflation and Volcker policy",
+    "start_date": "1979-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-black-monday-1987",
+    "title": "Black Monday",
+    "start_date": "1987-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-gulf-war-1990",
+    "title": "Gulf War",
+    "start_date": "1990-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-asian-crisis-1997",
+    "title": "Asian financial crisis",
+    "start_date": "1997-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-ltcm-1998",
+    "title": "LTCM crisis",
+    "start_date": "1998-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-dotcom-2000",
+    "title": "Dot-com period",
+    "start_date": "2000-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-september-attacks-2001",
+    "title": "September 11 attacks",
+    "start_date": "2001-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-global-financial-crisis-2008",
+    "title": "Global financial crisis",
+    "start_date": "2008-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-eurozone-2011",
+    "title": "Eurozone crisis",
+    "start_date": "2011-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-taper-tantrum-2013",
+    "title": "Taper tantrum",
+    "start_date": "2013-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-china-concerns-2015",
+    "title": "China growth and currency concerns",
+    "start_date": "2015-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-brexit-2016",
+    "title": "Brexit",
+    "start_date": "2016-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-covid-2020",
+    "title": "COVID-19 market stress",
+    "start_date": "2020-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-russia-ukraine-2022",
+    "title": "Russia-Ukraine war",
+    "start_date": "2022-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-banking-stress-2023",
+    "title": "Banking stress",
+    "start_date": "2023-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-geopolitics-central-banks-2024",
+    "title": "Geopolitics and central-bank demand",
+    "start_date": "2024-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  },
+  {
+    "event_id": "candidate-recent-research-2025",
+    "title": "2025-2026 research topics",
+    "start_date": "2025-01-01",
+    "end_date": null,
+    "date_precision": "year",
+    "regime": "to_be_researched",
+    "source_urls": [
+      "https://github.com/aliahmadi1382/Gold-Inforamtion/blob/main/docs/specification/original-brief.md"
+    ],
+    "verification": "research_candidate",
+    "notes": "Topic proposed in the supplied brief only. January 1 is a year label, not an asserted event date. Establish primary evidence, precise timing and study boundaries before analysis."
+  }
+]

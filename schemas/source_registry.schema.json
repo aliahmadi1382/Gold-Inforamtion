@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Url",
+          "type": "string"
+        },
+        "layers": {
+          "items": {
+            "enum": [
+              "price",
+              "structure",
+              "positioning",
+              "macro",
+              "central_banks",
+              "etf",
+              "physical",
+              "news",
+              "calendar",
+              "history",
+              "options"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Layers",
+          "type": "array"
+        },
+        "access": {
+          "enum": [
+            "public",
+            "api_key",
+            "licensed",
+            "manual"
+          ],
+          "title": "Access",
+          "type": "string"
+        },
+        "license_status": {
+          "enum": [
+            "OPEN_PUBLIC",
+            "LICENSED",
+            "RESTRICTED"
+          ],
+          "title": "License Status",
+          "type": "string"
+        },
+        "license_id": {
+          "minLength": 1,
+          "title": "License Id",
+          "type": "string"
+        },
+        "terms_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Terms Url",
+          "type": "string"
+        },
+        "redistribution_allowed": {
+          "default": false,
+          "title": "Redistribution Allowed",
+          "type": "boolean"
+        },
+        "training_allowed": {
+          "default": false,
+          "title": "Training Allowed",
+          "type": "boolean"
+        },
+        "implementation": {
+          "enum": [
+            "implemented",
+            "manual_import",
+            "planned",
+            "synthetic"
+          ],
+          "title": "Implementation",
+          "type": "string"
+        },
+        "coverage": {
+          "minLength": 1,
+          "title": "Coverage",
+          "type": "string"
+        },
+        "frequency": {
+          "minLength": 1,
+          "title": "Frequency",
+          "type": "string"
+        },
+        "notes": {
+          "minLength": 1,
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "provider",
+        "url",
+        "layers",
+        "access",
+        "license_status",
+        "license_id",
+        "terms_url",
+        "implementation",
+        "coverage",
+        "frequency",
+        "notes"
+      ],
+      "title": "Source",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "reviewed_on": {
+      "minLength": 1,
+      "title": "Reviewed On",
+      "type": "string"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "title": "Sources",
+      "type": "array"
+    }
+  },
+  "required": [
+    "reviewed_on",
+    "sources"
+  ],
+  "title": "Registry",
+  "type": "object"
+}

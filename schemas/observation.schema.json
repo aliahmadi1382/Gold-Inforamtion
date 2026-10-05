@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "provider": {
+          "minLength": 1,
+          "title": "Provider",
+          "type": "string"
+        },
+        "dataset": {
+          "minLength": 1,
+          "title": "Dataset",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "availability_basis": {
+          "enum": [
+            "verified_release",
+            "retrieval_time",
+            "synthetic"
+          ],
+          "title": "Availability Basis",
+          "type": "string"
+        },
+        "original_timestamp": {
+          "minLength": 1,
+          "title": "Original Timestamp",
+          "type": "string"
+        },
+        "original_timezone": {
+          "minLength": 1,
+          "title": "Original Timezone",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "transformations": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Transformations",
+          "type": "array"
+        },
+        "version": {
+          "default": "1.0.0",
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        },
+        "license_status": {
+          "enum": [
+            "OPEN_PUBLIC",
+            "LICENSED",
+            "RESTRICTED"
+          ],
+          "title": "License Status",
+          "type": "string"
+        },
+        "license_id": {
+          "minLength": 1,
+          "title": "License Id",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "raw_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Raw Sha256",
+          "type": "string"
+        },
+        "raw_record_id": {
+          "minLength": 1,
+          "title": "Raw Record Id",
+          "type": "string"
+        },
+        "synthetic": {
+          "default": false,
+          "title": "Synthetic",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source_id",
+        "source_url",
+        "provider",
+        "dataset",
+        "observed_at",
+        "available_at",
+        "retrieved_at",
+        "availability_basis",
+        "original_timestamp",
+        "original_timezone",
+        "unit",
+        "license_status",
+        "license_id",
+        "confidence",
+        "raw_sha256",
+        "raw_record_id"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Scalar series, distinguished by metric and explicit dimensions.",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "kind": {
+      "const": "observation",
+      "default": "observation",
+      "title": "Kind",
+      "type": "string"
+    },
+    "layer": {
+      "enum": [
+        "price",
+        "structure",
+        "positioning",
+        "macro",
+        "central_banks",
+        "etf",
+        "physical",
+        "news",
+        "calendar",
+        "history",
+        "options"
+      ],
+      "title": "Layer",
+      "type": "string"
+    },
+    "series_id": {
+      "minLength": 1,
+      "title": "Series Id",
+      "type": "string"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Value"
+    },
+    "dimensions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Dimensions",
+      "type": "object"
+    },
+    "vintage_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Vintage Date"
+    }
+  },
+  "required": [
+    "provenance",
+    "layer",
+    "series_id",
+    "value"
+  ],
+  "title": "Observation",
+  "type": "object"
+}

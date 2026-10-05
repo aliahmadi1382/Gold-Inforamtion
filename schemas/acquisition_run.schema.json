@@ -21,7 +21,8 @@
         "fetch-fred",
         "fetch-alpha-gold",
         "fetch-fred-reviewed",
-        "fetch-worldbank-gold"
+        "fetch-worldbank-gold",
+        "import-release-evidence"
       ],
       "title": "Operation",
       "type": "string"

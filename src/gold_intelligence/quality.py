@@ -258,7 +258,12 @@ def assess(
         resolved.sort(key=lambda record: record.provenance.observed_at)
         first, last = resolved[0].provenance, resolved[-1].provenance
         age = (as_of - last.observed_at).total_seconds() / 3600
-        age_key = f"series:{identity.get('series_id', '')}"
+        # A calendar event's reference month is not the age of an economic measurement.
+        age_key = (
+            f"series:{identity.get('series_id', '')}"
+            if identity["kind"] == "observation"
+            else identity["kind"]
+        )
         limit = policy.max_age_hours.get(age_key, policy.max_age_hours.get(identity["kind"]))
         if limit is not None and age > limit:
             issue(

@@ -39,7 +39,7 @@ For future real-time snapshots add quote freshness, clock skew, exchange session
 1. **Research:** auditable acquisition, rights, normalization, history, methods and reproducible features. Delivered foundation; real-data coverage remains source dependent.
 2. **Analyst:** verified feed integrations, schedule/release ingestion, freshness per series, correlations and regimes evaluated across time, evidence-linked narratives. Missing evidence and conflicting signals remain visible.
 3. **Decision:** validated strategy produces LONG/SHORT/NO TRADE, entry/stop/target, instrument-aware size, costs, risk/reward, calibrated confidence, invalidation and evidence. Requires out-of-sample testing and paper/shadow operation.
-4. **Execution:** deterministic risk service, broker adapter, order reconciliation, exposure limits, maximum daily loss, kill switch and monitored exits. No LLM has order credentials or direct order authority. No such service is installed in 0.4.
+4. **Execution:** deterministic risk service, broker adapter, order reconciliation, exposure limits, maximum daily loss, kill switch and monitored exits. No LLM has order credentials or direct order authority. No such service is installed in 0.5.
 
 ## Owner choices and defaults
 
@@ -54,3 +54,5 @@ The offline demo runs without a key; raw lineage verifies; invalid OHLC and time
 Release 0.3 adds successful account-specific acquisition, a distinct daily-close contract, complete saved-byte reconciliation and visible session/unit/calendar limitations. The daily-close readiness profile does not satisfy the OHLC profile. Historical release verification, an independent price comparison and trading-session methodology remain later gates.
 
 Release 0.4 adds seven metadata-checked FRED histories, conservative cutoff-aware macro selection, a three-period vintage example, a distinct monthly World Bank gold reference and monthly comparison. All acquired records reconcile to saved rows/cells. The monthly comparison does not establish daily price accuracy or upstream supplier independence. Source-defined gold units/session/weekend methodology and verified historical release timestamps remain acceptance gates before daily return/backtest research. See [phase-3 evidence](../source-methodology/history-acquisition.fa.md).
+
+Release 0.5 progresses independent calendar/reporting work while daily price methodology remains open. Reviewed BLS timing notes and archived embargo headers never create actual values or first-release availability. The Persian data-status brief is an initial reporting capability, not a completed analyst or decision system. See [timing evidence and limits](../source-methodology/release-evidence.fa.md).

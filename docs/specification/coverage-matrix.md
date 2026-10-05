@@ -18,14 +18,15 @@
 | ETF holdings, inflows/outflows | Observation contract, source registry | Fund and metric dimensions required; acquisition planned |
 | Mine, recycling, jewellery, bars/coins, technology, premiums | Observation contract, master spec | Country/sector/unit definitions; acquisition planned |
 | News vs event, geopolitics, transmission channels | `models.NewsEvent`, methodology | Validated contract; feed, deduplication and NLP planned |
-| Calendar, consensus, previous, actual, surprise | `models.CalendarRelease` | Release and consensus-time validation; live connector planned |
+| Calendar, consensus, previous, actual, surprise | `release_calendar.py`, `models.CalendarRelease` | Reviewed BLS schedule/header import and timezone-aware upcoming view; actual values, consensus, surprise and live refresh still absent |
 | Historical event reactions, drawdown, recovery | `analysis.event_study`, `data/events/` | Single-stream descriptive windows implemented; cross-asset study planned |
 | Full market-state representation | `snapshot.py`, JSON Schema | Technical and numeric context; missing layers visible; research-only output |
 | Four agent phases | Master spec, roadmap | Research foundation implemented; agent orchestration and LLM integration planned |
 | Risk controls, kill switch and broker isolation | `docs/trading-methodology/` | Execution acceptance requirements; no live order code |
 | Source, timestamp, unit, license, confidence, lineage | `models.Provenance`, `storage.py`, `registry.py` | Validated contracts and raw-to-record audit |
 | Acquisition history and coverage | `acquisition.py`, `quality.py`, `config/quality_policy.yaml` | Per-run manifests and per-stream as-of inventories; revision, missingness, integrity and age checks |
-| Phased development and owner education | `docs/phases.fa.md`, `docs/education/` | Ordered delivery gates, five Persian chapters, glossary and exercises |
+| Phased development and owner education | `docs/phases.fa.md`, `docs/education/` | Dependency-aware deliveries, six Persian chapters, glossary and exercises |
+| Readable local research status | `brief.py`, `gold research-brief` | Persian Markdown plus evidence JSON; macro and calendar states, missingness and limitations; no trading narrative or recommendation |
 | Raw/bronze/silver/gold/derived architecture | `docs/architecture.md`, `data/*/README.md` | Local store materializes raw and normalized; logical future zones documented |
 | Public/licensed/restricted data | Registry, `export-public`, Git ignore and publication check | Default-deny export and tracked data guard; no commercial datasets committed |
 | Seven initial questions | `config/project.yaml`, master spec | Daily XAU/USD and free personal APIs confirmed; keys supplied locally; broker/risk choices deferred |

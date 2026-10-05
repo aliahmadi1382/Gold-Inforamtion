@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "TimingEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "enum": [
+            "CPIAUCSL",
+            "UNRATE"
+          ],
+          "title": "Series Id",
+          "type": "string"
+        },
+        "reference_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "announced_at": {
+          "format": "date-time",
+          "title": "Announced At",
+          "type": "string"
+        },
+        "evidence_note": {
+          "maxLength": 1500,
+          "minLength": 1,
+          "title": "Evidence Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "series_id",
+        "reference_period",
+        "announced_at",
+        "evidence_note"
+      ],
+      "title": "TimingEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_url": {
+      "format": "uri",
+      "maxLength": 2083,
+      "minLength": 1,
+      "title": "Source Url",
+      "type": "string"
+    },
+    "captured_at": {
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "capture_method": {
+      "const": "reviewed_web_extract",
+      "default": "reviewed_web_extract",
+      "title": "Capture Method",
+      "type": "string"
+    },
+    "timing_basis": {
+      "enum": [
+        "schedule",
+        "archive_header"
+      ],
+      "title": "Timing Basis",
+      "type": "string"
+    },
+    "source_timezone": {
+      "const": "America/New_York",
+      "default": "America/New_York",
+      "title": "Source Timezone",
+      "type": "string"
+    },
+    "timezone_evidence": {
+      "minLength": 1,
+      "title": "Timezone Evidence",
+      "type": "string"
+    },
+    "caveats": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Caveats",
+      "type": "array"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/TimingEntry"
+      },
+      "maxItems": 256,
+      "minItems": 1,
+      "title": "Entries",
+      "type": "array"
+    }
+  },
+  "required": [
+    "source_url",
+    "captured_at",
+    "timing_basis",
+    "timezone_evidence",
+    "entries"
+  ],
+  "title": "ReleaseEvidence",
+  "type": "object"
+}

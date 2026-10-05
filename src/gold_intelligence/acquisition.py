@@ -35,6 +35,7 @@ SAFE_PARAMETERS = {
     "start",
     "end",
     "vintage",
+    "reviewed",
 }
 
 
@@ -49,6 +50,7 @@ class AcquisitionRun(Contract):
         "fetch-alpha-gold",
         "fetch-fred-reviewed",
         "fetch-worldbank-gold",
+        "import-release-evidence",
     ]
     application_version: NonEmpty
     started_at: Timestamp

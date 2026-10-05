@@ -1,4 +1,4 @@
-# Acquisition and quality operations (0.4)
+# Acquisition and quality operations (0.5)
 
 CLI ingestion now writes a manifest to `STORE/runs/<run_id>.json` before invoking the adapter. Successful or failed completion replaces the manifest atomically with finish time, application version, safe parameters, raw hashes, normalized IDs and inserted count. An identical re-import can reference records while inserting zero new records. Failures retain acquired raw evidence. Abrupt termination can leave `running`; never infer success from it. These files are local and are not a tamper-proof signing system or automatic retry service.
 
@@ -21,3 +21,5 @@ Exit codes: **0** for pass or warnings, **3** for a completed quality report wit
 Explicit credentials loading uses `--credentials-file local/credentials.env`. Only FRED_API_KEY and ALPHAVANTAGE_API_KEY are supported; values are scoped to the command and restored afterward. No shell expressions are evaluated. `fetch-alpha-gold` uses the same acquisition trace as the other ingestion commands and makes a single request without automatic retries.
 
 Quality report schema 1.1 adds `date_only_prices` and `weekend_date_labels` to stream inventories. Daily-close data triggers `DATE_ONLY_PRICE`; an instrument-convention unit triggers `UNIT_INFERRED`; retained Saturday/Sunday labels trigger `WEEKEND_DATE_LABELS`. These are explicit limitations, not requests to discard rows. `config/quality_daily_close.yaml` is a separate onboarding profile; it does not weaken the default OHLC policy. `scripts/inspect_onboarding.py` additionally verifies all stored gold/FRED values and dates against raw pointers, checks that each acquired raw row is represented, and records yearly calendar/null counts without another network request. Reconciliation failure returns 3. It does not establish independent price accuracy or historical release instants.
+
+Release 0.5 keeps `series:<id>` age overrides specific to scalar observations. A CPI calendar event does not inherit the measurement-age limit of CPIAUCSL; calendar evidence freshness is computed from its reviewed capture time in `calendar-context`. `research-brief` returns 3 on failed quality, 0 on pass/warnings. Recorded schedules and archive embargo headers never supply actual release timestamps or change FRED observation availability.

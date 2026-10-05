@@ -97,6 +97,23 @@ The World Bank adapter downloads the pinned, reviewed workbook URL in `world_ban
 
 `scripts/inspect_history.py` makes no network calls. It performs raw-row/cell reconciliation, acquisition-blob hash checks including metadata, unique-period inventories, current and historical cutoff checks, a vintage comparison and the monthly diagnostic. The default output is `local/market/history-report.json`; the default quality policy is `config/quality_history.yaml`. It can take a few minutes on a full local history because integrity checks read all records. Warnings about an intentionally old vintage or retired methodology stream are not evidence that current macro series are stale. The [phase-3 note](source-methodology/history-acquisition.fa.md) records actual coverage and open gates.
 
+## Reviewed release timing and Persian brief (0.5)
+
+```powershell
+uv run gold import-release-evidence local/release-research/cpi-schedule-reviewed.json --reviewed
+$cutoff = (Get-Date).ToUniversalTime().ToString('o')
+uv run gold calendar-context --as-of $cutoff --horizon-days 90 --output local/reports/calendar.json
+uv run gold research-brief --as-of $cutoff --output-dir local/reports
+```
+
+The import filename above is a local reviewed extraction, not a shipped example or a direct BLS download. `ReleaseEvidence` (generated schema `release_evidence.schema.json`) contains the official BLS URL, capture timestamp, schedule/archive-header basis, timezone evidence, caveats and selected rows. Each row names CPIAUCSL or UNRATE, reference month, an offset-aware New York announcement timestamp and a reviewer note. The source URL must match the series and, for archives, the dated release filename. Read the official page before using `--reviewed`; syntax checks cannot establish transcription accuracy.
+
+Original BLS HTML/ICS requests returned HTTP 403 locally. The delivered evidence was manually reviewed through readable official web pages. Raw hashes refer to the saved reviewed JSON notes, not to original HTML. No network call, account or key is needed for importing those notes or generating the report. Do not call this an automated BLS feed. Future manual review and ingestion is required to refresh it.
+
+Schedules and archived embargo clocks create only `scheduled_at`. Actual delivery, previous/actual values and consensus remain absent. Availability stays at ingestion; capture time is separately preserved in the raw note. Importing an old extract again cannot supersede a newer captured schedule. Selection happens before applying the upcoming horizon, so rescheduling an event outside the window does not resurrect its old date. Simultaneous contradictory captures fail. The calendar context rechecks note hashes and timing fields and labels evidence older than 168 hours stale, even when just reimported.
+
+`research-brief` writes `research-brief.fa.md` and `research-brief.json` locally. It uses the explicit cutoff, current macro plan and history-quality policy; override them with `--plan` or `--policy`. Exit code 3 indicates failed data-quality checks; warning results return 0. The Markdown view displays numbers to at most four decimal places, unit labels, missing states, upcoming announced clocks in three timezones and source record IDs. No order, predictive signal, alert or external publication is generated. Missing upcoming evidence is not proof no event is scheduled. Calendar coverage is limited to the reviewed CPI/employment evidence; cancellations and unobserved source changes are not automatically detected.
+
 ## CFTC positioning
 
 Use the official [compressed archive](https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm). Choose **Legacy / Futures Only / Text**, unzip locally, then:

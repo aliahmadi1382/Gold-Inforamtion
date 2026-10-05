@@ -10,6 +10,7 @@ from pydantic import ValidationError
 from .acquisition import SAFE_PARAMETERS, AcquisitionRun, acquire, list_runs
 from .alpha_vantage import ingest_alpha_gold
 from .analysis import event_study
+from .brief import ResearchBrief, build_brief, render_persian
 from .comparison import compare_monthly
 from .credentials import credential_environment
 from .demo import demo
@@ -18,6 +19,7 @@ from .macro import MacroContext, MacroPlan, fetch_core, load_plan, macro_context
 from .models import RECORD_TYPES, HistoricalEvent, Provenance
 from .quality import QualityPolicy, QualityReport, assess, load_policy
 from .registry import Registry, export_public, load_registry
+from .release_calendar import CalendarContext, ReleaseEvidence, calendar_context, import_evidence
 from .snapshot import MarketSnapshot, snapshot
 from .storage import Store
 from .world_bank import ingest_monthly_gold
@@ -40,6 +42,21 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    c = sub.add_parser(
+        "import-release-evidence", help="import reviewed official BLS timing evidence"
+    )
+    c.add_argument("path", type=Path)
+    c.add_argument("--reviewed", action="store_true", required=True)
+    c = sub.add_parser("calendar-context", help="upcoming announced times with source evidence")
+    c.add_argument("--as-of", type=timestamp, required=True)
+    c.add_argument("--horizon-days", type=int, default=90)
+    c.add_argument("--output", type=Path)
+    c = sub.add_parser("research-brief", help="local Persian data-status brief, JSON and Markdown")
+    c.add_argument("--as-of", type=timestamp, required=True)
+    c.add_argument("--horizon-days", type=int, default=90)
+    c.add_argument("--plan", type=Path, default=Path("config/macro_core.yaml"))
+    c.add_argument("--policy", type=Path, default=Path("config/quality_history.yaml"))
+    c.add_argument("--output-dir", type=Path, default=Path("local/reports"))
     sub.add_parser("fetch-alpha-gold", help="fetch daily XAUUSD close-only provider history")
     sub.add_parser("fetch-worldbank-gold", help="fetch the reviewed monthly Pink Sheet workbook")
     f = sub.add_parser(
@@ -139,6 +156,9 @@ def run(args) -> dict:
             "quality_report": QualityReport,
             "macro_plan": MacroPlan,
             "macro_context": MacroContext,
+            "release_evidence": ReleaseEvidence,
+            "calendar_context": CalendarContext,
+            "research_brief": ResearchBrief,
         }
         for name, model in models.items():
             schema = {
@@ -152,6 +172,35 @@ def run(args) -> dict:
     if args.command == "demo":
         return demo(args.output, registry)
     with Store(args.store) as store:
+        if args.command == "calendar-context":
+            report = calendar_context(store, args.as_of, args.horizon_days)
+            if args.output:
+                args.output.parent.mkdir(parents=True, exist_ok=True)
+                args.output.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
+            return report.model_dump(mode="json")
+        if args.command == "research-brief":
+            report = build_brief(
+                store,
+                registry,
+                load_plan(args.plan),
+                load_policy(args.policy),
+                args.as_of,
+                args.horizon_days,
+            )
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+            (args.output_dir / "research-brief.json").write_text(
+                report.model_dump_json(indent=2) + "\n", encoding="utf-8"
+            )
+            output = args.output_dir / "research-brief.fa.md"
+            output.write_text(render_persian(report), encoding="utf-8")
+            return {
+                "status": report.quality.status,
+                "report": str(output),
+                "macro_status": report.macro.status,
+                "calendar_status": report.calendar.status,
+                "upcoming_events": len(report.calendar.upcoming),
+                "daily_backtest_ready": False,
+            }
         if args.command == "fetch-fred-core":
             return fetch_core(
                 store,
@@ -196,6 +245,7 @@ def run(args) -> dict:
             "fetch-fred",
             "fetch-alpha-gold",
             "fetch-worldbank-gold",
+            "import-release-evidence",
         }:
             parameters = {
                 k: v if isinstance(v, bool) or v is None else str(v)
@@ -252,6 +302,8 @@ def run(args) -> dict:
 
 
 def perform_ingestion(args, store, registry) -> int:
+    if args.command == "import-release-evidence":
+        return import_evidence(store, args.path, registry.get("bls"), reviewed=args.reviewed)
     if args.command == "fetch-worldbank-gold":
         return ingest_monthly_gold(store, registry.get("world_bank_pink_sheet"))
     if args.command == "fetch-alpha-gold":
@@ -308,7 +360,9 @@ def main(argv=None) -> int:
         print(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False))
         if args.command == "fetch-fred-core" and result["status"] != "succeeded":
             return 3
-        return 3 if args.command == "quality" and result["status"] == "fail" else 0
+        return (
+            3 if args.command in {"quality", "research-brief"} and result["status"] == "fail" else 0
+        )
     except (ValueError, OSError, KeyError, ValidationError, yaml.YAMLError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

@@ -1,0 +1,673 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "CalendarContext": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "horizon_days": {
+          "title": "Horizon Days",
+          "type": "integer"
+        },
+        "max_evidence_age_hours": {
+          "title": "Max Evidence Age Hours",
+          "type": "number"
+        },
+        "eligible_events": {
+          "title": "Eligible Events",
+          "type": "integer"
+        },
+        "upcoming": {
+          "items": {
+            "$ref": "#/$defs/CalendarItem"
+          },
+          "title": "Upcoming",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "scheduled_events",
+            "no_upcoming_evidence",
+            "stale_evidence"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "limitations": {
+          "default": [
+            "Stored schedule snapshot; updates and cancellations require another source review.",
+            "Announced/embargo times do not establish actual delivery or first-release values.",
+            "No economic value or FRED availability timestamp is changed by calendar evidence."
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "as_of",
+        "horizon_days",
+        "max_evidence_age_hours",
+        "eligible_events",
+        "upcoming",
+        "status"
+      ],
+      "title": "CalendarContext",
+      "type": "object"
+    },
+    "CalendarItem": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "minLength": 1,
+          "title": "Series Id",
+          "type": "string"
+        },
+        "reference_period": {
+          "minLength": 1,
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "announced_at": {
+          "format": "date-time",
+          "title": "Announced At",
+          "type": "string"
+        },
+        "new_york_time": {
+          "format": "date-time",
+          "title": "New York Time",
+          "type": "string"
+        },
+        "tehran_time": {
+          "format": "date-time",
+          "title": "Tehran Time",
+          "type": "string"
+        },
+        "timing_basis": {
+          "enum": [
+            "schedule",
+            "archive_header"
+          ],
+          "title": "Timing Basis",
+          "type": "string"
+        },
+        "evidence_captured_at": {
+          "format": "date-time",
+          "title": "Evidence Captured At",
+          "type": "string"
+        },
+        "evidence_age_hours": {
+          "title": "Evidence Age Hours",
+          "type": "number"
+        },
+        "stale_evidence": {
+          "title": "Stale Evidence",
+          "type": "boolean"
+        },
+        "record_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "caveats": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Caveats",
+          "type": "array"
+        }
+      },
+      "required": [
+        "series_id",
+        "reference_period",
+        "announced_at",
+        "new_york_time",
+        "tehran_time",
+        "timing_basis",
+        "evidence_captured_at",
+        "evidence_age_hours",
+        "stale_evidence",
+        "record_id",
+        "source_url",
+        "caveats"
+      ],
+      "title": "CalendarItem",
+      "type": "object"
+    },
+    "MacroContext": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "system",
+            "source"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "vintage": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Vintage"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "incomplete"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/MacroEntry"
+          },
+          "title": "Entries",
+          "type": "array"
+        },
+        "note": {
+          "default": "Reference dates are period labels, not release times. Historical vintages retain retrieval-time availability unless a release timestamp is independently verified. Latest nulls remain missing; no backward fill or trading signal is produced.",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "as_of",
+        "mode",
+        "vintage",
+        "status",
+        "entries"
+      ],
+      "title": "MacroContext",
+      "type": "object"
+    },
+    "MacroEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "minLength": 1,
+          "title": "Series Id",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "frequency": {
+          "minLength": 1,
+          "title": "Frequency",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "missing",
+            "missing_value",
+            "stale"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "reference_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference At"
+        },
+        "available_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Available At"
+        },
+        "retrieved_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retrieved At"
+        },
+        "availability_basis": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Availability Basis"
+        },
+        "reference_age_days": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Age Days"
+        },
+        "max_age_days": {
+          "title": "Max Age Days",
+          "type": "number"
+        },
+        "record_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Record Id"
+        }
+      },
+      "required": [
+        "series_id",
+        "unit",
+        "frequency",
+        "status",
+        "max_age_days"
+      ],
+      "title": "MacroEntry",
+      "type": "object"
+    },
+    "QualityIssue": {
+      "additionalProperties": false,
+      "properties": {
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "stream_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stream Id"
+        },
+        "record_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Record Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "severity",
+        "code",
+        "message"
+      ],
+      "title": "QualityIssue",
+      "type": "object"
+    },
+    "QualityReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.1.0",
+          "default": "1.1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "replay_mode": {
+          "enum": [
+            "system",
+            "source"
+          ],
+          "title": "Replay Mode",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "warning",
+            "fail"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "data_mode": {
+          "enum": [
+            "empty",
+            "synthetic",
+            "real",
+            "mixed"
+          ],
+          "title": "Data Mode",
+          "type": "string"
+        },
+        "policy_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Policy Sha256",
+          "type": "string"
+        },
+        "total_records": {
+          "title": "Total Records",
+          "type": "integer"
+        },
+        "valid_records": {
+          "title": "Valid Records",
+          "type": "integer"
+        },
+        "eligible_records": {
+          "title": "Eligible Records",
+          "type": "integer"
+        },
+        "excluded_by_time": {
+          "title": "Excluded By Time",
+          "type": "integer"
+        },
+        "streams": {
+          "items": {
+            "$ref": "#/$defs/StreamInventory"
+          },
+          "title": "Streams",
+          "type": "array"
+        },
+        "issues": {
+          "items": {
+            "$ref": "#/$defs/QualityIssue"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "interpretation": {
+          "default": "Operational checks only. No guarantee of source accuracy, market completeness, historical release correctness or trading fitness.",
+          "title": "Interpretation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "as_of",
+        "replay_mode",
+        "status",
+        "data_mode",
+        "policy_sha256",
+        "total_records",
+        "valid_records",
+        "eligible_records",
+        "excluded_by_time",
+        "streams",
+        "issues"
+      ],
+      "title": "QualityReport",
+      "type": "object"
+    },
+    "StreamInventory": {
+      "additionalProperties": false,
+      "properties": {
+        "stream_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Stream Id",
+          "type": "string"
+        },
+        "identity": {
+          "additionalProperties": true,
+          "title": "Identity",
+          "type": "object"
+        },
+        "record_versions": {
+          "minimum": 1,
+          "title": "Record Versions",
+          "type": "integer"
+        },
+        "unique_observations": {
+          "minimum": 1,
+          "title": "Unique Observations",
+          "type": "integer"
+        },
+        "extra_versions": {
+          "minimum": 0,
+          "title": "Extra Versions",
+          "type": "integer"
+        },
+        "first_observed_at": {
+          "format": "date-time",
+          "title": "First Observed At",
+          "type": "string"
+        },
+        "last_observed_at": {
+          "format": "date-time",
+          "title": "Last Observed At",
+          "type": "string"
+        },
+        "last_available_at": {
+          "format": "date-time",
+          "title": "Last Available At",
+          "type": "string"
+        },
+        "age_hours": {
+          "title": "Age Hours",
+          "type": "number"
+        },
+        "freshness_limit_hours": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Freshness Limit Hours"
+        },
+        "missing_values": {
+          "minimum": 0,
+          "title": "Missing Values",
+          "type": "integer"
+        },
+        "missing_fraction": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Missing Fraction",
+          "type": "number"
+        },
+        "retrieval_time_only_versions": {
+          "minimum": 0,
+          "title": "Retrieval Time Only Versions",
+          "type": "integer"
+        },
+        "daily_gap_count": {
+          "minimum": 0,
+          "title": "Daily Gap Count",
+          "type": "integer"
+        },
+        "largest_gap_hours": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Largest Gap Hours"
+        },
+        "date_only_prices": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Date Only Prices",
+          "type": "integer"
+        },
+        "weekend_date_labels": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Weekend Date Labels",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "stream_id",
+        "identity",
+        "record_versions",
+        "unique_observations",
+        "extra_versions",
+        "first_observed_at",
+        "last_observed_at",
+        "last_available_at",
+        "age_hours",
+        "freshness_limit_hours",
+        "missing_values",
+        "missing_fraction",
+        "retrieval_time_only_versions",
+        "daily_gap_count",
+        "largest_gap_hours"
+      ],
+      "title": "StreamInventory",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "quality": {
+      "$ref": "#/$defs/QualityReport"
+    },
+    "macro": {
+      "$ref": "#/$defs/MacroContext"
+    },
+    "calendar": {
+      "$ref": "#/$defs/CalendarContext"
+    },
+    "daily_backtest_ready": {
+      "const": false,
+      "default": false,
+      "title": "Daily Backtest Ready",
+      "type": "boolean"
+    },
+    "scope": {
+      "default": "Descriptive data status and reviewed timing evidence; not a trading signal.",
+      "title": "Scope",
+      "type": "string"
+    }
+  },
+  "required": [
+    "generated_at",
+    "as_of",
+    "quality",
+    "macro",
+    "calendar"
+  ],
+  "title": "ResearchBrief",
+  "type": "object"
+}

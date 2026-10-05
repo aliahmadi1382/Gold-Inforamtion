@@ -131,10 +131,10 @@ sources:
     license_status: OPEN_PUBLIC
     license_id: BLS-public-data-review-required
     terms_url: https://www.bls.gov/bls/linksite.htm
-    implementation: planned
+    implementation: manual_import
     coverage: CPI, employment, wages, JOLTS and release schedules; series dependent
     frequency: Monthly and scheduled events
-    notes: America/New_York release times require daylight-saving-aware UTC conversion.
+    notes: Reviewed timing-evidence import for CPI and Employment Situation. Captures are explicit web extracts, not original downloaded pages. Announced/embargo clocks never promote FRED values to historical availability. Direct BLS downloads returned HTTP 403 in this environment. America/New_York offsets are validated against daylight-saving rules.
   - source_id: bea
     provider: US Bureau of Economic Analysis
     url: https://www.bea.gov/data

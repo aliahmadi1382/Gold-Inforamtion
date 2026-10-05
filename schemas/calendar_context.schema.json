@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "CalendarItem": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "minLength": 1,
+          "title": "Series Id",
+          "type": "string"
+        },
+        "reference_period": {
+          "minLength": 1,
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "announced_at": {
+          "format": "date-time",
+          "title": "Announced At",
+          "type": "string"
+        },
+        "new_york_time": {
+          "format": "date-time",
+          "title": "New York Time",
+          "type": "string"
+        },
+        "tehran_time": {
+          "format": "date-time",
+          "title": "Tehran Time",
+          "type": "string"
+        },
+        "timing_basis": {
+          "enum": [
+            "schedule",
+            "archive_header"
+          ],
+          "title": "Timing Basis",
+          "type": "string"
+        },
+        "evidence_captured_at": {
+          "format": "date-time",
+          "title": "Evidence Captured At",
+          "type": "string"
+        },
+        "evidence_age_hours": {
+          "title": "Evidence Age Hours",
+          "type": "number"
+        },
+        "stale_evidence": {
+          "title": "Stale Evidence",
+          "type": "boolean"
+        },
+        "record_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "caveats": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Caveats",
+          "type": "array"
+        }
+      },
+      "required": [
+        "series_id",
+        "reference_period",
+        "announced_at",
+        "new_york_time",
+        "tehran_time",
+        "timing_basis",
+        "evidence_captured_at",
+        "evidence_age_hours",
+        "stale_evidence",
+        "record_id",
+        "source_url",
+        "caveats"
+      ],
+      "title": "CalendarItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "horizon_days": {
+      "title": "Horizon Days",
+      "type": "integer"
+    },
+    "max_evidence_age_hours": {
+      "title": "Max Evidence Age Hours",
+      "type": "number"
+    },
+    "eligible_events": {
+      "title": "Eligible Events",
+      "type": "integer"
+    },
+    "upcoming": {
+      "items": {
+        "$ref": "#/$defs/CalendarItem"
+      },
+      "title": "Upcoming",
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "scheduled_events",
+        "no_upcoming_evidence",
+        "stale_evidence"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "limitations": {
+      "default": [
+        "Stored schedule snapshot; updates and cancellations require another source review.",
+        "Announced/embargo times do not establish actual delivery or first-release values.",
+        "No economic value or FRED availability timestamp is changed by calendar evidence."
+      ],
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "as_of",
+    "horizon_days",
+    "max_evidence_age_hours",
+    "eligible_events",
+    "upcoming",
+    "status"
+  ],
+  "title": "CalendarContext",
+  "type": "object"
+}

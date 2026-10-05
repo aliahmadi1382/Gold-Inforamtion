@@ -34,6 +34,13 @@ from .release_values import (
     release_value_report,
     render_release_values,
 )
+from .revision_ledger import (
+    RevisionLedger,
+    RevisionPlan,
+    load_revision_plan,
+    render_revision_ledger,
+    revision_ledger,
+)
 from .snapshot import MarketSnapshot, snapshot
 from .storage import Store
 from .world_bank import ingest_monthly_gold
@@ -56,6 +63,10 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    c = sub.add_parser("revision-ledger", help="fixed-window adjacent-document revision ledger")
+    c.add_argument("--as-of", type=timestamp, required=True)
+    c.add_argument("--plan", type=Path, default=Path("config/revision_ledger.yaml"))
+    c.add_argument("--output-dir", type=Path, default=Path("local/reports"))
     c = sub.add_parser(
         "import-release-values", help="import reviewed archive values with document identity"
     )
@@ -191,6 +202,8 @@ def run(args) -> dict:
             "monthly_research": MonthlyResearch,
             "release_value_evidence": ReleaseValueEvidence,
             "release_value_report": ReleaseValueReport,
+            "revision_plan": RevisionPlan,
+            "revision_ledger": RevisionLedger,
         }
         for name, model in models.items():
             schema = {
@@ -204,6 +217,23 @@ def run(args) -> dict:
     if args.command == "demo":
         return demo(args.output, registry)
     with Store(args.store) as store:
+        if args.command == "revision-ledger":
+            report = revision_ledger(store, registry, load_revision_plan(args.plan), args.as_of)
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+            (args.output_dir / "revision-ledger.json").write_text(
+                report.model_dump_json(indent=2) + "\n", encoding="utf-8"
+            )
+            output = args.output_dir / "revision-ledger.fa.md"
+            output.write_text(render_revision_ledger(report), encoding="utf-8")
+            return {
+                "status": report.status,
+                "report": str(output),
+                "expected_pairs": report.expected_pairs,
+                "compared_pairs": report.compared_pairs,
+                "vintage_matched_pairs": report.vintage_matched_pairs,
+                "fingerprint": report.fingerprint,
+                "intraday_replay_ready": False,
+            }
         if args.command == "release-value-report":
             report = release_value_report(store, registry, args.as_of)
             args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -428,6 +458,8 @@ def main(argv=None) -> int:
         if args.command == "monthly-research" and result["status"] == "insufficient_data":
             return 3
         if args.command == "release-value-report" and result["status"] != "compared":
+            return 3
+        if args.command == "revision-ledger" and result["status"] != "complete":
             return 3
         return (
             3 if args.command in {"quality", "research-brief"} and result["status"] == "fail" else 0

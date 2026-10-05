@@ -1,0 +1,759 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "CaptureChange": {
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "enum": [
+            "cpi_all_items_sa_mom",
+            "unemployment_rate_sa"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "reference_period": {
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "before_capture_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Before Capture Id",
+          "type": "string"
+        },
+        "after_capture_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "After Capture Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "unchanged_display",
+            "changed_display",
+            "added",
+            "removed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueAnchor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueAnchor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "difference_pp": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Difference Pp"
+        }
+      },
+      "required": [
+        "metric",
+        "reference_period",
+        "before_capture_id",
+        "after_capture_id",
+        "status",
+        "before",
+        "after"
+      ],
+      "title": "CaptureChange",
+      "type": "object"
+    },
+    "DocumentCapture": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Capture Id",
+          "type": "string"
+        },
+        "raw_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Raw Sha256",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "record_ids": {
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Record Ids",
+          "type": "array"
+        },
+        "evidence": {
+          "$ref": "#/$defs/ReleaseValueEvidence"
+        }
+      },
+      "required": [
+        "capture_id",
+        "raw_sha256",
+        "retrieved_at",
+        "record_ids",
+        "evidence"
+      ],
+      "title": "DocumentCapture",
+      "type": "object"
+    },
+    "DocumentSlot": {
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "enum": [
+            "cpi_all_items_sa_mom",
+            "unemployment_rate_sa"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "headline_period": {
+          "title": "Headline Period",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "present",
+            "missing",
+            "ambiguous"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "candidate_capture_ids": {
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Candidate Capture Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "metric",
+        "headline_period",
+        "status",
+        "candidate_capture_ids"
+      ],
+      "title": "DocumentSlot",
+      "type": "object"
+    },
+    "PublishedValue": {
+      "additionalProperties": false,
+      "properties": {
+        "reference_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "percent_change_mom_sa",
+            "percent_sa"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "decimal_places": {
+          "const": 1,
+          "default": 1,
+          "title": "Decimal Places",
+          "type": "integer"
+        },
+        "locator": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "review_note": {
+          "maxLength": 1500,
+          "minLength": 1,
+          "title": "Review Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reference_period",
+        "value",
+        "unit",
+        "locator",
+        "review_note"
+      ],
+      "title": "PublishedValue",
+      "type": "object"
+    },
+    "ReleaseValueEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "captured_at": {
+          "format": "date-time",
+          "title": "Captured At",
+          "type": "string"
+        },
+        "capture_method": {
+          "const": "reviewed_web_extract",
+          "default": "reviewed_web_extract",
+          "title": "Capture Method",
+          "type": "string"
+        },
+        "metric": {
+          "enum": [
+            "cpi_all_items_sa_mom",
+            "unemployment_rate_sa"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "release_id": {
+          "pattern": "^USDL-\\d{2}-\\d{4}$",
+          "title": "Release Id",
+          "type": "string"
+        },
+        "headline_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "Headline Period",
+          "type": "string"
+        },
+        "announced_at": {
+          "format": "date-time",
+          "title": "Announced At",
+          "type": "string"
+        },
+        "timing_basis": {
+          "const": "archive_embargo_header",
+          "default": "archive_embargo_header",
+          "title": "Timing Basis",
+          "type": "string"
+        },
+        "timezone_evidence": {
+          "minLength": 1,
+          "title": "Timezone Evidence",
+          "type": "string"
+        },
+        "document_status": {
+          "enum": [
+            "archive_as_captured",
+            "reissued"
+          ],
+          "title": "Document Status",
+          "type": "string"
+        },
+        "reissued_on": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reissued On"
+        },
+        "revision_note": {
+          "minLength": 1,
+          "title": "Revision Note",
+          "type": "string"
+        },
+        "caveats": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Caveats",
+          "type": "array"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/$defs/PublishedValue"
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_url",
+        "captured_at",
+        "metric",
+        "release_id",
+        "headline_period",
+        "announced_at",
+        "timezone_evidence",
+        "document_status",
+        "revision_note",
+        "values"
+      ],
+      "title": "ReleaseValueEvidence",
+      "type": "object"
+    },
+    "RevisionPair": {
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "enum": [
+            "cpi_all_items_sa_mom",
+            "unemployment_rate_sa"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "reference_period": {
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "next_headline_period": {
+          "title": "Next Headline Period",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "unchanged_display",
+            "changed_display",
+            "missing_document",
+            "ambiguous_document",
+            "missing_previous_value",
+            "invalid_document_order"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueAnchor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueAnchor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "difference_pp": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Difference Pp"
+        },
+        "before_vintage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueComparison"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after_vintage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueComparison"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "vintage_difference_pp": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vintage Difference Pp"
+        }
+      },
+      "required": [
+        "metric",
+        "reference_period",
+        "next_headline_period",
+        "status",
+        "before",
+        "after",
+        "before_vintage",
+        "after_vintage"
+      ],
+      "title": "RevisionPair",
+      "type": "object"
+    },
+    "RevisionPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "declared_at": {
+          "format": "date-time",
+          "title": "Declared At",
+          "type": "string"
+        },
+        "start_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "Start Period",
+          "type": "string"
+        },
+        "end_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "End Period",
+          "type": "string"
+        },
+        "metrics": {
+          "items": {
+            "enum": [
+              "cpi_all_items_sa_mom",
+              "unemployment_rate_sa"
+            ],
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "title": "Metrics",
+          "type": "array"
+        },
+        "selection_reason": {
+          "minLength": 1,
+          "title": "Selection Reason",
+          "type": "string"
+        },
+        "method": {
+          "const": "adjacent_document_display",
+          "default": "adjacent_document_display",
+          "title": "Method",
+          "type": "string"
+        }
+      },
+      "required": [
+        "declared_at",
+        "start_period",
+        "end_period",
+        "metrics",
+        "selection_reason"
+      ],
+      "title": "RevisionPlan",
+      "type": "object"
+    },
+    "ValueAnchor": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Capture Id",
+          "type": "string"
+        },
+        "record_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "reference_period": {
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "decimal_places": {
+          "const": 1,
+          "default": 1,
+          "title": "Decimal Places",
+          "type": "integer"
+        },
+        "locator": {
+          "title": "Locator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capture_id",
+        "record_id",
+        "reference_period",
+        "value",
+        "unit",
+        "locator"
+      ],
+      "title": "ValueAnchor",
+      "type": "object"
+    },
+    "ValueComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "matches_display",
+            "differs_display",
+            "rounding_boundary",
+            "missing_period",
+            "missing_value"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "difference_from_document": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Difference From Document"
+        },
+        "record_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Record Ids",
+          "type": "array"
+        },
+        "vintage_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Vintage Date"
+        },
+        "transformation": {
+          "enum": [
+            "native_unemployment_rate",
+            "100*(current_CPI/prior_CPI-1)"
+          ],
+          "title": "Transformation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "vintage_date",
+        "transformation"
+      ],
+      "title": "ValueComparison",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "software_version": {
+      "title": "Software Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Fingerprint",
+      "type": "string"
+    },
+    "plan": {
+      "$ref": "#/$defs/RevisionPlan"
+    },
+    "status": {
+      "enum": [
+        "complete",
+        "incomplete",
+        "no_evidence"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "expected_pairs": {
+      "title": "Expected Pairs",
+      "type": "integer"
+    },
+    "compared_pairs": {
+      "title": "Compared Pairs",
+      "type": "integer"
+    },
+    "vintage_matched_pairs": {
+      "title": "Vintage Matched Pairs",
+      "type": "integer"
+    },
+    "changed_display_pairs": {
+      "title": "Changed Display Pairs",
+      "type": "integer"
+    },
+    "document_slots": {
+      "items": {
+        "$ref": "#/$defs/DocumentSlot"
+      },
+      "title": "Document Slots",
+      "type": "array"
+    },
+    "captures": {
+      "items": {
+        "$ref": "#/$defs/DocumentCapture"
+      },
+      "title": "Captures",
+      "type": "array"
+    },
+    "pairs": {
+      "items": {
+        "$ref": "#/$defs/RevisionPair"
+      },
+      "title": "Pairs",
+      "type": "array"
+    },
+    "capture_changes": {
+      "items": {
+        "$ref": "#/$defs/CaptureChange"
+      },
+      "title": "Capture Changes",
+      "type": "array"
+    },
+    "first_release_verified": {
+      "const": false,
+      "default": false,
+      "title": "First Release Verified",
+      "type": "boolean"
+    },
+    "intraday_replay_ready": {
+      "const": false,
+      "default": false,
+      "title": "Intraday Replay Ready",
+      "type": "boolean"
+    },
+    "limitations": {
+      "default": [
+        "Equality is only at the one-decimal display precision and only for adjacent documents.",
+        "Archive captures may be reissued; their header clocks do not date observed revisions.",
+        "Same-document recapture differences are separate from cross-document differences.",
+        "Missing and ambiguous document slots remain in the declared coverage denominator.",
+        "FRED vintages are day-resolution and share the underlying BLS statistical source.",
+        "Availability remains retrieval bounded; no historical availability is inferred.",
+        "The plan declaration is operator supplied, not independently certified preregistration.",
+        "Differences are not market surprises and do not estimate tradable gold responses."
+      ],
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "software_version",
+    "generated_at",
+    "as_of",
+    "fingerprint",
+    "plan",
+    "status",
+    "expected_pairs",
+    "compared_pairs",
+    "vintage_matched_pairs",
+    "changed_display_pairs",
+    "document_slots",
+    "captures",
+    "pairs",
+    "capture_changes"
+  ],
+  "title": "RevisionLedger",
+  "type": "object"
+}

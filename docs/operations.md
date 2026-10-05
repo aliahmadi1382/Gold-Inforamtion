@@ -149,6 +149,26 @@ Display consistency means less than 0.05 percentage-point difference from a one-
 
 Exit code 0 (`compared`) means all selected archive values have historical display consistency and nonmissing current counterparts, within this deliberately narrow comparison scope. Code 3 (`incomplete` or `no_evidence`) accompanies a written report with missing or discrepant comparisons. Invalid input/integrity failures return 2. A successful comparison always retains `intraday_replay_ready: false` and `first_release_verified: false`. Preserve raw extracts, acquisition manifests, record IDs and code version along with the report. See [method and live evidence](source-methodology/release-values.fa.md) and [lesson eight](education/08-release-values-and-vintages.fa.md).
 
+## Fixed-window revision ledger (0.8)
+
+```powershell
+$ledgerCutoff = (Get-Date).ToUniversalTime().ToString('o')
+uv run gold revision-ledger --plan config/revision_ledger.yaml --as-of $ledgerCutoff
+uv run python scripts/inspect_revision_ledger.py
+```
+
+The report command reads existing local evidence and makes no network request. Its default plan declares January–June 2020 for the two reviewed metrics; it also requires July headline documents to compare the final June period. The plan contains the declared time, reason, inclusive period range and metrics. This timestamp is operator supplied, not independently certified preregistration. Change and preserve the plan before examining a different study window. Plans allow 1–120 months and unique supported metrics.
+
+For each reference month P, `before` is P in the document with headline P; `after` is P in the document with headline P+1. `difference_pp` is after minus before in percentage points. These are values from latest eligible captures, not certified first releases. Each side is also compared with the exact-date FRED vintage for its document. FRED vintage differences use unrounded computed outputs; document differences use the preserved one-decimal display precision. A zero document difference does not imply zero sub-display or later annual revision.
+
+`revision-ledger.fa.md` and `revision-ledger.json` retain the expected document grid, all expected pairs, complete capture history, raw hashes and document/FRED parent IDs. Missing documents or previous-period cells are explicit. Multiple archive URLs for one metric/headline remain ambiguous even with equal values; the program does not choose a convenient source. Non-increasing header chronology prevents comparison. Conflicting same-capture evidence, identity drift within one URL and raw/normalized inconsistencies fail. Older reimports cannot resurrect values absent in the latest capture.
+
+`capture_changes` separately records added, removed, equal or changed values between consecutive local captures of the **same URL**, restricted to the declared economic periods. It cannot distinguish archive edits from corrected manual transcription without further review. Repeated imports of the same capture are collapsed. With only one capture per URL, there is no evidence about recapture differences. Header clocks never become revision timestamps or historical availability.
+
+Exit 0 (`complete`) requires every planned pair to be comparable and both historical vintages to match at display precision. A written partial/empty report returns 3; invalid evidence or parameters return 2. Completeness only applies to this declared adjacent-document study, and `first_release_verified`/`intraday_replay_ready` remain false. The standalone inspection command expects a complete ledger and independently reconciles its raw cells, FRED rational arithmetic and coverage totals. Its scope excludes certification of the source/transcription, archive recapture causality and intraday timing; full store integrity is separately checked by `gold audit`.
+
+All real outputs remain under ignored `local/`. See the [delivery evidence](source-methodology/revision-ledger.fa.md) and [Persian lesson nine](education/09-revision-ledger.fa.md). A fresh checkout has code and schemas, not these private local records.
+
 ## CFTC positioning
 
 Use the official [compressed archive](https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm). Choose **Legacy / Futures Only / Text**, unzip locally, then:

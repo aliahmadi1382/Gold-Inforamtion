@@ -1,6 +1,6 @@
 # Master Data & Research Specification
 
-Version 1.3.0 · reviewed 2026-10-05 · implementation release 0.7.0.
+Version 1.4.0 · reviewed 2026-10-05 · implementation release 0.8.0.
 The supplied brief is preserved verbatim in `original-brief.md` as an input artifact, not a verified factual source or a promise of working integrations. This specification and the source audit take precedence for implementation status.
 
 ## Objective and scope
@@ -60,3 +60,5 @@ Release 0.4 adds seven metadata-checked FRED histories, conservative cutoff-awar
 Release 0.5 progresses independent calendar/reporting work while daily price methodology remains open. Reviewed BLS timing notes and archived embargo headers never create actual values or first-release availability. The Persian data-status brief is an initial reporting capability, not a completed analyst or decision system. See [timing evidence and limits](../source-methodology/release-evidence.fa.md).
 
 Release 0.6 adds descriptive monthly gold/macro relationships with fixed transformations, explicit samples, missingness gates, methodology-break separation and rolling windows. Release 0.7 adds reviewed economic values tied to specific BLS documents and exact-date FRED vintages. Reissued documents and current revisions remain explicit. Neither delivery establishes causation, profitable strategy behavior or intraday first-delivery times. See [monthly research](../source-methodology/monthly-research.fa.md) and [release-value evidence](../source-methodology/release-values.fa.md).
+
+Release 0.8 expands the reviewed archive coverage to a declared January–June 2020 comparison window, with July headline documents as the terminal boundary. The revision ledger retains every expected pair, ambiguous/missing document slots, exact-date vintage parents and separate same-document capture history. Complete-document selection, raw integrity and independent arithmetic reconciliation are acceptance criteria. This bounded archive comparison does not certify exhaustive revision history, first release or actual delivery. See [revision ledger evidence](../source-methodology/revision-ledger.fa.md).

@@ -1,0 +1,12 @@
+# Declared before expanding/reviewing the adjacent-document comparisons.
+# This is a local analysis plan, not an independently timestamped preregistration.
+declared_at: '2026-10-05T14:10:26Z'
+start_period: '2020-01'
+end_period: '2020-06'
+metrics:
+  - cpi_all_items_sa_mom
+  - unemployment_rate_sa
+selection_reason: >-
+  Extend the existing February/March 2020 archive pilot to the contiguous first
+  half of 2020. Include July headline documents to compare the last June period.
+  Keep all expected metric-period pairs, including missing or ambiguous evidence.

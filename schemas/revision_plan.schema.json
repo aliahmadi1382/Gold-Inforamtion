@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "declared_at": {
+      "format": "date-time",
+      "title": "Declared At",
+      "type": "string"
+    },
+    "start_period": {
+      "pattern": "^\\d{4}-\\d{2}$",
+      "title": "Start Period",
+      "type": "string"
+    },
+    "end_period": {
+      "pattern": "^\\d{4}-\\d{2}$",
+      "title": "End Period",
+      "type": "string"
+    },
+    "metrics": {
+      "items": {
+        "enum": [
+          "cpi_all_items_sa_mom",
+          "unemployment_rate_sa"
+        ],
+        "type": "string"
+      },
+      "maxItems": 2,
+      "minItems": 1,
+      "title": "Metrics",
+      "type": "array"
+    },
+    "selection_reason": {
+      "minLength": 1,
+      "title": "Selection Reason",
+      "type": "string"
+    },
+    "method": {
+      "const": "adjacent_document_display",
+      "default": "adjacent_document_display",
+      "title": "Method",
+      "type": "string"
+    }
+  },
+  "required": [
+    "declared_at",
+    "start_period",
+    "end_period",
+    "metrics",
+    "selection_reason"
+  ],
+  "title": "RevisionPlan",
+  "type": "object"
+}

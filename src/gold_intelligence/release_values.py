@@ -200,8 +200,8 @@ def read_blob(store, digest, cache):
     return cache[digest]
 
 
-def selected_documents(store, registry, records, cache):
-    """Select entire latest captured documents; dropped rows must not reappear."""
+def document_versions(store, registry, records, cache):
+    """Validate every eligible complete capture before selecting document versions."""
     bundles, grouped = {}, defaultdict(list)
     records = [
         r for r in records if r.provenance.source_id == "bls" and r.provenance.dataset == DATASET
@@ -223,6 +223,12 @@ def selected_documents(store, registry, records, cache):
             grouped[str(evidence.source_url)].append((evidence, expected))
         if record_id(r) not in {record_id(row) for row in bundles[key][1]}:
             raise ValueError("release value differs from reviewed evidence")
+    return grouped
+
+
+def selected_documents(store, registry, records, cache):
+    """Select entire latest captured documents; dropped rows must not reappear."""
+    grouped = document_versions(store, registry, records, cache)
     selected = []
     for versions in grouped.values():
         latest_capture = max(e.captured_at for e, _ in versions)

@@ -169,6 +169,33 @@ Exit 0 (`complete`) requires every planned pair to be comparable and both histor
 
 All real outputs remain under ignored `local/`. See the [delivery evidence](source-methodology/revision-ledger.fa.md) and [Persian lesson nine](education/09-revision-ledger.fa.md). A fresh checkout has code and schemas, not these private local records.
 
+## Unified research report (0.9)
+
+Build all research sections from the existing real store at one explicit cutoff. The example uses the recorded delivery cutoff, not the current time; later ingestions require a correspondingly chosen cutoff. No API call or credential loading occurs.
+
+```powershell
+uv run gold --store local/market research-report --as-of 2026-10-05T14:32:01Z --output-dir local/reports/unified
+```
+
+The command prints `bundle`, `report`, section statuses and a fingerprint. Every run gets a new `research-<generation-time>-<suffix>` directory; previous output and reader notes are preserved. The overview is `research-report.fa.md`; `research-report.json` contains the complete typed aggregate. `details/` contains quality, macro, calendar, monthly, release-value and revision JSON, plus the last three Persian reports. `manifest.json` records the eleven artifact paths, sizes and SHA-256 hashes. A `.incomplete-*` directory can remain after failure and must not be treated as a completed report.
+
+Use the printed bundle path in the commands below; the placeholder is not a literal existing directory:
+
+```powershell
+$reportBundle = 'local/reports/unified/research-REPLACE-WITH-PRINTED-RUN'
+uv run gold verify-report $reportBundle
+uv run python scripts/inspect_monthly_research.py --store local/market --report "$reportBundle/details/monthly-research.json"
+uv run python scripts/inspect_revision_ledger.py --store local/market --report "$reportBundle/details/revision-ledger.json" --output local/reports/unified-revision-validation.json
+```
+
+`verify-report` requires only the saved bundle, without opening the store or registry. It checks byte integrity, typed contracts, shared cutoff/version/settings, section summaries and exact equality of child JSON to embedded components. It does not authenticate the issuer, prove source accuracy, reconcile arithmetic to raw data or validate unlisted reader notes. The independent scripts do require the original local store; the ledger script checks complete ledgers. Keep manifests and listed files unchanged, and add notes in a separate unlisted file.
+
+`research-report` defaults to `config/macro_core.yaml`, `config/monthly_research.yaml`, `config/revision_ledger.yaml` and `config/quality_history.yaml`; override with `--macro-plan`, `--monthly-plan`, `--revision-plan` and `--policy`. Calendar options are `--horizon-days` (1–366, default 90) and `--calendar-max-age-hours` (>0 to 8760, default 168). There is no synthetic allowance or source-replay option for this combined report. Existing standalone commands remain available.
+
+Exit 0 means a bundle was produced with status `compiled` or `with_limits`; inspect the latter's limitations. Exit 3 means a readable `partial` bundle was produced because an essential section is missing or quality failed on normal absence. Exit 2 denotes input/integrity/output failure; no newly completed bundle is promised. `verify-report` exits 0 for a verified bundle and 2 for validation/file errors. A fresh checkout has no real records and will normally produce `partial`.
+
+All components are recomputed in one SQLite read transaction, with one `system` cutoff. Reference dates, freshness thresholds and document vintages remain distinct. A matching semantic fingerprint excludes build clocks but includes evidence, settings, registry hash, cutoff and software version; it is not a digital signature. The report cannot clear daily backtest or intraday-release gates. See [delivery evidence](source-methodology/unified-research-report.fa.md) and [Persian lesson ten](education/10-unified-research-report.fa.md).
+
 ## CFTC positioning
 
 Use the official [compressed archive](https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm). Choose **Legacy / Futures Only / Text**, unzip locally, then:

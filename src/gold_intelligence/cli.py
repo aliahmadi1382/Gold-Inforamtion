@@ -34,6 +34,14 @@ from .release_values import (
     release_value_report,
     render_release_values,
 )
+from .research_report import (
+    ReportManifest,
+    ReportSettings,
+    ResearchReport,
+    build_research_report,
+    verify_research_bundle,
+    write_research_report,
+)
 from .revision_ledger import (
     RevisionLedger,
     RevisionPlan,
@@ -63,6 +71,17 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    c = sub.add_parser("research-report", help="compose local research with one shared cutoff")
+    c.add_argument("--as-of", type=timestamp, required=True)
+    c.add_argument("--macro-plan", type=Path, default=Path("config/macro_core.yaml"))
+    c.add_argument("--monthly-plan", type=Path, default=Path("config/monthly_research.yaml"))
+    c.add_argument("--revision-plan", type=Path, default=Path("config/revision_ledger.yaml"))
+    c.add_argument("--policy", type=Path, default=Path("config/quality_history.yaml"))
+    c.add_argument("--horizon-days", type=int, default=90)
+    c.add_argument("--calendar-max-age-hours", type=float, default=168)
+    c.add_argument("--output-dir", type=Path, default=Path("local/reports/unified"))
+    c = sub.add_parser("verify-report", help="verify a saved report bundle's hashes and coherence")
+    c.add_argument("directory", type=Path)
     c = sub.add_parser("revision-ledger", help="fixed-window adjacent-document revision ledger")
     c.add_argument("--as-of", type=timestamp, required=True)
     c.add_argument("--plan", type=Path, default=Path("config/revision_ledger.yaml"))
@@ -179,6 +198,8 @@ def parser() -> argparse.ArgumentParser:
 
 
 def run(args) -> dict:
+    if args.command == "verify-report":
+        return verify_research_bundle(args.directory)
     registry = load_registry(args.registry)
     if args.command == "validate-registry":
         return {"sources": len(registry.sources), "valid": True}
@@ -204,6 +225,8 @@ def run(args) -> dict:
             "release_value_report": ReleaseValueReport,
             "revision_plan": RevisionPlan,
             "revision_ledger": RevisionLedger,
+            "research_report": ResearchReport,
+            "report_manifest": ReportManifest,
         }
         for name, model in models.items():
             schema = {
@@ -217,6 +240,26 @@ def run(args) -> dict:
     if args.command == "demo":
         return demo(args.output, registry)
     with Store(args.store) as store:
+        if args.command == "research-report":
+            settings = ReportSettings(
+                macro_plan=load_plan(args.macro_plan),
+                quality_policy=load_policy(args.policy),
+                monthly_plan=load_research_plan(args.monthly_plan),
+                revision_plan=load_revision_plan(args.revision_plan),
+                calendar_horizon_days=args.horizon_days,
+                calendar_max_evidence_age_hours=args.calendar_max_age_hours,
+            )
+            report = build_research_report(store, registry, settings, args.as_of)
+            directory = write_research_report(report, args.output_dir)
+            return {
+                "status": report.status,
+                "report": str(directory / "research-report.fa.md"),
+                "bundle": str(directory),
+                "fingerprint": report.fingerprint,
+                "as_of": report.as_of.isoformat(),
+                "sections": {s.key: s.status for s in report.sections},
+                "daily_backtest_ready": False,
+            }
         if args.command == "revision-ledger":
             report = revision_ledger(store, registry, load_revision_plan(args.plan), args.as_of)
             args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -460,6 +503,8 @@ def main(argv=None) -> int:
         if args.command == "release-value-report" and result["status"] != "compared":
             return 3
         if args.command == "revision-ledger" and result["status"] != "complete":
+            return 3
+        if args.command == "research-report" and result["status"] == "partial":
             return 3
         return (
             3 if args.command in {"quality", "research-brief"} and result["status"] == "fail" else 0

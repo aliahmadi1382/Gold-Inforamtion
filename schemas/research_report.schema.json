@@ -1,0 +1,2453 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Association": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "title": "Series Id",
+          "type": "string"
+        },
+        "population": {
+          "enum": [
+            "pairwise",
+            "common"
+          ],
+          "title": "Population",
+          "type": "string"
+        },
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "months": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Months",
+          "type": "array"
+        },
+        "n": {
+          "title": "N",
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "estimated",
+            "too_short",
+            "no_overlap",
+            "constant"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "pearson": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pearson"
+        },
+        "spearman": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Spearman"
+        }
+      },
+      "required": [
+        "series_id",
+        "population",
+        "method",
+        "months",
+        "n",
+        "status",
+        "pearson",
+        "spearman"
+      ],
+      "title": "Association",
+      "type": "object"
+    },
+    "CalendarContext": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "horizon_days": {
+          "title": "Horizon Days",
+          "type": "integer"
+        },
+        "max_evidence_age_hours": {
+          "title": "Max Evidence Age Hours",
+          "type": "number"
+        },
+        "eligible_events": {
+          "title": "Eligible Events",
+          "type": "integer"
+        },
+        "upcoming": {
+          "items": {
+            "$ref": "#/$defs/CalendarItem"
+          },
+          "title": "Upcoming",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "scheduled_events",
+            "no_upcoming_evidence",
+            "stale_evidence"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "limitations": {
+          "default": [
+            "Stored schedule snapshot; updates and cancellations require another source review.",
+            "Announced/embargo times do not establish actual delivery or first-release values.",
+            "No economic value or FRED availability timestamp is changed by calendar evidence."
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "as_of",
+        "horizon_days",
+        "max_evidence_age_hours",
+        "eligible_events",
+        "upcoming",
+        "status"
+      ],
+      "title": "CalendarContext",
+      "type": "object"
+    },
+    "CalendarItem": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "minLength": 1,
+          "title": "Series Id",
+          "type": "string"
+        },
+        "reference_period": {
+          "minLength": 1,
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "announced_at": {
+          "format": "date-time",
+          "title": "Announced At",
+          "type": "string"
+        },
+        "new_york_time": {
+          "format": "date-time",
+          "title": "New York Time",
+          "type": "string"
+        },
+        "tehran_time": {
+          "format": "date-time",
+          "title": "Tehran Time",
+          "type": "string"
+        },
+        "timing_basis": {
+          "enum": [
+            "schedule",
+            "archive_header"
+          ],
+          "title": "Timing Basis",
+          "type": "string"
+        },
+        "evidence_captured_at": {
+          "format": "date-time",
+          "title": "Evidence Captured At",
+          "type": "string"
+        },
+        "evidence_age_hours": {
+          "title": "Evidence Age Hours",
+          "type": "number"
+        },
+        "stale_evidence": {
+          "title": "Stale Evidence",
+          "type": "boolean"
+        },
+        "record_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "caveats": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Caveats",
+          "type": "array"
+        }
+      },
+      "required": [
+        "series_id",
+        "reference_period",
+        "announced_at",
+        "new_york_time",
+        "tehran_time",
+        "timing_basis",
+        "evidence_captured_at",
+        "evidence_age_hours",
+        "stale_evidence",
+        "record_id",
+        "source_url",
+        "caveats"
+      ],
+      "title": "CalendarItem",
+      "type": "object"
+    },
+    "CaptureChange": {
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "enum": [
+            "cpi_all_items_sa_mom",
+            "unemployment_rate_sa"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "reference_period": {
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "before_capture_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Before Capture Id",
+          "type": "string"
+        },
+        "after_capture_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "After Capture Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "unchanged_display",
+            "changed_display",
+            "added",
+            "removed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueAnchor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueAnchor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "difference_pp": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Difference Pp"
+        }
+      },
+      "required": [
+        "metric",
+        "reference_period",
+        "before_capture_id",
+        "after_capture_id",
+        "status",
+        "before",
+        "after"
+      ],
+      "title": "CaptureChange",
+      "type": "object"
+    },
+    "CoreSeries": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "pattern": "^[A-Z0-9_]+$",
+          "title": "Series Id",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "frequency": {
+          "enum": [
+            "D",
+            "W",
+            "M",
+            "Q"
+          ],
+          "title": "Frequency",
+          "type": "string"
+        },
+        "provider_units": {
+          "minLength": 1,
+          "title": "Provider Units",
+          "type": "string"
+        },
+        "seasonal_adjustment": {
+          "enum": [
+            "SA",
+            "NSA",
+            "SAAR"
+          ],
+          "title": "Seasonal Adjustment",
+          "type": "string"
+        },
+        "max_age_days": {
+          "exclusiveMinimum": 0,
+          "title": "Max Age Days",
+          "type": "number"
+        }
+      },
+      "required": [
+        "series_id",
+        "unit",
+        "frequency",
+        "provider_units",
+        "seasonal_adjustment",
+        "max_age_days"
+      ],
+      "title": "CoreSeries",
+      "type": "object"
+    },
+    "DocumentCapture": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Capture Id",
+          "type": "string"
+        },
+        "raw_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Raw Sha256",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "record_ids": {
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Record Ids",
+          "type": "array"
+        },
+        "evidence": {
+          "$ref": "#/$defs/ReleaseValueEvidence"
+        }
+      },
+      "required": [
+        "capture_id",
+        "raw_sha256",
+        "retrieved_at",
+        "record_ids",
+        "evidence"
+      ],
+      "title": "DocumentCapture",
+      "type": "object"
+    },
+    "DocumentSlot": {
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "enum": [
+            "cpi_all_items_sa_mom",
+            "unemployment_rate_sa"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "headline_period": {
+          "title": "Headline Period",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "present",
+            "missing",
+            "ambiguous"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "candidate_capture_ids": {
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Candidate Capture Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "metric",
+        "headline_period",
+        "status",
+        "candidate_capture_ids"
+      ],
+      "title": "DocumentSlot",
+      "type": "object"
+    },
+    "MacroContext": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "mode": {
+          "enum": [
+            "system",
+            "source"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "vintage": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Vintage"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "incomplete"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/MacroEntry"
+          },
+          "title": "Entries",
+          "type": "array"
+        },
+        "note": {
+          "default": "Reference dates are period labels, not release times. Historical vintages retain retrieval-time availability unless a release timestamp is independently verified. Latest nulls remain missing; no backward fill or trading signal is produced.",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "as_of",
+        "mode",
+        "vintage",
+        "status",
+        "entries"
+      ],
+      "title": "MacroContext",
+      "type": "object"
+    },
+    "MacroEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "minLength": 1,
+          "title": "Series Id",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "frequency": {
+          "minLength": 1,
+          "title": "Frequency",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "missing",
+            "missing_value",
+            "stale"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "reference_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference At"
+        },
+        "available_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Available At"
+        },
+        "retrieved_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Retrieved At"
+        },
+        "availability_basis": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Availability Basis"
+        },
+        "reference_age_days": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Age Days"
+        },
+        "max_age_days": {
+          "title": "Max Age Days",
+          "type": "number"
+        },
+        "record_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Record Id"
+        }
+      },
+      "required": [
+        "series_id",
+        "unit",
+        "frequency",
+        "status",
+        "max_age_days"
+      ],
+      "title": "MacroEntry",
+      "type": "object"
+    },
+    "MacroPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "series": {
+          "items": {
+            "$ref": "#/$defs/CoreSeries"
+          },
+          "minItems": 1,
+          "title": "Series",
+          "type": "array"
+        }
+      },
+      "required": [
+        "series"
+      ],
+      "title": "MacroPlan",
+      "type": "object"
+    },
+    "MonthlyChange": {
+      "additionalProperties": false,
+      "properties": {
+        "month": {
+          "format": "date",
+          "title": "Month",
+          "type": "string"
+        },
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "values": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Values",
+          "type": "object"
+        },
+        "exclusions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Exclusions",
+          "type": "object"
+        }
+      },
+      "required": [
+        "month",
+        "method",
+        "values",
+        "exclusions"
+      ],
+      "title": "MonthlyChange",
+      "type": "object"
+    },
+    "MonthlyLevel": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "title": "Series Id",
+          "type": "string"
+        },
+        "month": {
+          "format": "date",
+          "title": "Month",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "method": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Method"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "missing",
+            "insufficient_daily_coverage"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "expected_labels": {
+          "title": "Expected Labels",
+          "type": "integer"
+        },
+        "valid_values": {
+          "title": "Valid Values",
+          "type": "integer"
+        },
+        "missing_labels": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Missing Labels",
+          "type": "array"
+        },
+        "null_labels": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Null Labels",
+          "type": "array"
+        },
+        "record_ids": {
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Record Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "series_id",
+        "month",
+        "unit",
+        "status",
+        "value",
+        "expected_labels",
+        "valid_values",
+        "missing_labels",
+        "null_labels",
+        "record_ids"
+      ],
+      "title": "MonthlyLevel",
+      "type": "object"
+    },
+    "MonthlyResearch": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "software_version": {
+          "title": "Software Version",
+          "type": "string"
+        },
+        "plan": {
+          "$ref": "#/$defs/MonthlyResearchPlan"
+        },
+        "fingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Fingerprint",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "descriptive_only",
+            "insufficient_data"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "daily_backtest_ready": {
+          "const": false,
+          "default": false,
+          "title": "Daily Backtest Ready",
+          "type": "boolean"
+        },
+        "levels": {
+          "items": {
+            "$ref": "#/$defs/MonthlyLevel"
+          },
+          "title": "Levels",
+          "type": "array"
+        },
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/MonthlyChange"
+          },
+          "title": "Changes",
+          "type": "array"
+        },
+        "associations": {
+          "items": {
+            "$ref": "#/$defs/Association"
+          },
+          "title": "Associations",
+          "type": "array"
+        },
+        "rolling": {
+          "items": {
+            "$ref": "#/$defs/RollingAssociation"
+          },
+          "title": "Rolling",
+          "type": "array"
+        },
+        "definitions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Definitions",
+          "type": "object"
+        },
+        "sources": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Sources",
+          "type": "object"
+        },
+        "limitations": {
+          "default": [
+            "Latest versions known at the cutoff; not an original-release historical replay.",
+            "Gold uses monthly average prices, not executable close-to-close returns.",
+            "Contemporaneous association is neither causation nor a forecasting test.",
+            "June 2025 gold change crosses a methodology break and is excluded.",
+            "Daily coverage uses weekday labels, not a verified trading/holiday calendar.",
+            "No imputation; missing months invalidate adjacent changes and rolling windows.",
+            "The minimum sample is a reporting policy, not a statistical power guarantee.",
+            "Overlapping rolling windows are dependent; no p-values or confidence claims.",
+            "No lag search, fitted strategy, transaction costs or out-of-sample evaluation."
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "generated_at",
+        "as_of",
+        "software_version",
+        "plan",
+        "fingerprint",
+        "status",
+        "levels",
+        "changes",
+        "associations",
+        "rolling",
+        "definitions",
+        "sources"
+      ],
+      "title": "MonthlyResearch",
+      "type": "object"
+    },
+    "MonthlyResearchPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "start_month": {
+          "default": "2006-02-01",
+          "format": "date",
+          "title": "Start Month",
+          "type": "string"
+        },
+        "minimum_valid_weekday_fraction": {
+          "default": 0.8,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Minimum Valid Weekday Fraction",
+          "type": "number"
+        },
+        "minimum_pairs": {
+          "default": 36,
+          "minimum": 3,
+          "title": "Minimum Pairs",
+          "type": "integer"
+        },
+        "rolling_months": {
+          "default": 60,
+          "minimum": 3,
+          "title": "Rolling Months",
+          "type": "integer"
+        }
+      },
+      "title": "MonthlyResearchPlan",
+      "type": "object"
+    },
+    "PublishedValue": {
+      "additionalProperties": false,
+      "properties": {
+        "reference_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "percent_change_mom_sa",
+            "percent_sa"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "decimal_places": {
+          "const": 1,
+          "default": 1,
+          "title": "Decimal Places",
+          "type": "integer"
+        },
+        "locator": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "review_note": {
+          "maxLength": 1500,
+          "minLength": 1,
+          "title": "Review Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reference_period",
+        "value",
+        "unit",
+        "locator",
+        "review_note"
+      ],
+      "title": "PublishedValue",
+      "type": "object"
+    },
+    "QualityIssue": {
+      "additionalProperties": false,
+      "properties": {
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "code": {
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "stream_id": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stream Id"
+        },
+        "record_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Record Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "severity",
+        "code",
+        "message"
+      ],
+      "title": "QualityIssue",
+      "type": "object"
+    },
+    "QualityPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "max_age_hours": {
+          "additionalProperties": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "title": "Max Age Hours",
+          "type": "object"
+        },
+        "daily_gap_warning_hours": {
+          "default": 96,
+          "exclusiveMinimum": 0,
+          "title": "Daily Gap Warning Hours",
+          "type": "number"
+        },
+        "missing_fraction_warning_above": {
+          "default": 0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Missing Fraction Warning Above",
+          "type": "number"
+        },
+        "required_streams": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RequiredStream"
+          },
+          "title": "Required Streams",
+          "type": "array"
+        }
+      },
+      "title": "QualityPolicy",
+      "type": "object"
+    },
+    "QualityReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.1.0",
+          "default": "1.1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "replay_mode": {
+          "enum": [
+            "system",
+            "source"
+          ],
+          "title": "Replay Mode",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "pass",
+            "warning",
+            "fail"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "data_mode": {
+          "enum": [
+            "empty",
+            "synthetic",
+            "real",
+            "mixed"
+          ],
+          "title": "Data Mode",
+          "type": "string"
+        },
+        "policy_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Policy Sha256",
+          "type": "string"
+        },
+        "total_records": {
+          "title": "Total Records",
+          "type": "integer"
+        },
+        "valid_records": {
+          "title": "Valid Records",
+          "type": "integer"
+        },
+        "eligible_records": {
+          "title": "Eligible Records",
+          "type": "integer"
+        },
+        "excluded_by_time": {
+          "title": "Excluded By Time",
+          "type": "integer"
+        },
+        "streams": {
+          "items": {
+            "$ref": "#/$defs/StreamInventory"
+          },
+          "title": "Streams",
+          "type": "array"
+        },
+        "issues": {
+          "items": {
+            "$ref": "#/$defs/QualityIssue"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "interpretation": {
+          "default": "Operational checks only. No guarantee of source accuracy, market completeness, historical release correctness or trading fitness.",
+          "title": "Interpretation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "as_of",
+        "replay_mode",
+        "status",
+        "data_mode",
+        "policy_sha256",
+        "total_records",
+        "valid_records",
+        "eligible_records",
+        "excluded_by_time",
+        "streams",
+        "issues"
+      ],
+      "title": "QualityReport",
+      "type": "object"
+    },
+    "ReleaseDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "source_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "release_id": {
+          "title": "Release Id",
+          "type": "string"
+        },
+        "metric": {
+          "enum": [
+            "cpi_all_items_sa_mom",
+            "unemployment_rate_sa"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "headline_period": {
+          "title": "Headline Period",
+          "type": "string"
+        },
+        "announced_at": {
+          "format": "date-time",
+          "title": "Announced At",
+          "type": "string"
+        },
+        "tehran_time": {
+          "format": "date-time",
+          "title": "Tehran Time",
+          "type": "string"
+        },
+        "captured_at": {
+          "format": "date-time",
+          "title": "Captured At",
+          "type": "string"
+        },
+        "document_status": {
+          "enum": [
+            "archive_as_captured",
+            "reissued"
+          ],
+          "title": "Document Status",
+          "type": "string"
+        },
+        "reissued_on": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reissued On"
+        },
+        "revision_note": {
+          "title": "Revision Note",
+          "type": "string"
+        },
+        "caveats": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Caveats",
+          "type": "array"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/$defs/ReleaseValueLink"
+          },
+          "title": "Values",
+          "type": "array"
+        },
+        "first_release_verified": {
+          "const": false,
+          "default": false,
+          "title": "First Release Verified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source_url",
+        "release_id",
+        "metric",
+        "headline_period",
+        "announced_at",
+        "tehran_time",
+        "captured_at",
+        "document_status",
+        "reissued_on",
+        "revision_note",
+        "caveats",
+        "values"
+      ],
+      "title": "ReleaseDocument",
+      "type": "object"
+    },
+    "ReleaseValueEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_url": {
+          "format": "uri",
+          "maxLength": 2083,
+          "minLength": 1,
+          "title": "Source Url",
+          "type": "string"
+        },
+        "captured_at": {
+          "format": "date-time",
+          "title": "Captured At",
+          "type": "string"
+        },
+        "capture_method": {
+          "const": "reviewed_web_extract",
+          "default": "reviewed_web_extract",
+          "title": "Capture Method",
+          "type": "string"
+        },
+        "metric": {
+          "enum": [
+            "cpi_all_items_sa_mom",
+            "unemployment_rate_sa"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "release_id": {
+          "pattern": "^USDL-\\d{2}-\\d{4}$",
+          "title": "Release Id",
+          "type": "string"
+        },
+        "headline_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "Headline Period",
+          "type": "string"
+        },
+        "announced_at": {
+          "format": "date-time",
+          "title": "Announced At",
+          "type": "string"
+        },
+        "timing_basis": {
+          "const": "archive_embargo_header",
+          "default": "archive_embargo_header",
+          "title": "Timing Basis",
+          "type": "string"
+        },
+        "timezone_evidence": {
+          "minLength": 1,
+          "title": "Timezone Evidence",
+          "type": "string"
+        },
+        "document_status": {
+          "enum": [
+            "archive_as_captured",
+            "reissued"
+          ],
+          "title": "Document Status",
+          "type": "string"
+        },
+        "reissued_on": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reissued On"
+        },
+        "revision_note": {
+          "minLength": 1,
+          "title": "Revision Note",
+          "type": "string"
+        },
+        "caveats": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Caveats",
+          "type": "array"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/$defs/PublishedValue"
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_url",
+        "captured_at",
+        "metric",
+        "release_id",
+        "headline_period",
+        "announced_at",
+        "timezone_evidence",
+        "document_status",
+        "revision_note",
+        "values"
+      ],
+      "title": "ReleaseValueEvidence",
+      "type": "object"
+    },
+    "ReleaseValueLink": {
+      "additionalProperties": false,
+      "properties": {
+        "reference_period": {
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "period_role": {
+          "enum": [
+            "headline",
+            "previous_in_document"
+          ],
+          "title": "Period Role",
+          "type": "string"
+        },
+        "document_value": {
+          "title": "Document Value",
+          "type": "number"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "locator": {
+          "title": "Locator",
+          "type": "string"
+        },
+        "document_record_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Document Record Id",
+          "type": "string"
+        },
+        "release_date_vintage": {
+          "$ref": "#/$defs/ValueComparison"
+        },
+        "current_revision": {
+          "$ref": "#/$defs/ValueComparison"
+        }
+      },
+      "required": [
+        "reference_period",
+        "period_role",
+        "document_value",
+        "unit",
+        "locator",
+        "document_record_id",
+        "release_date_vintage",
+        "current_revision"
+      ],
+      "title": "ReleaseValueLink",
+      "type": "object"
+    },
+    "ReleaseValueReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "software_version": {
+          "title": "Software Version",
+          "type": "string"
+        },
+        "fingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Fingerprint",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "compared",
+            "incomplete",
+            "no_evidence"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "documents": {
+          "items": {
+            "$ref": "#/$defs/ReleaseDocument"
+          },
+          "title": "Documents",
+          "type": "array"
+        },
+        "intraday_replay_ready": {
+          "const": false,
+          "default": false,
+          "title": "Intraday Replay Ready",
+          "type": "boolean"
+        },
+        "limitations": {
+          "default": [
+            "Official archive values are manually reviewed extracts, not original HTML bytes.",
+            "An archive may have been reissued; the capture date identifies the inspected version.",
+            "An embargo header and a date-only FRED vintage do not prove intraday delivery time.",
+            "Same-day FRED consistency is not independent confirmation or proof of first release.",
+            "CPI MoM uses two index levels from the same vintage and compares at display precision.",
+            "Current-revision differences are not release surprises; no consensus input is present.",
+            "Historical availability is not backdated; replay remains retrieval bounded."
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "generated_at",
+        "as_of",
+        "software_version",
+        "fingerprint",
+        "status",
+        "documents"
+      ],
+      "title": "ReleaseValueReport",
+      "type": "object"
+    },
+    "ReportSection": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "enum": [
+            "quality",
+            "price",
+            "macro",
+            "calendar",
+            "monthly",
+            "releases",
+            "revisions"
+          ],
+          "title": "Key",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "limited",
+            "missing"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "evidence_pointer": {
+          "title": "Evidence Pointer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "status",
+        "evidence_pointer"
+      ],
+      "title": "ReportSection",
+      "type": "object"
+    },
+    "ReportSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "macro_plan": {
+          "$ref": "#/$defs/MacroPlan"
+        },
+        "quality_policy": {
+          "$ref": "#/$defs/QualityPolicy"
+        },
+        "monthly_plan": {
+          "$ref": "#/$defs/MonthlyResearchPlan"
+        },
+        "revision_plan": {
+          "$ref": "#/$defs/RevisionPlan"
+        },
+        "calendar_horizon_days": {
+          "default": 90,
+          "maximum": 366,
+          "minimum": 1,
+          "title": "Calendar Horizon Days",
+          "type": "integer"
+        },
+        "calendar_max_evidence_age_hours": {
+          "default": 168,
+          "exclusiveMinimum": 0,
+          "maximum": 8760,
+          "title": "Calendar Max Evidence Age Hours",
+          "type": "number"
+        }
+      },
+      "required": [
+        "macro_plan",
+        "quality_policy",
+        "monthly_plan",
+        "revision_plan"
+      ],
+      "title": "ReportSettings",
+      "type": "object"
+    },
+    "RequiredStream": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "price_bar",
+            "price_close",
+            "observation",
+            "positioning",
+            "news_event",
+            "calendar_release"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        },
+        "dataset": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset"
+        },
+        "instrument": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instrument"
+        },
+        "series_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Id"
+        },
+        "timeframe": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timeframe"
+        },
+        "min_observations": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Min Observations",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "RequiredStream",
+      "type": "object"
+    },
+    "RevisionLedger": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "software_version": {
+          "title": "Software Version",
+          "type": "string"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "fingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Fingerprint",
+          "type": "string"
+        },
+        "plan": {
+          "$ref": "#/$defs/RevisionPlan"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "incomplete",
+            "no_evidence"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "expected_pairs": {
+          "title": "Expected Pairs",
+          "type": "integer"
+        },
+        "compared_pairs": {
+          "title": "Compared Pairs",
+          "type": "integer"
+        },
+        "vintage_matched_pairs": {
+          "title": "Vintage Matched Pairs",
+          "type": "integer"
+        },
+        "changed_display_pairs": {
+          "title": "Changed Display Pairs",
+          "type": "integer"
+        },
+        "document_slots": {
+          "items": {
+            "$ref": "#/$defs/DocumentSlot"
+          },
+          "title": "Document Slots",
+          "type": "array"
+        },
+        "captures": {
+          "items": {
+            "$ref": "#/$defs/DocumentCapture"
+          },
+          "title": "Captures",
+          "type": "array"
+        },
+        "pairs": {
+          "items": {
+            "$ref": "#/$defs/RevisionPair"
+          },
+          "title": "Pairs",
+          "type": "array"
+        },
+        "capture_changes": {
+          "items": {
+            "$ref": "#/$defs/CaptureChange"
+          },
+          "title": "Capture Changes",
+          "type": "array"
+        },
+        "first_release_verified": {
+          "const": false,
+          "default": false,
+          "title": "First Release Verified",
+          "type": "boolean"
+        },
+        "intraday_replay_ready": {
+          "const": false,
+          "default": false,
+          "title": "Intraday Replay Ready",
+          "type": "boolean"
+        },
+        "limitations": {
+          "default": [
+            "Equality is only at the one-decimal display precision and only for adjacent documents.",
+            "Archive captures may be reissued; their header clocks do not date observed revisions.",
+            "Same-document recapture differences are separate from cross-document differences.",
+            "Missing and ambiguous document slots remain in the declared coverage denominator.",
+            "FRED vintages are day-resolution and share the underlying BLS statistical source.",
+            "Availability remains retrieval bounded; no historical availability is inferred.",
+            "The plan declaration is operator supplied, not independently certified preregistration.",
+            "Differences are not market surprises and do not estimate tradable gold responses."
+          ],
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "software_version",
+        "generated_at",
+        "as_of",
+        "fingerprint",
+        "plan",
+        "status",
+        "expected_pairs",
+        "compared_pairs",
+        "vintage_matched_pairs",
+        "changed_display_pairs",
+        "document_slots",
+        "captures",
+        "pairs",
+        "capture_changes"
+      ],
+      "title": "RevisionLedger",
+      "type": "object"
+    },
+    "RevisionPair": {
+      "additionalProperties": false,
+      "properties": {
+        "metric": {
+          "enum": [
+            "cpi_all_items_sa_mom",
+            "unemployment_rate_sa"
+          ],
+          "title": "Metric",
+          "type": "string"
+        },
+        "reference_period": {
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "next_headline_period": {
+          "title": "Next Headline Period",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "unchanged_display",
+            "changed_display",
+            "missing_document",
+            "ambiguous_document",
+            "missing_previous_value",
+            "invalid_document_order"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueAnchor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueAnchor"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "difference_pp": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Difference Pp"
+        },
+        "before_vintage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueComparison"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after_vintage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ValueComparison"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "vintage_difference_pp": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vintage Difference Pp"
+        }
+      },
+      "required": [
+        "metric",
+        "reference_period",
+        "next_headline_period",
+        "status",
+        "before",
+        "after",
+        "before_vintage",
+        "after_vintage"
+      ],
+      "title": "RevisionPair",
+      "type": "object"
+    },
+    "RevisionPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "declared_at": {
+          "format": "date-time",
+          "title": "Declared At",
+          "type": "string"
+        },
+        "start_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "Start Period",
+          "type": "string"
+        },
+        "end_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "End Period",
+          "type": "string"
+        },
+        "metrics": {
+          "items": {
+            "enum": [
+              "cpi_all_items_sa_mom",
+              "unemployment_rate_sa"
+            ],
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "title": "Metrics",
+          "type": "array"
+        },
+        "selection_reason": {
+          "minLength": 1,
+          "title": "Selection Reason",
+          "type": "string"
+        },
+        "method": {
+          "const": "adjacent_document_display",
+          "default": "adjacent_document_display",
+          "title": "Method",
+          "type": "string"
+        }
+      },
+      "required": [
+        "declared_at",
+        "start_period",
+        "end_period",
+        "metrics",
+        "selection_reason"
+      ],
+      "title": "RevisionPlan",
+      "type": "object"
+    },
+    "RollingAssociation": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "title": "Series Id",
+          "type": "string"
+        },
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "first_month": {
+          "format": "date",
+          "title": "First Month",
+          "type": "string"
+        },
+        "last_month": {
+          "format": "date",
+          "title": "Last Month",
+          "type": "string"
+        },
+        "n": {
+          "title": "N",
+          "type": "integer"
+        },
+        "pearson": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pearson"
+        },
+        "spearman": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Spearman"
+        }
+      },
+      "required": [
+        "series_id",
+        "method",
+        "first_month",
+        "last_month",
+        "n",
+        "pearson",
+        "spearman"
+      ],
+      "title": "RollingAssociation",
+      "type": "object"
+    },
+    "StreamInventory": {
+      "additionalProperties": false,
+      "properties": {
+        "stream_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Stream Id",
+          "type": "string"
+        },
+        "identity": {
+          "additionalProperties": true,
+          "title": "Identity",
+          "type": "object"
+        },
+        "record_versions": {
+          "minimum": 1,
+          "title": "Record Versions",
+          "type": "integer"
+        },
+        "unique_observations": {
+          "minimum": 1,
+          "title": "Unique Observations",
+          "type": "integer"
+        },
+        "extra_versions": {
+          "minimum": 0,
+          "title": "Extra Versions",
+          "type": "integer"
+        },
+        "first_observed_at": {
+          "format": "date-time",
+          "title": "First Observed At",
+          "type": "string"
+        },
+        "last_observed_at": {
+          "format": "date-time",
+          "title": "Last Observed At",
+          "type": "string"
+        },
+        "last_available_at": {
+          "format": "date-time",
+          "title": "Last Available At",
+          "type": "string"
+        },
+        "age_hours": {
+          "title": "Age Hours",
+          "type": "number"
+        },
+        "freshness_limit_hours": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Freshness Limit Hours"
+        },
+        "missing_values": {
+          "minimum": 0,
+          "title": "Missing Values",
+          "type": "integer"
+        },
+        "missing_fraction": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Missing Fraction",
+          "type": "number"
+        },
+        "retrieval_time_only_versions": {
+          "minimum": 0,
+          "title": "Retrieval Time Only Versions",
+          "type": "integer"
+        },
+        "daily_gap_count": {
+          "minimum": 0,
+          "title": "Daily Gap Count",
+          "type": "integer"
+        },
+        "largest_gap_hours": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Largest Gap Hours"
+        },
+        "date_only_prices": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Date Only Prices",
+          "type": "integer"
+        },
+        "weekend_date_labels": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Weekend Date Labels",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "stream_id",
+        "identity",
+        "record_versions",
+        "unique_observations",
+        "extra_versions",
+        "first_observed_at",
+        "last_observed_at",
+        "last_available_at",
+        "age_hours",
+        "freshness_limit_hours",
+        "missing_values",
+        "missing_fraction",
+        "retrieval_time_only_versions",
+        "daily_gap_count",
+        "largest_gap_hours"
+      ],
+      "title": "StreamInventory",
+      "type": "object"
+    },
+    "ValueAnchor": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Capture Id",
+          "type": "string"
+        },
+        "record_id": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "reference_period": {
+          "title": "Reference Period",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "decimal_places": {
+          "const": 1,
+          "default": 1,
+          "title": "Decimal Places",
+          "type": "integer"
+        },
+        "locator": {
+          "title": "Locator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capture_id",
+        "record_id",
+        "reference_period",
+        "value",
+        "unit",
+        "locator"
+      ],
+      "title": "ValueAnchor",
+      "type": "object"
+    },
+    "ValueComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "matches_display",
+            "differs_display",
+            "rounding_boundary",
+            "missing_period",
+            "missing_value"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "difference_from_document": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Difference From Document"
+        },
+        "record_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Record Ids",
+          "type": "array"
+        },
+        "vintage_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Vintage Date"
+        },
+        "transformation": {
+          "enum": [
+            "native_unemployment_rate",
+            "100*(current_CPI/prior_CPI-1)"
+          ],
+          "title": "Transformation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "vintage_date",
+        "transformation"
+      ],
+      "title": "ValueComparison",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "software_version": {
+      "title": "Software Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Fingerprint",
+      "type": "string"
+    },
+    "registry_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Registry Sha256",
+      "type": "string"
+    },
+    "settings": {
+      "$ref": "#/$defs/ReportSettings"
+    },
+    "status": {
+      "enum": [
+        "compiled",
+        "with_limits",
+        "partial"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/ReportSection"
+      },
+      "title": "Sections",
+      "type": "array"
+    },
+    "quality": {
+      "$ref": "#/$defs/QualityReport"
+    },
+    "macro": {
+      "$ref": "#/$defs/MacroContext"
+    },
+    "calendar": {
+      "$ref": "#/$defs/CalendarContext"
+    },
+    "monthly": {
+      "$ref": "#/$defs/MonthlyResearch"
+    },
+    "releases": {
+      "$ref": "#/$defs/ReleaseValueReport"
+    },
+    "revisions": {
+      "$ref": "#/$defs/RevisionLedger"
+    },
+    "data_basis": {
+      "const": "stored_data_single_snapshot",
+      "default": "stored_data_single_snapshot",
+      "title": "Data Basis",
+      "type": "string"
+    },
+    "daily_backtest_ready": {
+      "const": false,
+      "default": false,
+      "title": "Daily Backtest Ready",
+      "type": "boolean"
+    },
+    "intraday_replay_ready": {
+      "const": false,
+      "default": false,
+      "title": "Intraday Replay Ready",
+      "type": "boolean"
+    },
+    "first_release_verified": {
+      "const": false,
+      "default": false,
+      "title": "First Release Verified",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "software_version",
+    "generated_at",
+    "as_of",
+    "fingerprint",
+    "registry_sha256",
+    "settings",
+    "status",
+    "sections",
+    "quality",
+    "macro",
+    "calendar",
+    "monthly",
+    "releases",
+    "revisions"
+  ],
+  "title": "ResearchReport",
+  "type": "object"
+}

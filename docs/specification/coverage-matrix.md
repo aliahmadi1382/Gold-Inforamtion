@@ -25,10 +25,11 @@
 | Risk controls, kill switch and broker isolation | `docs/trading-methodology/` | Execution acceptance requirements; no live order code |
 | Source, timestamp, unit, license, confidence, lineage | `models.Provenance`, `storage.py`, `registry.py` | Validated contracts and raw-to-record audit |
 | Acquisition history and coverage | `acquisition.py`, `quality.py`, `config/quality_policy.yaml` | Per-run manifests and per-stream as-of inventories; revision, missingness, integrity and age checks |
-| Phased development and owner education | `docs/phases.fa.md`, `docs/education/` | Dependency-aware deliveries, nine Persian chapters, glossary and exercises |
+| Phased development and owner education | `docs/phases.fa.md`, `docs/education/` | Dependency-aware deliveries, ten Persian chapters, glossary and exercises |
 | Cross-document revisions and coverage | `revision_ledger.py`, `config/revision_ledger.yaml` | Fixed-window adjacent-document comparisons with exact-date vintages; complete-capture selection, ambiguity/missingness and separate recapture history; no first-release or delivery-time certification |
 | Monthly gold/macro relationships | `monthly_research.py`, `config/monthly_research.yaml` | Current-revision descriptive changes, common/pairwise samples, Pearson/Spearman, contiguous rolling windows, method-break and missingness gates; not causal or predictive research |
 | Readable local research status | `brief.py`, `gold research-brief` | Persian Markdown plus evidence JSON; macro and calendar states, missingness and limitations; no trading narrative or recommendation |
+| Unified research report | `research_report.py`, `gold research-report`, `gold verify-report` | Shared cutoff and database snapshot, seven evidence-linked sections, preserved missingness, per-run bundles and manifest/hash/coherence checks; stored data only, no LLM analyst |
 | Raw/bronze/silver/gold/derived architecture | `docs/architecture.md`, `data/*/README.md` | Local store materializes raw and normalized; logical future zones documented |
 | Public/licensed/restricted data | Registry, `export-public`, Git ignore and publication check | Default-deny export and tracked data guard; no commercial datasets committed |
 | Seven initial questions | `config/project.yaml`, master spec | Daily XAU/USD and free personal APIs confirmed; keys supplied locally; broker/risk choices deferred |

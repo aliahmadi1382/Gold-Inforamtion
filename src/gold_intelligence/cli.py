@@ -17,6 +17,13 @@ from .demo import demo
 from .ingestion import import_cftc, import_prices, import_records, ingest_fred, timestamp
 from .macro import MacroContext, MacroPlan, fetch_core, load_plan, macro_context
 from .models import RECORD_TYPES, HistoricalEvent, Provenance
+from .monthly_research import (
+    MonthlyResearch,
+    MonthlyResearchPlan,
+    load_research_plan,
+    monthly_research,
+    render_monthly_persian,
+)
 from .quality import QualityPolicy, QualityReport, assess, load_policy
 from .registry import Registry, export_public, load_registry
 from .release_calendar import CalendarContext, ReleaseEvidence, calendar_context, import_evidence
@@ -42,6 +49,10 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    c = sub.add_parser("monthly-research", help="local descriptive gold/macro relationships")
+    c.add_argument("--as-of", type=timestamp, required=True)
+    c.add_argument("--plan", type=Path, default=Path("config/monthly_research.yaml"))
+    c.add_argument("--output-dir", type=Path, default=Path("local/reports"))
     c = sub.add_parser(
         "import-release-evidence", help="import reviewed official BLS timing evidence"
     )
@@ -159,6 +170,8 @@ def run(args) -> dict:
             "release_evidence": ReleaseEvidence,
             "calendar_context": CalendarContext,
             "research_brief": ResearchBrief,
+            "monthly_research_plan": MonthlyResearchPlan,
+            "monthly_research": MonthlyResearch,
         }
         for name, model in models.items():
             schema = {
@@ -172,6 +185,21 @@ def run(args) -> dict:
     if args.command == "demo":
         return demo(args.output, registry)
     with Store(args.store) as store:
+        if args.command == "monthly-research":
+            report = monthly_research(store, load_research_plan(args.plan), args.as_of)
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+            (args.output_dir / "monthly-research.json").write_text(
+                report.model_dump_json(indent=2) + "\n", encoding="utf-8"
+            )
+            output = args.output_dir / "monthly-research.fa.md"
+            output.write_text(render_monthly_persian(report), encoding="utf-8")
+            return {
+                "status": report.status,
+                "report": str(output),
+                "fingerprint": report.fingerprint,
+                "estimated_associations": sum(a.status == "estimated" for a in report.associations),
+                "daily_backtest_ready": False,
+            }
         if args.command == "calendar-context":
             report = calendar_context(store, args.as_of, args.horizon_days)
             if args.output:
@@ -359,6 +387,8 @@ def main(argv=None) -> int:
             result = run(args)
         print(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False))
         if args.command == "fetch-fred-core" and result["status"] != "succeeded":
+            return 3
+        if args.command == "monthly-research" and result["status"] == "insufficient_data":
             return 3
         return (
             3 if args.command in {"quality", "research-brief"} and result["status"] == "fail" else 0

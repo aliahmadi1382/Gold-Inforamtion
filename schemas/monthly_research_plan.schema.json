@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "start_month": {
+      "default": "2006-02-01",
+      "format": "date",
+      "title": "Start Month",
+      "type": "string"
+    },
+    "minimum_valid_weekday_fraction": {
+      "default": 0.8,
+      "exclusiveMinimum": 0,
+      "maximum": 1,
+      "title": "Minimum Valid Weekday Fraction",
+      "type": "number"
+    },
+    "minimum_pairs": {
+      "default": 36,
+      "minimum": 3,
+      "title": "Minimum Pairs",
+      "type": "integer"
+    },
+    "rolling_months": {
+      "default": 60,
+      "minimum": 3,
+      "title": "Rolling Months",
+      "type": "integer"
+    }
+  },
+  "title": "MonthlyResearchPlan",
+  "type": "object"
+}

@@ -1,0 +1,5 @@
+# Fixed before inspecting correlations; descriptive, revised-data research only.
+start_month: 2006-02-01
+minimum_valid_weekday_fraction: 0.80
+minimum_pairs: 36
+rolling_months: 60

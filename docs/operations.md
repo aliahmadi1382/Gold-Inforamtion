@@ -114,6 +114,22 @@ Schedules and archived embargo clocks create only `scheduled_at`. Actual deliver
 
 `research-brief` writes `research-brief.fa.md` and `research-brief.json` locally. It uses the explicit cutoff, current macro plan and history-quality policy; override them with `--plan` or `--policy`. Exit code 3 indicates failed data-quality checks; warning results return 0. The Markdown view displays numbers to at most four decimal places, unit labels, missing states, upcoming announced clocks in three timezones and source record IDs. No order, predictive signal, alert or external publication is generated. Missing upcoming evidence is not proof no event is scheduled. Calendar coverage is limited to the reviewed CPI/employment evidence; cancellations and unobserved source changes are not automatically detected.
 
+## Monthly relationship research (0.6)
+
+```powershell
+$studyCutoff = (Get-Date).ToUniversalTime().ToString('o')
+uv run gold monthly-research --as-of $studyCutoff --output-dir local/reports
+uv run python scripts/inspect_monthly_research.py --store local/market --report local/reports/monthly-research.json
+```
+
+This command reads the existing local store; it does not fetch data or require credentials. It writes `monthly-research.fa.md` and `monthly-research.json`. The fixed five-series study uses World Bank monthly gold plus FRED DTWEXBGS, DFII10, DGS10 and CPIAUCSL. `--plan` defaults to `config/monthly_research.yaml`; changes to start, coverage, minimum sample or rolling window must accompany interpretation. The default start is February 2006, using January as the change base. Gold and index changes are percentages; rate differences are percentage points. CPI is month-over-month seasonally adjusted inflation, not year-over-year inflation or release surprise.
+
+Only completed calendar months and versions available/retrieved by the explicit cutoff qualify. Historical vintage requests remain separate. All weekday date labels must be present, with at least 80% non-null values; missing labels and null labels are separately retained. These are research coverage rules, not a certified holiday calendar. A rejected month invalidates its own and the next month's change. June 2025 gold change is excluded at the World Bank method break. Results keep the two price methodologies separate.
+
+The report contains pairwise and common-sample Pearson/Spearman coefficients, exact included months, all monthly levels with input record IDs, reasons for excluded changes and complete contiguous 60-month common-sample windows. Coefficients below the configured minimum of 36 months are absent, not zero. The threshold is a reporting policy, not a power guarantee. Constant series have undefined correlations. No p-values, fitted lags, trading returns or out-of-sample claims are generated. An `insufficient_data` report is still written and returns exit code 3; descriptive results return 0, invalid input/integrity failures return 2.
+
+The independent inspection script recomputes selected monthly levels, coverage, adjacent changes, sample membership and reported Pearson/Spearman coefficients from the SQLite inputs. It does not certify provider definitions or causality. Preserve the code version, configuration, cutoff, local store/raw bytes and JSON fingerprint for reproduction. The output includes current revisions known at the cutoff, not what was known during each historical month. Keep real derived outputs under ignored `local/`. See the [method note](source-methodology/monthly-research.fa.md) and [Persian lesson](education/07-monthly-relationships.fa.md).
+
 ## CFTC positioning
 
 Use the official [compressed archive](https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm). Choose **Legacy / Futures Only / Text**, unzip locally, then:

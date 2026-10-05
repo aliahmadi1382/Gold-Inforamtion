@@ -1,0 +1,434 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Association": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "title": "Series Id",
+          "type": "string"
+        },
+        "population": {
+          "enum": [
+            "pairwise",
+            "common"
+          ],
+          "title": "Population",
+          "type": "string"
+        },
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "months": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Months",
+          "type": "array"
+        },
+        "n": {
+          "title": "N",
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "estimated",
+            "too_short",
+            "no_overlap",
+            "constant"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "pearson": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pearson"
+        },
+        "spearman": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Spearman"
+        }
+      },
+      "required": [
+        "series_id",
+        "population",
+        "method",
+        "months",
+        "n",
+        "status",
+        "pearson",
+        "spearman"
+      ],
+      "title": "Association",
+      "type": "object"
+    },
+    "MonthlyChange": {
+      "additionalProperties": false,
+      "properties": {
+        "month": {
+          "format": "date",
+          "title": "Month",
+          "type": "string"
+        },
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "values": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Values",
+          "type": "object"
+        },
+        "exclusions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Exclusions",
+          "type": "object"
+        }
+      },
+      "required": [
+        "month",
+        "method",
+        "values",
+        "exclusions"
+      ],
+      "title": "MonthlyChange",
+      "type": "object"
+    },
+    "MonthlyLevel": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "title": "Series Id",
+          "type": "string"
+        },
+        "month": {
+          "format": "date",
+          "title": "Month",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "method": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Method"
+        },
+        "status": {
+          "enum": [
+            "available",
+            "missing",
+            "insufficient_daily_coverage"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "expected_labels": {
+          "title": "Expected Labels",
+          "type": "integer"
+        },
+        "valid_values": {
+          "title": "Valid Values",
+          "type": "integer"
+        },
+        "missing_labels": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Missing Labels",
+          "type": "array"
+        },
+        "null_labels": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "title": "Null Labels",
+          "type": "array"
+        },
+        "record_ids": {
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Record Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "series_id",
+        "month",
+        "unit",
+        "status",
+        "value",
+        "expected_labels",
+        "valid_values",
+        "missing_labels",
+        "null_labels",
+        "record_ids"
+      ],
+      "title": "MonthlyLevel",
+      "type": "object"
+    },
+    "MonthlyResearchPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "start_month": {
+          "default": "2006-02-01",
+          "format": "date",
+          "title": "Start Month",
+          "type": "string"
+        },
+        "minimum_valid_weekday_fraction": {
+          "default": 0.8,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Minimum Valid Weekday Fraction",
+          "type": "number"
+        },
+        "minimum_pairs": {
+          "default": 36,
+          "minimum": 3,
+          "title": "Minimum Pairs",
+          "type": "integer"
+        },
+        "rolling_months": {
+          "default": 60,
+          "minimum": 3,
+          "title": "Rolling Months",
+          "type": "integer"
+        }
+      },
+      "title": "MonthlyResearchPlan",
+      "type": "object"
+    },
+    "RollingAssociation": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "title": "Series Id",
+          "type": "string"
+        },
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "first_month": {
+          "format": "date",
+          "title": "First Month",
+          "type": "string"
+        },
+        "last_month": {
+          "format": "date",
+          "title": "Last Month",
+          "type": "string"
+        },
+        "n": {
+          "title": "N",
+          "type": "integer"
+        },
+        "pearson": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pearson"
+        },
+        "spearman": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Spearman"
+        }
+      },
+      "required": [
+        "series_id",
+        "method",
+        "first_month",
+        "last_month",
+        "n",
+        "pearson",
+        "spearman"
+      ],
+      "title": "RollingAssociation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "software_version": {
+      "title": "Software Version",
+      "type": "string"
+    },
+    "plan": {
+      "$ref": "#/$defs/MonthlyResearchPlan"
+    },
+    "fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Fingerprint",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "descriptive_only",
+        "insufficient_data"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "daily_backtest_ready": {
+      "const": false,
+      "default": false,
+      "title": "Daily Backtest Ready",
+      "type": "boolean"
+    },
+    "levels": {
+      "items": {
+        "$ref": "#/$defs/MonthlyLevel"
+      },
+      "title": "Levels",
+      "type": "array"
+    },
+    "changes": {
+      "items": {
+        "$ref": "#/$defs/MonthlyChange"
+      },
+      "title": "Changes",
+      "type": "array"
+    },
+    "associations": {
+      "items": {
+        "$ref": "#/$defs/Association"
+      },
+      "title": "Associations",
+      "type": "array"
+    },
+    "rolling": {
+      "items": {
+        "$ref": "#/$defs/RollingAssociation"
+      },
+      "title": "Rolling",
+      "type": "array"
+    },
+    "definitions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Definitions",
+      "type": "object"
+    },
+    "sources": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Sources",
+      "type": "object"
+    },
+    "limitations": {
+      "default": [
+        "Latest versions known at the cutoff; not an original-release historical replay.",
+        "Gold uses monthly average prices, not executable close-to-close returns.",
+        "Contemporaneous association is neither causation nor a forecasting test.",
+        "June 2025 gold change crosses a methodology break and is excluded.",
+        "Daily coverage uses weekday labels, not a verified trading/holiday calendar.",
+        "No imputation; missing months invalidate adjacent changes and rolling windows.",
+        "The minimum sample is a reporting policy, not a statistical power guarantee.",
+        "Overlapping rolling windows are dependent; no p-values or confidence claims.",
+        "No lag search, fitted strategy, transaction costs or out-of-sample evaluation."
+      ],
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "generated_at",
+    "as_of",
+    "software_version",
+    "plan",
+    "fingerprint",
+    "status",
+    "levels",
+    "changes",
+    "associations",
+    "rolling",
+    "definitions",
+    "sources"
+  ],
+  "title": "MonthlyResearch",
+  "type": "object"
+}

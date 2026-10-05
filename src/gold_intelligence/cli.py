@@ -34,6 +34,12 @@ from .release_values import (
     release_value_report,
     render_release_values,
 )
+from .report_comparison import (
+    ComparisonManifest,
+    ReportComparison,
+    compare_reports,
+    verify_comparison,
+)
 from .research_report import (
     ReportManifest,
     ReportSettings,
@@ -71,6 +77,12 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    c = sub.add_parser("compare-reports", help="compare two verified saved research bundles")
+    c.add_argument("before", type=Path)
+    c.add_argument("after", type=Path)
+    c.add_argument("--output-dir", type=Path, default=Path("local/reports/comparisons"))
+    c = sub.add_parser("verify-comparison", help="verify and recompute a saved comparison")
+    c.add_argument("directory", type=Path)
     c = sub.add_parser("research-report", help="compose local research with one shared cutoff")
     c.add_argument("--as-of", type=timestamp, required=True)
     c.add_argument("--macro-plan", type=Path, default=Path("config/macro_core.yaml"))
@@ -198,6 +210,19 @@ def parser() -> argparse.ArgumentParser:
 
 
 def run(args) -> dict:
+    if args.command == "compare-reports":
+        report, directory = compare_reports(args.before, args.after, args.output_dir)
+        return {
+            "status": report.status,
+            "bundle": str(directory),
+            "report": str(directory / "comparison.fa.md"),
+            "fingerprint": report.fingerprint,
+            "context_changes": len(report.context_changes),
+            "changed_entities": len(report.changes),
+            "daily_backtest_ready": False,
+        }
+    if args.command == "verify-comparison":
+        return verify_comparison(args.directory)
     if args.command == "verify-report":
         return verify_research_bundle(args.directory)
     registry = load_registry(args.registry)
@@ -227,6 +252,8 @@ def run(args) -> dict:
             "revision_ledger": RevisionLedger,
             "research_report": ResearchReport,
             "report_manifest": ReportManifest,
+            "report_comparison": ReportComparison,
+            "comparison_manifest": ComparisonManifest,
         }
         for name, model in models.items():
             schema = {

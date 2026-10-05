@@ -1,0 +1,352 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "EntityChange": {
+      "additionalProperties": false,
+      "properties": {
+        "section": {
+          "enum": [
+            "quality",
+            "price",
+            "macro",
+            "calendar",
+            "monthly",
+            "releases",
+            "revisions"
+          ],
+          "title": "Section",
+          "type": "string"
+        },
+        "collection": {
+          "title": "Collection",
+          "type": "string"
+        },
+        "identity": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Identity",
+          "type": "array"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "action": {
+          "enum": [
+            "added",
+            "removed",
+            "modified"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "before_pointer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Before Pointer"
+        },
+        "after_pointer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "After Pointer"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/FieldChange"
+          },
+          "minItems": 1,
+          "title": "Fields",
+          "type": "array"
+        }
+      },
+      "required": [
+        "section",
+        "collection",
+        "identity",
+        "label",
+        "action",
+        "before_pointer",
+        "after_pointer",
+        "fields"
+      ],
+      "title": "EntityChange",
+      "type": "object"
+    },
+    "FieldChange": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "result",
+            "evidence",
+            "age"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "before_present": {
+          "title": "Before Present",
+          "type": "boolean"
+        },
+        "after_present": {
+          "title": "After Present",
+          "type": "boolean"
+        },
+        "before": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "after": {
+          "$ref": "#/$defs/JsonValue"
+        }
+      },
+      "required": [
+        "path",
+        "category",
+        "before_present",
+        "after_present",
+        "before",
+        "after"
+      ],
+      "title": "FieldChange",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "ReportReference": {
+      "additionalProperties": false,
+      "properties": {
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "report_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Report Sha256",
+          "type": "string"
+        },
+        "fingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Fingerprint",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "software_version": {
+          "title": "Software Version",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "location",
+        "report_sha256",
+        "fingerprint",
+        "as_of",
+        "generated_at",
+        "software_version",
+        "status"
+      ],
+      "title": "ReportReference",
+      "type": "object"
+    },
+    "SectionComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "enum": [
+            "quality",
+            "price",
+            "macro",
+            "calendar",
+            "monthly",
+            "releases",
+            "revisions"
+          ],
+          "title": "Key",
+          "type": "string"
+        },
+        "before_status": {
+          "title": "Before Status",
+          "type": "string"
+        },
+        "after_status": {
+          "title": "After Status",
+          "type": "string"
+        },
+        "added": {
+          "minimum": 0,
+          "title": "Added",
+          "type": "integer"
+        },
+        "removed": {
+          "minimum": 0,
+          "title": "Removed",
+          "type": "integer"
+        },
+        "modified": {
+          "minimum": 0,
+          "title": "Modified",
+          "type": "integer"
+        },
+        "unchanged": {
+          "minimum": 0,
+          "title": "Unchanged",
+          "type": "integer"
+        },
+        "evidence_ids_added": {
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Evidence Ids Added",
+          "type": "array"
+        },
+        "evidence_ids_removed": {
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Evidence Ids Removed",
+          "type": "array"
+        }
+      },
+      "required": [
+        "key",
+        "before_status",
+        "after_status",
+        "added",
+        "removed",
+        "modified",
+        "unchanged",
+        "evidence_ids_added",
+        "evidence_ids_removed"
+      ],
+      "title": "SectionComparison",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "comparator_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Comparator Version",
+      "type": "string"
+    },
+    "software_version": {
+      "title": "Software Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Fingerprint",
+      "type": "string"
+    },
+    "before": {
+      "$ref": "#/$defs/ReportReference"
+    },
+    "after": {
+      "$ref": "#/$defs/ReportReference"
+    },
+    "status": {
+      "enum": [
+        "unchanged",
+        "context_only",
+        "changed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "context_changes": {
+      "items": {
+        "$ref": "#/$defs/FieldChange"
+      },
+      "title": "Context Changes",
+      "type": "array"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/SectionComparison"
+      },
+      "title": "Sections",
+      "type": "array"
+    },
+    "changes": {
+      "items": {
+        "$ref": "#/$defs/EntityChange"
+      },
+      "title": "Changes",
+      "type": "array"
+    },
+    "daily_backtest_ready": {
+      "const": false,
+      "default": false,
+      "title": "Daily Backtest Ready",
+      "type": "boolean"
+    },
+    "causal_attribution": {
+      "const": false,
+      "default": false,
+      "title": "Causal Attribution",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "software_version",
+    "generated_at",
+    "fingerprint",
+    "before",
+    "after",
+    "status",
+    "context_changes",
+    "sections",
+    "changes"
+  ],
+  "title": "ReportComparison",
+  "type": "object"
+}

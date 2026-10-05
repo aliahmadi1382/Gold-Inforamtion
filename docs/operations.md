@@ -196,6 +196,31 @@ Exit 0 means a bundle was produced with status `compiled` or `with_limits`; insp
 
 All components are recomputed in one SQLite read transaction, with one `system` cutoff. Reference dates, freshness thresholds and document vintages remain distinct. A matching semantic fingerprint excludes build clocks but includes evidence, settings, registry hash, cutoff and software version; it is not a digital signature. The report cannot clear daily backtest or intraday-release gates. See [delivery evidence](source-methodology/unified-research-report.fa.md) and [Persian lesson ten](education/10-unified-research-report.fa.md).
 
+## Comparing saved research runs (0.10)
+
+`compare-reports` takes two completed `research-report` bundle directories, in before/after order. The after cutoff must be equal or later; generation time does not determine the order. Replace the placeholders with the printed `bundle` paths from the chosen runs:
+
+```powershell
+$beforeReport = 'local/reports/unified/research-BEFORE-RUN'
+$afterReport = 'local/reports/unified/research-AFTER-RUN'
+uv run gold compare-reports $beforeReport $afterReport --output-dir local/reports/comparisons
+```
+
+No registry, store, key or network access is required. Both complete input bundles are verified before comparison, and exactly the checked main-JSON bytes become the source snapshots. A new `comparison-*` directory contains `comparison.fa.md`, complete `comparison.json`, `inputs/before.json`, `inputs/after.json` and `manifest.json`. Real input copies and derived values remain subject to the original source rights; keep them under ignored `local/`. Prior runs are preserved; `.incomplete-*` output after failure is not a completed comparison.
+
+```powershell
+$comparisonBundle = 'local/reports/comparisons/comparison-PRINTED-RUN'
+uv run gold verify-comparison $comparisonBundle
+```
+
+Verification checks four file hashes/sizes, the typed comparison and fingerprint, then recomputes the comparison from its two included input snapshots. The original bundle locations are not needed. This verifies computational coherence within the supported comparator version, not economic truth, publisher authenticity or all original source-bundle files. Unlisted notes are preserved and outside verification.
+
+`unchanged` means no differences within the compared content/context; `context_only` means only cutoff/settings/software/registry changed; `changed` means at least one semantic entity differs. All three successfully produced outcomes exit 0, even when the input report is partial. Invalid/corrupt inputs, reversed cutoffs, ambiguous row identities or output errors exit 2. Inspect input and section statuses; success does not certify data completeness. `verify-comparison` also uses exit 0/2.
+
+The schema/comparator is versioned as `1.0.0`; source reports use the supported typed research-report contract (tested with 0.9 and 0.10 artifacts). Entity rows match by meaning, with original JSON pointers for inspection. Lists of parent record IDs are sorted; metadata clocks and derived report fingerprints are not market changes. The complete JSON retains every reported difference; Markdown previews at most twelve entities and four fields per entity per section, with approximate age display. Input byte hashes bind exact snapshots even when data-change status is unchanged. Source paths and comparison generation time do not affect its fingerprint.
+
+Price coverage cannot establish equality of underlying prices. Added/removed evidence means membership in the report, not database insertion/deletion; an ID change can be a recapture without a numeric revision. Common-sample membership remains visible. Attribution is not inferred from simultaneous context and output changes. See [delivery evidence](source-methodology/report-comparison.fa.md) and [Persian lesson eleven](education/11-comparing-research-runs.fa.md).
+
 ## CFTC positioning
 
 Use the official [compressed archive](https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm). Choose **Legacy / Futures Only / Text**, unzip locally, then:

@@ -581,9 +581,11 @@ def write_research_report(report, output_dir):
     return destination
 
 
-def verify_research_bundle(directory):
+def load_verified_report(directory):
+    """Return the same bytes and models that passed verification, without rereading."""
     directory = Path(directory).resolve()
     manifest = ReportManifest.model_validate_json((directory / "manifest.json").read_bytes())
+    contents = {}
     for item in manifest.files:
         path = (directory / item.path).resolve()
         if not path.is_relative_to(directory):
@@ -591,7 +593,8 @@ def verify_research_bundle(directory):
         content = path.read_bytes()
         if len(content) != item.bytes or hashlib.sha256(content).hexdigest() != item.sha256:
             raise ValueError("report artifact hash mismatch")
-    report = ResearchReport.model_validate_json((directory / "research-report.json").read_bytes())
+        contents[item.path] = content
+    report = ResearchReport.model_validate_json(contents["research-report.json"])
     if (
         report.as_of != manifest.as_of
         or report.software_version != manifest.software_version
@@ -606,10 +609,15 @@ def verify_research_bundle(directory):
         ("releases", "release-values"),
         ("revisions", "revision-ledger"),
     ):
-        if json.loads((directory / f"details/{name}.json").read_bytes()) != getattr(
-            report, key
-        ).model_dump(mode="json"):
+        if json.loads(contents[f"details/{name}.json"]) != getattr(report, key).model_dump(
+            mode="json"
+        ):
             raise ValueError("report detail differs from its embedded component")
+    return report, manifest, contents["research-report.json"]
+
+
+def verify_research_bundle(directory):
+    report, manifest, _ = load_verified_report(directory)
     return {
         "status": "verified",
         "files": len(manifest.files),

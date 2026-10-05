@@ -1,6 +1,6 @@
 # Master Data & Research Specification
 
-Version 1.5.0 · reviewed 2026-10-05 · implementation release 0.9.0.
+Version 1.6.0 · reviewed 2026-10-05 · implementation release 0.10.0.
 The supplied brief is preserved verbatim in `original-brief.md` as an input artifact, not a verified factual source or a promise of working integrations. This specification and the source audit take precedence for implementation status.
 
 ## Objective and scope
@@ -64,3 +64,5 @@ Release 0.6 adds descriptive monthly gold/macro relationships with fixed transfo
 Release 0.8 expands the reviewed archive coverage to a declared January–June 2020 comparison window, with July headline documents as the terminal boundary. The revision ledger retains every expected pair, ambiguous/missing document slots, exact-date vintage parents and separate same-document capture history. Complete-document selection, raw integrity and independent arithmetic reconciliation are acceptance criteria. This bounded archive comparison does not certify exhaustive revision history, first release or actual delivery. See [revision ledger evidence](../source-methodology/revision-ledger.fa.md).
 
 Release 0.9 composes the existing research engines at one explicit system cutoff in one SQLite read transaction. Its seven-section overview links to the exact nested evidence, preserves missing/limited states and keeps daily backtest, first-release and intraday readiness false. Acceptance includes concurrent-ingestion isolation, atomic publication of a new run directory, non-overwrite of previous runs, complete manifests, hashes and semantic coherence, plus independent reconciliation of real monthly/ledger details. No source data acquisition, LLM analyst or economic-authenticity guarantee is added. See [unified report evidence](../source-methodology/unified-research-report.fa.md).
+
+Release 0.10 compares verified report bundles by semantic row identities, keeping cutoff/settings/software/registry changes separate from report content. Acceptance includes reorder invariance, explicit missing/null/zero distinctions, unit/method separation, sample membership, recapture vs value differences, view exits, exact verified input bytes, tamper rejection, preserved prior runs and standalone recomputation from copied input JSON. Completeness is bounded by what source reports contain: daily-price coverage cannot certify all prices or the entire database. Causal attribution remains false. See [comparison evidence](../source-methodology/report-comparison.fa.md).

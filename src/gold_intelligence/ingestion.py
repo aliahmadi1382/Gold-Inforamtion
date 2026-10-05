@@ -13,6 +13,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
+from . import __version__
 from .models import RECORD_TYPES, Observation, Positioning, PriceBar, Provenance, aware
 from .registry import Registry, Source, validate_record_source
 from .storage import Store
@@ -282,7 +283,7 @@ def fetch_bytes(url: str, attempts: int = 3) -> bytes:
     """Bounded requests; never expose request URLs (which may contain credentials)."""
     for attempt in range(attempts):
         try:
-            request = Request(url, headers={"User-Agent": "GoldMarketIntelligence/0.1"})
+            request = Request(url, headers={"User-Agent": f"GoldMarketIntelligence/{__version__}"})
             with urlopen(request, timeout=30) as response:
                 content = response.read(20_000_001)
                 if len(content) > 20_000_000:

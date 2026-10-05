@@ -141,6 +141,18 @@
             }
           ],
           "title": "Largest Gap Hours"
+        },
+        "date_only_prices": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Date Only Prices",
+          "type": "integer"
+        },
+        "weekend_date_labels": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Weekend Date Labels",
+          "type": "integer"
         }
       },
       "required": [
@@ -167,8 +179,8 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "1.0.0",
-      "default": "1.0.0",
+      "const": "1.1.0",
+      "default": "1.1.0",
       "title": "Schema Version",
       "type": "string"
     },

@@ -41,7 +41,9 @@ SAFE_PARAMETERS = {
 class AcquisitionRun(Contract):
     schema_version: Literal["1.0.0"] = "1.0.0"
     run_id: str = Field(pattern=r"^[a-f0-9]{32}$")
-    operation: Literal["import-prices", "import-cftc", "import-records", "fetch-fred"]
+    operation: Literal[
+        "import-prices", "import-cftc", "import-records", "fetch-fred", "fetch-alpha-gold"
+    ]
     application_version: NonEmpty
     started_at: Timestamp
     finished_at: Timestamp | None = None

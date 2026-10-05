@@ -1,15 +1,15 @@
 # Master Data & Research Specification
 
-Version 1.1.0 · reviewed 2026-10-05 · implementation release 0.2.0.
+Version 1.2.0 · reviewed 2026-10-05 · implementation release 0.3.0.
 The supplied brief is preserved verbatim in `original-brief.md` as an input artifact, not a verified factual source or a promise of working integrations. This specification and the source audit take precedence for implementation status.
 
 ## Objective and scope
 
-Build an evidence-grounded Gold Market Intelligence & Decision System in four independently validated stages. The delivered release is a runnable research foundation. A daily XAU/USD stream is the initial analysis target; no real price feed, broker, proprietary dataset or current market opinion is assumed. Historical coverage means the earliest defensible evidence **per series and monetary regime**, not a continuous tick history extending back to 1919.
+Build an evidence-grounded Gold Market Intelligence & Decision System in four independently validated stages. The delivered release supports research acquisition. Daily XAU/USD is the initial target; a provider's date-labeled gold closes and a FRED macro sample have been acquired locally with documented limitations. No broker or current market opinion is assumed. Historical coverage means the earliest defensible evidence **per series and monetary regime**, not a continuous tick history extending back to 1919.
 
-| Layer | Required observations and grain | Candidate acquisition | Release 0.2 |
+| Layer | Required observations and grain | Candidate acquisition | Release 0.3 |
 | --- | --- | --- | --- |
-| 1 Price | Instrument × venue × contract × price type × bar end; OHLC, volume unit, OI; future quote/tick/curve records | Licensed spot provider, LBMA/IBA, CME | Validated canonical OHLC importer; benchmark/spot/futures/ETF/CFD kept separate |
+| 1 Price | Instrument × venue × contract × price type × bar end or declared date label; OHLC where actually provided | Alpha Vantage gold closes, entitled spot/benchmark providers | Alpha Vantage date-only close adapter and separate contract; canonical OHLC importer; instruments kept separate |
 | 2 Structure | Stream × as-of × feature version; trend, range, pivots, momentum, volatility | Derived only from eligible price observations | SMA, momentum, ATR, realized volatility, prior range breakout, delayed confirmed pivots |
 | 3 Positioning | Market code × report family × category × report date × vintage | CFTC annual archives | Legacy futures-only CSV parser; net positions; other families explicitly planned |
 | 4 Macro | Series × reference period × release/vintage × unit | FRED/ALFRED, BLS, BEA, Fed, Treasury; licensed ISM/PMI/DXY providers | FRED adapter and 22-series shortlist; relationships remain research hypotheses |
@@ -39,14 +39,16 @@ For future real-time snapshots add quote freshness, clock skew, exchange session
 1. **Research:** auditable acquisition, rights, normalization, history, methods and reproducible features. Delivered foundation; real-data coverage remains source dependent.
 2. **Analyst:** verified feed integrations, schedule/release ingestion, freshness per series, correlations and regimes evaluated across time, evidence-linked narratives. Missing evidence and conflicting signals remain visible.
 3. **Decision:** validated strategy produces LONG/SHORT/NO TRADE, entry/stop/target, instrument-aware size, costs, risk/reward, calibrated confidence, invalidation and evidence. Requires out-of-sample testing and paper/shadow operation.
-4. **Execution:** deterministic risk service, broker adapter, order reconciliation, exposure limits, maximum daily loss, kill switch and monitored exits. No LLM has order credentials or direct order authority. No such service is installed in 0.2.
+4. **Execution:** deterministic risk service, broker adapter, order reconciliation, exposure limits, maximum daily loss, kill switch and monitored exits. No LLM has order credentials or direct order authority. No such service is installed in 0.3.
 
 ## Owner choices and defaults
 
-The repository URL and write access were supplied and verified. The owner confirmed daily XAU/USD first, shorter timeframes afterward, free/public sources only, personal free APIs for Alpha Vantage and FRED, and Persian educational material with each phase. These decisions are recorded in `config/project.yaml`. Local key availability is the current real-data dependency; broker, execution venue and risk limits remain unset. Other supported bar frequencies describe an input contract, not an acquired intraday dataset. Earliest reliable history by era and the hybrid future architecture remain design defaults.
+The repository URL and write access were supplied and verified. The owner confirmed daily XAU/USD first, shorter timeframes afterward, free/public sources only, personal free APIs for Alpha Vantage and FRED, and Persian educational material with each phase. These decisions are recorded in `config/project.yaml`. Keys were supplied locally and both APIs were tested. Broker, execution venue and risk limits remain unset. Other supported bar frequencies describe an input contract, not an acquired intraday dataset. Earliest reliable history by era and the hybrid future architecture remain design defaults.
 
 The [execution phases](../phases.fa.md) break the four research-to-execution stages into manageable deliveries. The [education index](../education/README.fa.md) accompanies implemented capabilities and distinguishes price-only observations from complete OHLC.
 
 ## Acceptance for this delivery
 
 The offline demo runs without a key; raw lineage verifies; invalid OHLC and timezone-naive timestamps fail; revisions and future releases cannot leak into default as-of queries; synthetic and real context are separated; restricted exports fail before writing; adapters fail clearly on schema drift; all ten layers have explicit status; CI checks tests, schemas, formatting and publication boundaries. Release 0.2 additionally requires acquisition success/failure manifests, per-stream as-of inventories, explicit quality failures, scoped local credentials and Persian training. Full historical harvesting and profitable/live trading are outside these acceptance claims.
+
+Release 0.3 adds successful account-specific acquisition, a distinct daily-close contract, complete saved-byte reconciliation and visible session/unit/calendar limitations. The daily-close readiness profile does not satisfy the OHLC profile. Historical release verification, an independent price comparison and trading-session methodology remain later gates.

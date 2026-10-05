@@ -53,6 +53,26 @@ uv run gold fetch-fred DFII10 --start 2003-01-01 --end 2026-10-02
 
 In a POSIX shell, use `export FRED_API_KEY='YOUR_OWN_KEY'`. Do not commit keys or screenshots of them. `--vintage 2020-03-20` requests a vintage view when supported. The adapter stores null for FRED `.` missing values and preserves realtime interval metadata. It does not convert revised values into first-release history. Source-specific units are in `config/macro_series.yaml`; verify metadata before extending that shortlist. An API-level error aborts the normalized batch. Raw successful pages may remain for diagnosis.
 
+## Alpha Vantage daily gold closes
+
+```sh
+uv run gold --credentials-file local/credentials.env fetch-alpha-gold
+uv run gold runs
+uv run python scripts/inspect_onboarding.py
+```
+
+The first command makes one request to `GOLD_SILVER_HISTORY` with `symbol=GOLD` and `interval=daily`. It requires `ALPHAVANTAGE_API_KEY`. The entire returned history is validated before one normalized transaction, with a run manifest and original bytes. Service notices, wrong nominal, changed fields, duplicate/future dates and invalid prices fail explicitly. Errors do not print provider message bodies, which may echo keys. Avoid repeated calls while diagnosing a free-tier quota notice.
+
+Records are `price_close`, not `price_bar`. Date labels are retained at midnight UTC with a documented transformation; this does not assert a closing time or source timezone. Weekend rows are preserved and flagged. `XAUUSD` maps to USD/troy ounce by instrument convention, marked as inferred, because the response has no unit field. The provider reference is not labelled a broker venue or executable quote. The OHLC `snapshot` and `event-study` commands still require full bars; they do not silently use this stream.
+
+The inspection script uses local bytes only and reports full raw-row reconciliation plus yearly profiles. Its default policy is `config/quality_daily_close.yaml`, requiring a daily gold-close stream and DFII10 history. For a direct quality report at a chosen cutoff:
+
+```sh
+uv run gold --store local/market quality --policy config/quality_daily_close.yaml --as-of 2026-10-05T10:35:15.056743Z --output local/market/quality.json
+```
+
+Use the actual `as_of` from your inspection report or a current offset-aware timestamp. A copied example cutoff can exclude a newer acquisition. The default OHLC policy remains separate and fails when bars are absent. [First live acquisition findings](source-methodology/first-acquisition.fa.md) describe the observed limits.
+
 ## CFTC positioning
 
 Use the official [compressed archive](https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm). Choose **Legacy / Futures Only / Text**, unzip locally, then:
@@ -85,8 +105,8 @@ Event windows require complete observations; dates with only a research-candidat
 
 ## Failure handling and maintenance
 
-Commands return exit code 2 for invalid input, network failure or rejected rights. A completed `quality` report with status `fail` returns 3; `pass` and `warning` return 0. HTTP errors never print the request URL containing the FRED key. Check the provider schema after a header error; do not silently map a different report family. `gold audit` detects corrupt or missing raw bytes. Back up the entire local directory together with acquisition metadata; copying just the SQLite file loses raw lineage. Close writers before copying SQLite or use its backup API.
+Commands return exit code 2 for invalid input, network failure or rejected rights. A completed `quality` report with status `fail` returns 3; `pass` and `warning` return 0. HTTP errors never print request URLs containing keys. Check the provider schema after a header error; do not silently map a different report family. `gold audit` detects corrupt or missing raw bytes. Back up the entire local directory together with acquisition metadata; copying just the SQLite file loses raw lineage. Close writers before copying SQLite or use its backup API.
 
 CLI ingestion commands write per-run manifests under the store's `runs/` directory. `gold runs` lists their status, raw/normalized references and counts. `gold quality` evaluates stream coverage, revisions, missing values, reference age and raw/source integrity at an explicit cutoff. See [quality operations](quality-operations.md) for policy, failure and crash semantics.
 
-There is no automatic refresh scheduler. Monitor/retry orchestration, per-row quarantine/recovery, database migrations, calendar-specific gaps and distributed/concurrent ingestion are follow-up work. Run manifests record failures but do not provide a quarantine or rollback service. Never delete raw records solely to make a quality check pass. Tests are offline; live FRED verification requires an actual key and is not claimed by passing fixtures.
+There is no automatic refresh scheduler. Monitor/retry orchestration, per-row quarantine/recovery, database migrations, calendar-specific gaps and distributed/concurrent ingestion are follow-up work. Run manifests record failures but do not provide a quarantine or rollback service. Never delete raw records solely to make a quality check pass. CI tests are offline. The live Alpha Vantage/FRED checks recorded on 2026-10-05 are separate, account-specific observations, not guarantees of future service availability.

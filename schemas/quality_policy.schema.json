@@ -7,6 +7,7 @@
         "kind": {
           "enum": [
             "price_bar",
+            "price_close",
             "observation",
             "positioning",
             "news_event",

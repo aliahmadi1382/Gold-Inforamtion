@@ -8,6 +8,7 @@ import yaml
 from pydantic import ValidationError
 
 from .acquisition import SAFE_PARAMETERS, AcquisitionRun, acquire, list_runs
+from .alpha_vantage import ingest_alpha_gold
 from .analysis import event_study
 from .credentials import credential_environment
 from .demo import demo
@@ -36,6 +37,7 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    sub.add_parser("fetch-alpha-gold", help="fetch daily XAUUSD close-only provider history")
     q = sub.add_parser("quality", help="audit eligible data and report coverage/readiness")
     q.add_argument("--as-of", type=timestamp, required=True)
     q.add_argument("--mode", choices=["system", "source"], default="system")
@@ -145,7 +147,13 @@ def run(args) -> dict:
                 args.output.parent.mkdir(parents=True, exist_ok=True)
                 args.output.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
             return report.model_dump(mode="json")
-        if args.command in {"import-prices", "import-cftc", "import-records", "fetch-fred"}:
+        if args.command in {
+            "import-prices",
+            "import-cftc",
+            "import-records",
+            "fetch-fred",
+            "fetch-alpha-gold",
+        }:
             parameters = {
                 k: v if isinstance(v, bool) or v is None else str(v)
                 for k, v in vars(args).items()
@@ -155,6 +163,8 @@ def run(args) -> dict:
                 parameters["input_filename"] = args.path.name
             if hasattr(args, "futures_only"):
                 parameters["futures_only_confirmed"] = args.futures_only
+            if args.command == "fetch-alpha-gold":
+                parameters.update(source="alpha_vantage_gold", instrument="XAUUSD", timeframe="1d")
             return acquire(
                 store, args.command, parameters, lambda: perform_ingestion(args, store, registry)
             )
@@ -195,6 +205,8 @@ def run(args) -> dict:
 
 
 def perform_ingestion(args, store, registry) -> int:
+    if args.command == "fetch-alpha-gold":
+        return ingest_alpha_gold(store, registry.get("alpha_vantage_gold"))
     if args.command == "import-records":
         return import_records(store, args.path, args.raw_dir, registry)
     if args.command == "import-prices":

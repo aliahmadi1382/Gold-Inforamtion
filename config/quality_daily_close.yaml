@@ -1,0 +1,18 @@
+# Onboarding readiness for date-only provider prices plus the first macro series.
+# This does not satisfy the separate OHLC policy or historical release-time requirements.
+schema_version: 1.0.0
+max_age_hours:
+  price_close: 96
+  series:DFII10: 168
+daily_gap_warning_hours: 96
+missing_fraction_warning_above: 0.0
+required_streams:
+  - kind: price_close
+    source_id: alpha_vantage_gold
+    instrument: XAUUSD
+    timeframe: 1d
+    min_observations: 50
+  - kind: observation
+    source_id: fred
+    series_id: DFII10
+    min_observations: 50

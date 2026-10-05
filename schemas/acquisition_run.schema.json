@@ -18,7 +18,8 @@
         "import-prices",
         "import-cftc",
         "import-records",
-        "fetch-fred"
+        "fetch-fred",
+        "fetch-alpha-gold"
       ],
       "title": "Operation",
       "type": "string"

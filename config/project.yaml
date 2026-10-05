@@ -16,9 +16,9 @@ owner_decisions:
   sources: free_and_public_only
   acquisition_route: free_personal_apis
   selected_providers: [alpha_vantage, fred]
+  credentials: local_keys_supplied_and_connection_verified
   education_language: fa
 # Design defaults, not hidden runtime flags. CLI parameters are explicit.
 pending_owner_decisions:
-  - Local availability of personal Alpha Vantage and FRED API keys
   - Broker and execution venue if execution is later commissioned
   - Risk limits and validation criteria before any paper/live strategy

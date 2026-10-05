@@ -1,6 +1,6 @@
 """Versioned contracts shared by adapters, storage, research, and JSON Schema."""
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from typing import Annotated, Literal
 from zoneinfo import ZoneInfo
 
@@ -132,6 +132,35 @@ class Observation(Record):
     vintage_date: date | None = None
 
 
+class PriceClose(Record):
+    """Provider daily close with a date label, never an invented OHLC bar end."""
+
+    kind: Literal["price_close"] = "price_close"
+    instrument: NonEmpty
+    venue: NonEmpty
+    timeframe: Literal["1d"] = "1d"
+    price_type: Literal["provider_reference"] = "provider_reference"
+    session_date: date
+    timestamp_precision: Literal["date"] = "date"
+    session_timezone: NonEmpty | None = None
+    unit_basis: Literal["provider_metadata", "instrument_convention"]
+    close: float = Field(gt=0)
+
+    @model_validator(mode="after")
+    def date_label_integrity(self):
+        expected = datetime.combine(self.session_date, datetime.min.time(), UTC)
+        if self.provenance.observed_at != expected:
+            raise ValueError("daily close observed_at must be its midnight UTC date label")
+        if self.provenance.observed_at > self.provenance.available_at:
+            raise ValueError("daily close date cannot follow availability")
+        if self.session_timezone is not None:
+            try:
+                ZoneInfo(self.session_timezone)
+            except (KeyError, ValueError) as exc:
+                raise ValueError("session_timezone must be an IANA timezone") from exc
+        return self
+
+
 class Positioning(Record):
     kind: Literal["positioning"] = "positioning"
     market_code: str = Field(pattern=r"^\d{6}$")
@@ -221,6 +250,7 @@ class HistoricalEvent(Contract):
 
 RECORD_TYPES = {
     "price_bar": PriceBar,
+    "price_close": PriceClose,
     "observation": Observation,
     "positioning": Positioning,
     "news_event": NewsEvent,

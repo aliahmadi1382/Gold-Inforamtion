@@ -17,7 +17,9 @@ Positive = Annotated[float, Field(gt=0)]
 
 
 class RequiredStream(Contract):
-    kind: Literal["price_bar", "observation", "positioning", "news_event", "calendar_release"]
+    kind: Literal[
+        "price_bar", "price_close", "observation", "positioning", "news_event", "calendar_release"
+    ]
     source_id: NonEmpty | None = None
     dataset: NonEmpty | None = None
     instrument: NonEmpty | None = None
@@ -58,10 +60,12 @@ class StreamInventory(Contract):
     retrieval_time_only_versions: int = Field(ge=0)
     daily_gap_count: int = Field(ge=0)
     largest_gap_hours: float | None
+    date_only_prices: int = Field(default=0, ge=0)
+    weekend_date_labels: int = Field(default=0, ge=0)
 
 
 class QualityReport(Contract):
-    schema_version: Literal["1.0.0"] = "1.0.0"
+    schema_version: Literal["1.1.0"] = "1.1.0"
     as_of: Timestamp
     replay_mode: Literal["system", "source"]
     status: Literal["pass", "warning", "fail"]
@@ -101,6 +105,16 @@ def stream_identity(record: Record) -> dict:
             price_type=record.price_type,
             contract_expiry=str(record.contract_expiry) if record.contract_expiry else None,
             volume_unit=record.volume_unit,
+        )
+    elif record.kind == "price_close":
+        identity.update(
+            instrument=record.instrument,
+            venue=record.venue,
+            timeframe=record.timeframe,
+            price_type=record.price_type,
+            timestamp_precision=record.timestamp_precision,
+            session_timezone=record.session_timezone,
+            unit_basis=record.unit_basis,
         )
     elif record.kind == "observation":
         identity.update(
@@ -278,6 +292,34 @@ def assess(
                 for a, b in zip(resolved, resolved[1:], strict=False)
             ]
         large_gaps = sum(gap > policy.daily_gap_warning_hours for gap in gaps)
+        date_only_prices = sum(r.kind == "price_close" for r in resolved)
+        weekend_labels = sum(
+            r.kind == "price_close" and r.session_date.weekday() >= 5 for r in resolved
+        )
+        if date_only_prices:
+            issue(
+                "DATE_ONLY_PRICE",
+                "Provider dates are period labels, not verified session-close instants; "
+                "OHLC features and intraday alignment are unavailable.",
+                severity="warning",
+                stream_id=sid,
+            )
+        if identity.get("unit_basis") == "instrument_convention":
+            issue(
+                "UNIT_INFERRED",
+                "Price unit follows the instrument convention; "
+                "the response does not explicitly certify the unit.",
+                severity="warning",
+                stream_id=sid,
+            )
+        if weekend_labels:
+            issue(
+                "WEEKEND_DATE_LABELS",
+                "Provider weekend dates are retained; confirm calendar and pricing methodology "
+                "before treating every row as a trading session.",
+                severity="warning",
+                stream_id=sid,
+            )
         if large_gaps:
             issue(
                 "DAILY_GAP_REVIEW",
@@ -303,6 +345,8 @@ def assess(
                 retrieval_time_only_versions=retrieval_only,
                 daily_gap_count=large_gaps,
                 largest_gap_hours=max(gaps) if gaps else None,
+                date_only_prices=date_only_prices,
+                weekend_date_labels=weekend_labels,
             )
         )
     for expected in policy.required_streams:

@@ -71,6 +71,7 @@ def validate_record_source(record: Record, registry: Registry) -> Source:
         if record.kind == "observation"
         else {
             "price_bar": "price",
+            "price_close": "price",
             "positioning": "positioning",
             "news_event": "news",
             "calendar_release": "calendar",

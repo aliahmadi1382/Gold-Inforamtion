@@ -11,7 +11,8 @@
 | Liquidity, supply/demand, mean reversion, regime ML | `docs/market-structure/` | Research definitions; not inferred as facts from OHLC |
 | COT long/short/spread/OI/net/categories | `ingestion.import_cftc`, `models.Positioning` | Legacy futures-only implemented; managed-money/disaggregated adapter planned |
 | COT changes, concentration and crowded trades | `docs/market-structure/` | Future features with same-family history and declared window |
-| USD, rates, real yields, inflation, labor, activity | `config/macro_series.yaml`, `ingest_fred` | 22-series shortlist and adapter; DFII10 sample verified live, broader acquisition pending |
+| USD, rates, real yields, inflation, labor, activity | `config/macro_core.yaml`, `macro.py`, `ingest_fred` | Seven full macro histories acquired with metadata checks and cutoff selection; 22-series broader shortlist; historical release-time verification remains open |
+| Long monthly gold reference | `world_bank.py`, `comparison.py` | Pink Sheet from 1960 acquired locally; separate monthly definition, June 2025 method break and descriptive comparison; no fabricated daily history |
 | DXY, ISM, PMI, confidence, Fed expectations | `docs/macro-drivers/` | Separate providers/methods needed; no proxy silently relabelled |
 | Central-bank buying, sales, reserves | `models.Observation`, source registry | Contract and provenance; WGC/IMF import pending rights review |
 | ETF holdings, inflows/outflows | Observation contract, source registry | Fund and metric dimensions required; acquisition planned |
@@ -24,7 +25,7 @@
 | Risk controls, kill switch and broker isolation | `docs/trading-methodology/` | Execution acceptance requirements; no live order code |
 | Source, timestamp, unit, license, confidence, lineage | `models.Provenance`, `storage.py`, `registry.py` | Validated contracts and raw-to-record audit |
 | Acquisition history and coverage | `acquisition.py`, `quality.py`, `config/quality_policy.yaml` | Per-run manifests and per-stream as-of inventories; revision, missingness, integrity and age checks |
-| Phased development and owner education | `docs/phases.fa.md`, `docs/education/` | Ordered delivery gates, four Persian chapters, glossary and exercises |
+| Phased development and owner education | `docs/phases.fa.md`, `docs/education/` | Ordered delivery gates, five Persian chapters, glossary and exercises |
 | Raw/bronze/silver/gold/derived architecture | `docs/architecture.md`, `data/*/README.md` | Local store materializes raw and normalized; logical future zones documented |
 | Public/licensed/restricted data | Registry, `export-public`, Git ignore and publication check | Default-deny export and tracked data guard; no commercial datasets committed |
 | Seven initial questions | `config/project.yaml`, master spec | Daily XAU/USD and free personal APIs confirmed; keys supplied locally; broker/risk choices deferred |

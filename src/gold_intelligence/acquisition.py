@@ -42,7 +42,13 @@ class AcquisitionRun(Contract):
     schema_version: Literal["1.0.0"] = "1.0.0"
     run_id: str = Field(pattern=r"^[a-f0-9]{32}$")
     operation: Literal[
-        "import-prices", "import-cftc", "import-records", "fetch-fred", "fetch-alpha-gold"
+        "import-prices",
+        "import-cftc",
+        "import-records",
+        "fetch-fred",
+        "fetch-alpha-gold",
+        "fetch-fred-reviewed",
+        "fetch-worldbank-gold",
     ]
     application_version: NonEmpty
     started_at: Timestamp

@@ -19,7 +19,9 @@
         "import-cftc",
         "import-records",
         "fetch-fred",
-        "fetch-alpha-gold"
+        "fetch-alpha-gold",
+        "fetch-fred-reviewed",
+        "fetch-worldbank-gold"
       ],
       "title": "Operation",
       "type": "string"

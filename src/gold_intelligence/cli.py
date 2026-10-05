@@ -10,14 +10,17 @@ from pydantic import ValidationError
 from .acquisition import SAFE_PARAMETERS, AcquisitionRun, acquire, list_runs
 from .alpha_vantage import ingest_alpha_gold
 from .analysis import event_study
+from .comparison import compare_monthly
 from .credentials import credential_environment
 from .demo import demo
 from .ingestion import import_cftc, import_prices, import_records, ingest_fred, timestamp
+from .macro import MacroContext, MacroPlan, fetch_core, load_plan, macro_context
 from .models import RECORD_TYPES, HistoricalEvent, Provenance
 from .quality import QualityPolicy, QualityReport, assess, load_policy
 from .registry import Registry, export_public, load_registry
 from .snapshot import MarketSnapshot, snapshot
 from .storage import Store
+from .world_bank import ingest_monthly_gold
 
 
 def parser() -> argparse.ArgumentParser:
@@ -38,6 +41,23 @@ def parser() -> argparse.ArgumentParser:
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
     sub.add_parser("fetch-alpha-gold", help="fetch daily XAUUSD close-only provider history")
+    sub.add_parser("fetch-worldbank-gold", help="fetch the reviewed monthly Pink Sheet workbook")
+    f = sub.add_parser(
+        "fetch-fred-core", help="backfill the reviewed macro set with metadata gates"
+    )
+    f.add_argument("--plan", type=Path, default=Path("config/macro_core.yaml"))
+    f.add_argument("--start", type=date.fromisoformat, default=date(1776, 7, 4))
+    f.add_argument("--end", type=date.fromisoformat, required=True)
+    f.add_argument("--vintage", type=date.fromisoformat)
+    f = sub.add_parser("macro-context", help="select only macro observations known at the cutoff")
+    f.add_argument("--plan", type=Path, default=Path("config/macro_core.yaml"))
+    f.add_argument("--as-of", type=timestamp, required=True)
+    f.add_argument("--mode", choices=["system", "source"], default="system")
+    f.add_argument("--vintage", type=date.fromisoformat)
+    f.add_argument("--output", type=Path)
+    f = sub.add_parser("compare-monthly", help="compare distinct gold series at monthly frequency")
+    f.add_argument("--as-of", type=timestamp, required=True)
+    f.add_argument("--output", type=Path)
     q = sub.add_parser("quality", help="audit eligible data and report coverage/readiness")
     q.add_argument("--as-of", type=timestamp, required=True)
     q.add_argument("--mode", choices=["system", "source"], default="system")
@@ -117,6 +137,8 @@ def run(args) -> dict:
             "acquisition_run": AcquisitionRun,
             "quality_policy": QualityPolicy,
             "quality_report": QualityReport,
+            "macro_plan": MacroPlan,
+            "macro_context": MacroContext,
         }
         for name, model in models.items():
             schema = {
@@ -130,6 +152,26 @@ def run(args) -> dict:
     if args.command == "demo":
         return demo(args.output, registry)
     with Store(args.store) as store:
+        if args.command == "fetch-fred-core":
+            return fetch_core(
+                store,
+                registry.get("fred"),
+                load_plan(args.plan),
+                args.start,
+                args.end,
+                args.vintage,
+            )
+        if args.command in {"macro-context", "compare-monthly"}:
+            if args.command == "macro-context":
+                result = macro_context(
+                    store, load_plan(args.plan), args.as_of, args.mode, args.vintage
+                ).model_dump(mode="json")
+            else:
+                result = compare_monthly(store, args.as_of)
+            if args.output:
+                args.output.parent.mkdir(parents=True, exist_ok=True)
+                args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+            return result
         if args.command == "audit":
             return store.audit()
         if args.command == "runs":
@@ -153,6 +195,7 @@ def run(args) -> dict:
             "import-records",
             "fetch-fred",
             "fetch-alpha-gold",
+            "fetch-worldbank-gold",
         }:
             parameters = {
                 k: v if isinstance(v, bool) or v is None else str(v)
@@ -165,6 +208,10 @@ def run(args) -> dict:
                 parameters["futures_only_confirmed"] = args.futures_only
             if args.command == "fetch-alpha-gold":
                 parameters.update(source="alpha_vantage_gold", instrument="XAUUSD", timeframe="1d")
+            if args.command == "fetch-worldbank-gold":
+                parameters.update(
+                    source="world_bank_pink_sheet", instrument="GOLD", timeframe="1mo"
+                )
             return acquire(
                 store, args.command, parameters, lambda: perform_ingestion(args, store, registry)
             )
@@ -205,6 +252,8 @@ def run(args) -> dict:
 
 
 def perform_ingestion(args, store, registry) -> int:
+    if args.command == "fetch-worldbank-gold":
+        return ingest_monthly_gold(store, registry.get("world_bank_pink_sheet"))
     if args.command == "fetch-alpha-gold":
         return ingest_alpha_gold(store, registry.get("alpha_vantage_gold"))
     if args.command == "import-records":
@@ -257,6 +306,8 @@ def main(argv=None) -> int:
         with credential_environment(args.credentials_file):
             result = run(args)
         print(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False))
+        if args.command == "fetch-fred-core" and result["status"] != "succeeded":
+            return 3
         return 3 if args.command == "quality" and result["status"] == "fail" else 0
     except (ValueError, OSError, KeyError, ValidationError, yaml.YAMLError) as exc:
         print(f"error: {exc}", file=sys.stderr)

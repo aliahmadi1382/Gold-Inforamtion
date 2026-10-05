@@ -1,0 +1,24 @@
+# Coverage gate for phase 3; not a backtest or release-time certification.
+schema_version: 1.0.0
+max_age_hours:
+  price_close: 96
+  series:DFF: 168
+  series:DGS10: 168
+  series:DFII10: 168
+  series:T10YIE: 168
+  series:DTWEXBGS: 336
+  series:CPIAUCSL: 1800
+  series:UNRATE: 1800
+  series:WB_GOLD_MONTHLY: 1800
+daily_gap_warning_hours: 96
+missing_fraction_warning_above: 0.0
+required_streams:
+  - {kind: price_close, source_id: alpha_vantage_gold, instrument: XAUUSD, timeframe: 1d, min_observations: 50}
+  - {kind: observation, source_id: fred, series_id: DFF, min_observations: 50}
+  - {kind: observation, source_id: fred, series_id: DGS10, min_observations: 50}
+  - {kind: observation, source_id: fred, series_id: DFII10, min_observations: 50}
+  - {kind: observation, source_id: fred, series_id: T10YIE, min_observations: 50}
+  - {kind: observation, source_id: fred, series_id: DTWEXBGS, min_observations: 50}
+  - {kind: observation, source_id: fred, series_id: CPIAUCSL, min_observations: 50}
+  - {kind: observation, source_id: fred, series_id: UNRATE, min_observations: 50}
+  - {kind: observation, source_id: world_bank_pink_sheet, series_id: WB_GOLD_MONTHLY, min_observations: 12}

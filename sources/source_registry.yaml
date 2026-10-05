@@ -39,6 +39,18 @@ sources:
     coverage: Account response dependent; verify local quality report for actual coverage
     frequency: Daily date-labeled closing price; no OHLC or session timestamp
     notes: Free personal API. XAUUSD nominal maps to USD per troy ounce by instrument convention, not explicit response metadata. Preserve weekend labels. Session clock and underlying venue are unspecified. No public redistribution or model-training grant recorded.
+  - source_id: world_bank_pink_sheet
+    provider: World Bank / attributed commodity data suppliers
+    url: https://www.worldbank.org/en/research/commodity-markets
+    layers: [price]
+    access: public
+    license_status: OPEN_PUBLIC
+    license_id: World-Bank-Pink-Sheet-dataset-specific-review
+    terms_url: https://www.worldbank.org/ext/en/legal/terms-conditions
+    implementation: implemented
+    coverage: Monthly gold averages since January 1960; verify downloaded workbook
+    frequency: Monthly average, not daily close or OHLC
+    notes: Gold methodology changes in June 2025 from London afternoon fixing averages to spot daily averages. Acquisition is public; upstream rights and public redistribution are not assumed. Keep separate from Alpha Vantage daily quotes.
   - source_id: fred
     provider: Federal Reserve Bank of St. Louis / upstream series owner
     url: https://fred.stlouisfed.org/

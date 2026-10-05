@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "CoreSeries": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "pattern": "^[A-Z0-9_]+$",
+          "title": "Series Id",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "frequency": {
+          "enum": [
+            "D",
+            "W",
+            "M",
+            "Q"
+          ],
+          "title": "Frequency",
+          "type": "string"
+        },
+        "provider_units": {
+          "minLength": 1,
+          "title": "Provider Units",
+          "type": "string"
+        },
+        "seasonal_adjustment": {
+          "enum": [
+            "SA",
+            "NSA",
+            "SAAR"
+          ],
+          "title": "Seasonal Adjustment",
+          "type": "string"
+        },
+        "max_age_days": {
+          "exclusiveMinimum": 0,
+          "title": "Max Age Days",
+          "type": "number"
+        }
+      },
+      "required": [
+        "series_id",
+        "unit",
+        "frequency",
+        "provider_units",
+        "seasonal_adjustment",
+        "max_age_days"
+      ],
+      "title": "CoreSeries",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "series": {
+      "items": {
+        "$ref": "#/$defs/CoreSeries"
+      },
+      "minItems": 1,
+      "title": "Series",
+      "type": "array"
+    }
+  },
+  "required": [
+    "series"
+  ],
+  "title": "MacroPlan",
+  "type": "object"
+}

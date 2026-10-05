@@ -1,4 +1,4 @@
-# Acquisition and quality operations (0.3)
+# Acquisition and quality operations (0.4)
 
 CLI ingestion now writes a manifest to `STORE/runs/<run_id>.json` before invoking the adapter. Successful or failed completion replaces the manifest atomically with finish time, application version, safe parameters, raw hashes, normalized IDs and inserted count. An identical re-import can reference records while inserting zero new records. Failures retain acquired raw evidence. Abrupt termination can leave `running`; never infer success from it. These files are local and are not a tamper-proof signing system or automatic retry service.
 
@@ -16,7 +16,7 @@ Quality reports include total/valid/eligible records, time-excluded records, str
 
 The policy is validated from `config/quality_policy.yaml` and its canonical hash is in every report. `max_age_hours` accepts kind keys and `series:<id>` overrides. Age means reference-period age, not proof a provider missed a release. Daily gaps compare elapsed calendar hours only. No exchange-specific trading-session completeness is claimed. Missing policy thresholds mean freshness is not assessed for that stream, not that it is fresh.
 
-Exit codes: **0** for pass or warnings, **3** for a completed quality report with failures, **2** for command/input/system errors. Passing quality does not clear source licensing or prove historical publication times. Keep real reports under `local/` and do not upload derived data automatically.
+Exit codes: **0** for pass or warnings, **3** for a completed quality report with failures or a partial/failed `fetch-fred-core` batch, **2** for command/input/system errors. Passing quality does not clear source licensing or prove historical publication times. `macro-context` statuses describe availability, not a quality certification. Keep real reports under `local/` and do not upload derived data automatically.
 
 Explicit credentials loading uses `--credentials-file local/credentials.env`. Only FRED_API_KEY and ALPHAVANTAGE_API_KEY are supported; values are scoped to the command and restored afterward. No shell expressions are evaluated. `fetch-alpha-gold` uses the same acquisition trace as the other ingestion commands and makes a single request without automatic retries.
 

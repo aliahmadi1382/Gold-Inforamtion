@@ -169,7 +169,9 @@ Exit 0 (`complete`) requires every planned pair to be comparable and both histor
 
 All real outputs remain under ignored `local/`. See the [delivery evidence](source-methodology/revision-ledger.fa.md) and [Persian lesson nine](education/09-revision-ledger.fa.md). A fresh checkout has code and schemas, not these private local records.
 
-## Unified research report (0.9)
+<a id="unified-research-report-09"></a>
+
+## Unified research report (0.12)
 
 Build all research sections from the existing real store at one explicit cutoff. The example uses the recorded delivery cutoff, not the current time; later ingestions require a correspondingly chosen cutoff. No API call or credential loading occurs.
 
@@ -177,7 +179,7 @@ Build all research sections from the existing real store at one explicit cutoff.
 uv run gold --store local/market research-report --as-of 2026-10-05T14:32:01Z --output-dir local/reports/unified
 ```
 
-The command prints `bundle`, `report`, section statuses and a fingerprint. Every run gets a new `research-<generation-time>-<suffix>` directory; previous output and reader notes are preserved. The overview is `research-report.fa.md`; `research-report.json` contains the complete typed aggregate. `details/` contains quality, macro, calendar, monthly, release-value and revision JSON, plus the last three Persian reports. `manifest.json` records the eleven artifact paths, sizes and SHA-256 hashes. A `.incomplete-*` directory can remain after failure and must not be treated as a completed report.
+The command prints `bundle`, `report`, section statuses and a fingerprint. Every run gets a new `research-<generation-time>-<suffix>` directory; previous output and reader notes are preserved. The overview is `research-report.fa.md`; `research-report.json` contains the complete typed aggregate. `details/` contains quality, macro, calendar, monthly, release-value, revision and positioning JSON, plus four Persian detail reports. Report/manifest schema `2.0.0` lists thirteen artifacts. Schema-1 bundles retain eleven artifacts and no COT section. A `.incomplete-*` directory can remain after failure and must not be treated as a completed report.
 
 Use the printed bundle path in the commands below; the placeholder is not a literal existing directory:
 
@@ -186,17 +188,20 @@ $reportBundle = 'local/reports/unified/research-REPLACE-WITH-PRINTED-RUN'
 uv run gold verify-report $reportBundle
 uv run python scripts/inspect_monthly_research.py --store local/market --report "$reportBundle/details/monthly-research.json"
 uv run python scripts/inspect_revision_ledger.py --store local/market --report "$reportBundle/details/revision-ledger.json" --output local/reports/unified-revision-validation.json
+uv run python scripts/inspect_positioning.py --store local/market --report "$reportBundle/details/positioning.json" --output local/reports/unified-positioning-validation.json
 ```
 
 `verify-report` requires only the saved bundle, without opening the store or registry. It checks byte integrity, typed contracts, shared cutoff/version/settings, section summaries and exact equality of child JSON to embedded components. It does not authenticate the issuer, prove source accuracy, reconcile arithmetic to raw data or validate unlisted reader notes. The independent scripts do require the original local store; the ledger script checks complete ledgers. Keep manifests and listed files unchanged, and add notes in a separate unlisted file.
 
-`research-report` defaults to `config/macro_core.yaml`, `config/monthly_research.yaml`, `config/revision_ledger.yaml` and `config/quality_history.yaml`; override with `--macro-plan`, `--monthly-plan`, `--revision-plan` and `--policy`. Calendar options are `--horizon-days` (1–366, default 90) and `--calendar-max-age-hours` (>0 to 8760, default 168). There is no synthetic allowance or source-replay option for this combined report. Existing standalone commands remain available.
+`research-report` defaults to `config/macro_core.yaml`, `config/monthly_research.yaml`, `config/revision_ledger.yaml` and `config/quality_history.yaml`; override with `--macro-plan`, `--monthly-plan`, `--revision-plan` and `--policy`. Calendar options are `--horizon-days` (1–366, default 90) and `--calendar-max-age-hours` (>0 to 8760, default 168). COT uses `--positioning-max-age-days` (1–365, default 14). Missing eligible COT makes the section missing; stale data is explicitly labeled. Available COT remains limited by retrieval-bound historical availability. There is no synthetic allowance or source-replay option for this combined report. Existing standalone commands remain available.
 
 Exit 0 means a bundle was produced with status `compiled` or `with_limits`; inspect the latter's limitations. Exit 3 means a readable `partial` bundle was produced because an essential section is missing or quality failed on normal absence. Exit 2 denotes input/integrity/output failure; no newly completed bundle is promised. `verify-report` exits 0 for a verified bundle and 2 for validation/file errors. A fresh checkout has no real records and will normally produce `partial`.
 
-All components are recomputed in one SQLite read transaction, with one `system` cutoff. Reference dates, freshness thresholds and document vintages remain distinct. A matching semantic fingerprint excludes build clocks but includes evidence, settings, registry hash, cutoff and software version; it is not a digital signature. The report cannot clear daily backtest or intraday-release gates. See [delivery evidence](source-methodology/unified-research-report.fa.md) and [Persian lesson ten](education/10-unified-research-report.fa.md).
+All components are recomputed in one SQLite read transaction, with one `system` cutoff. Reference dates, freshness thresholds and document vintages remain distinct. A matching semantic fingerprint excludes build clocks but includes evidence, settings, registry hash, cutoff and software version; it is not a digital signature. The report cannot clear daily backtest or intraday-release gates. See [current delivery evidence](source-methodology/integrated-positioning.fa.md) and [Persian lesson thirteen](education/13-integrated-positioning.fa.md); the [0.9 delivery note](source-methodology/unified-research-report.fa.md) documents the earlier format.
 
-## Comparing saved research runs (0.10)
+<a id="comparing-saved-research-runs-010"></a>
+
+## Comparing saved research runs (0.12)
 
 `compare-reports` takes two completed `research-report` bundle directories, in before/after order. The after cutoff must be equal or later; generation time does not determine the order. Replace the placeholders with the printed `bundle` paths from the chosen runs:
 
@@ -217,7 +222,7 @@ Verification checks four file hashes/sizes, the typed comparison and fingerprint
 
 `unchanged` means no differences within the compared content/context; `context_only` means only cutoff/settings/software/registry changed; `changed` means at least one semantic entity differs. All three successfully produced outcomes exit 0, even when the input report is partial. Invalid/corrupt inputs, reversed cutoffs, ambiguous row identities or output errors exit 2. Inspect input and section statuses; success does not certify data completeness. `verify-comparison` also uses exit 0/2.
 
-The schema/comparator is versioned as `1.0.0`; source reports use the supported typed research-report contract (tested with 0.9 and 0.10 artifacts). Entity rows match by meaning, with original JSON pointers for inspection. Lists of parent record IDs are sorted; metadata clocks and derived report fingerprints are not market changes. The complete JSON retains every reported difference; Markdown previews at most twelve entities and four fields per entity per section, with approximate age display. Input byte hashes bind exact snapshots even when data-change status is unchanged. Source paths and comparison generation time do not affect its fingerprint.
+New comparisons use schema/comparator `2.0.0` and accept both research-report schema `1.0.0` and `2.0.0`. Saved schema-1 comparisons still recompute with comparator 1; no new fields are injected into legacy inputs. The comparison manifest remains schema `1.0.0` because its four-file structure is unchanged. If either report schema lacks COT, that section is marked `not_in_schema`, its comparison basis records which input lacks it, and no position/evidence differences are inferred. Machine counts are zero because no rows were compared; Markdown shows dashes. Missing data in two schema-2 inputs is a separate, comparable state. Entity rows match by meaning, with original JSON pointers for inspection. Lists of parent record IDs are sorted; metadata clocks and derived report fingerprints are not market changes. The complete JSON retains every reported difference; Markdown previews at most twelve entities and four fields per entity per section, with approximate age display. Input byte hashes bind exact snapshots even when data-change status is unchanged. Source paths and comparison generation time do not affect its fingerprint.
 
 Price coverage cannot establish equality of underlying prices. Added/removed evidence means membership in the report, not database insertion/deletion; an ID change can be a recapture without a numeric revision. Common-sample membership remains visible. Attribution is not inferred from simultaneous context and output changes. See [delivery evidence](source-methodology/report-comparison.fa.md) and [Persian lesson eleven](education/11-comparing-research-runs.fa.md).
 
@@ -240,7 +245,7 @@ For an independent arithmetic check, replace the report path with the one printe
 uv run python scripts/inspect_positioning.py --report local/reports/positioning/positioning-RUN/positioning.json --output local/reports/positioning-validation.json
 ```
 
-The inspector checks selected coverage, raw cells, nets, OI shares, deltas and profile counts. `gold audit` verifies the immediate record-to-capture hash; `positioning-context` and the inspector also follow capture links to pages and metadata. This standalone context is not yet a detail section of `research-report` or `compare-reports`. See [method and live evidence](source-methodology/cot-positioning.fa.md) and [lesson twelve](education/12-cot-positioning.fa.md).
+The inspector checks selected coverage, raw cells, nets, OI shares, deltas and profile counts. `gold audit` verifies the immediate record-to-capture hash; `positioning-context` and the inspector also follow capture links to pages and metadata. The same context is now included in schema-2 `research-report` bundles and compared by `compare-reports` when both input schemas include it; the standalone command remains available. See [method and live evidence](source-methodology/cot-positioning.fa.md) and [lesson twelve](education/12-cot-positioning.fa.md).
 
 ### Manual legacy import
 
@@ -279,3 +284,5 @@ Commands return exit code 2 for invalid input, network failure or rejected right
 CLI ingestion commands write per-run manifests under the store's `runs/` directory. `gold runs` lists their status, raw/normalized references and counts. `gold quality` evaluates stream coverage, revisions, missing values, reference age and raw/source integrity at an explicit cutoff. See [quality operations](quality-operations.md) for policy, failure and crash semantics.
 
 There is no automatic refresh scheduler. Monitor/retry orchestration, per-row quarantine/recovery, database migrations, calendar-specific gaps and distributed/concurrent ingestion are follow-up work. Run manifests record failures but do not provide a quarantine or rollback service. Never delete raw records solely to make a quality check pass. CI tests are offline. The live Alpha Vantage/FRED checks recorded on 2026-10-05 are separate, account-specific observations, not guarantees of future service availability.
+
+COT comparison keys include source, dataset, market, family, unit, observation date and category. Net values, evidence recaptures and observation age remain distinct. Markdown previews the newest changed COT dates first. Report schema/version and the COT source-registry hash are calculation context; source release instants remain unverified.

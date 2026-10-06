@@ -24,14 +24,17 @@ from .monthly_research import (
     monthly_research,
     render_monthly_persian,
 )
+from .positioning import NAMES as POSITION_NAMES
+from .positioning import PositioningContext, positioning_context, render_positioning
 from .quality import QualityPolicy, QualityReport, assess
 from .release_calendar import CalendarContext, calendar_context
 from .release_values import ReleaseValueReport, release_value_report, render_release_values
 from .revision_ledger import RevisionLedger, RevisionPlan, render_revision_ledger, revision_ledger
 from .storage import canonical
 
-PARTS = ("quality", "macro", "calendar", "monthly", "releases", "revisions")
-LABELS = {
+PARTS_V1 = ("quality", "macro", "calendar", "monthly", "releases", "revisions")
+PARTS = (*PARTS_V1, "positioning")
+LABELS_V1 = {
     "quality": "کنترل کیفیت",
     "price": "پوشش قیمت روزانه",
     "macro": "شاخص‌های کلان",
@@ -40,12 +43,14 @@ LABELS = {
     "releases": "اتصال مقدار و سند",
     "revisions": "دفتر اصلاحیه‌ها",
 }
+LABELS = {**LABELS_V1, "positioning": "موقعیت معامله‌گران COT"}
 STATES = {
     "available": "در دسترس در دامنهٔ تعریف‌شده",
     "limited": "دارای محدودیت",
     "missing": "فاقد شواهد کافی",
+    "not_in_schema": "در قالب این گزارش وجود ندارد",
 }
-FILES = {
+FILES_V1 = {
     "research-report.json",
     "research-report.fa.md",
     "details/quality.json",
@@ -58,9 +63,10 @@ FILES = {
     "details/revision-ledger.json",
     "details/revision-ledger.fa.md",
 }
+FILES = FILES_V1 | {"details/positioning.json", "details/positioning.fa.md"}
 
 
-class ReportSettings(Contract):
+class ReportSettingsV1(Contract):
     macro_plan: MacroPlan
     quality_policy: QualityPolicy
     monthly_plan: MonthlyResearchPlan
@@ -69,10 +75,20 @@ class ReportSettings(Contract):
     calendar_max_evidence_age_hours: float = Field(default=168, gt=0, le=8760)
 
 
-class ReportSection(Contract):
+class ReportSettings(ReportSettingsV1):
+    positioning_max_age_days: int = Field(default=14, ge=1, le=365)
+
+
+class ReportSectionV1(Contract):
     key: Literal["quality", "price", "macro", "calendar", "monthly", "releases", "revisions"]
     status: Literal["available", "limited", "missing"]
     evidence_pointer: str
+
+
+class ReportSection(ReportSectionV1):
+    key: Literal[
+        "quality", "price", "macro", "calendar", "monthly", "releases", "revisions", "positioning"
+    ]
 
 
 def price_streams(quality):
@@ -85,7 +101,7 @@ def price_streams(quality):
     )
 
 
-def section_states(quality, macro, calendar, monthly, releases, revisions):
+def section_states(quality, macro, calendar, monthly, releases, revisions, positioning=None):
     prices = price_streams(quality)
     price_ids = {s.stream_id for s in prices}
     price_issues = any(i.stream_id in price_ids for i in quality.issues)
@@ -151,7 +167,19 @@ def section_states(quality, macro, calendar, monthly, releases, revisions):
             "/revisions",
         ),
     ]
-    return tuple(ReportSection(key=k, status=s, evidence_pointer=p) for k, s, p in states)
+    model = ReportSectionV1
+    if positioning is not None:
+        # Retrieval-bound historical availability remains a substantive limitation,
+        # even when the observation is inside the configured freshness threshold.
+        states.append(
+            (
+                "positioning",
+                "missing" if positioning.status == "no_data" else "limited",
+                "/positioning",
+            )
+        )
+        model = ReportSection
+    return tuple(model(key=k, status=s, evidence_pointer=p) for k, s, p in states)
 
 
 def overall_status(sections, quality):
@@ -174,16 +202,16 @@ def fingerprint(payload):
     return hashlib.sha256(canonical(semantic_payload(payload)).encode()).hexdigest()
 
 
-class ResearchReport(Contract):
+class ResearchReportV1(Contract):
     schema_version: Literal["1.0.0"] = "1.0.0"
     software_version: str
     generated_at: Timestamp
     as_of: Timestamp
     fingerprint: Hash
     registry_sha256: Hash
-    settings: ReportSettings
+    settings: ReportSettingsV1
     status: Literal["compiled", "with_limits", "partial"]
-    sections: tuple[ReportSection, ...]
+    sections: tuple[ReportSectionV1, ...]
     quality: QualityReport
     macro: MacroContext
     calendar: CalendarContext
@@ -197,7 +225,8 @@ class ResearchReport(Contract):
 
     @model_validator(mode="after")
     def consistent_bundle(self):
-        parts = {name: getattr(self, name) for name in PARTS}
+        names = PARTS_V1 if self.schema_version == "1.0.0" else PARTS
+        parts = {name: getattr(self, name) for name in names}
         if any(part.as_of != self.as_of for part in parts.values()):
             raise ValueError("report components must share exactly one cutoff")
         if any(
@@ -236,6 +265,51 @@ class ResearchReport(Contract):
         return self
 
 
+class ResearchReport(ResearchReportV1):
+    schema_version: Literal["2.0.0"] = "2.0.0"
+    settings: ReportSettings
+    sections: tuple[ReportSection, ...]
+    positioning: PositioningContext
+
+    @model_validator(mode="after")
+    def positioning_matches_settings_and_inventory(self):
+        cot = self.positioning
+        if cot.max_age_days != self.settings.positioning_max_age_days:
+            raise ValueError("positioning age policy differs from report settings")
+        streams = [
+            s
+            for s in self.quality.streams
+            if s.identity.get("source_id") == cot.source_id
+            and s.identity.get("kind") == "positioning"
+        ]
+        if sum(s.record_versions for s in streams) != cot.eligible_record_versions:
+            raise ValueError("positioning versions differ from quality inventory")
+        if cot.weeks:
+            expected = set(POSITION_NAMES)
+            if (
+                len(streams) != len(expected)
+                or {s.identity.get("category") for s in streams} != expected
+            ):
+                raise ValueError("positioning categories differ from quality inventory")
+            if any(s.unique_observations != len(cot.weeks) for s in streams):
+                raise ValueError("positioning dates differ from quality inventory")
+        return self
+
+
+def parse_versioned(payload, models, label):
+    """Dispatch before validation; never inject new defaults into a legacy document."""
+    data = json.loads(payload) if isinstance(payload, (bytes, str)) else payload
+    if not isinstance(data, dict) or data.get("schema_version") not in models:
+        raise ValueError(f"unsupported {label} schema version")
+    return models[data["schema_version"]].model_validate(data)
+
+
+def parse_research_report(payload):
+    return parse_versioned(
+        payload, {"1.0.0": ResearchReportV1, "2.0.0": ResearchReport}, "research report"
+    )
+
+
 def build_research_report(store, registry, settings, as_of):
     as_of = aware(as_of).astimezone(UTC)
     if store.db.in_transaction:
@@ -264,10 +338,13 @@ def build_research_report(store, registry, settings, as_of):
             monthly=monthly_research(store, settings.monthly_plan, as_of),
             releases=release_value_report(store, registry, as_of),
             revisions=revision_ledger(store, registry, settings.revision_plan, as_of),
+            positioning=positioning_context(
+                store, registry, as_of, settings.positioning_max_age_days
+            ),
         )
         sections = section_states(**parts)
         payload = dict(
-            schema_version="1.0.0",
+            schema_version="2.0.0",
             software_version=__version__,
             generated_at=datetime.now(UTC).isoformat(),
             as_of=as_of.isoformat(),
@@ -350,6 +427,60 @@ def render_research_report(report):
     lines += [
         "",
         "جزئیات جریان‌ها و هشدارهایشان: [گزارش کیفیت](details/quality.json).",
+    ]
+    if report.schema_version == "2.0.0":
+        cot = report.positioning
+        lines += [
+            "",
+            "## موقعیت معامله‌گران آتی طلا — COT",
+            "",
+            "دامنهٔ مستقل: طلای COMEX، گزارش تفکیکی فقط آتی، تمام سررسیدها؛ "
+            "واحد هر قرارداد ۱۰۰ اونس ترواست. این جدول با قیمت نقدی XAU/USD ادغام نمی‌شود.",
+            "",
+        ]
+        if cot.weeks:
+            latest = max(cot.weeks, key=lambda w: w.observed_date)
+            freshness = (
+                "دادهٔ قدیمی؛ نیازمند به‌روزرسانی" if cot.status == "stale" else "در محدودهٔ سن مجاز"
+            )
+            lines += [
+                f"آخرین مشاهده: **{latest.observed_date}**؛ "
+                f"سن: {cot.latest_observation_age_days} روز؛ "
+                f"آستانه: {cot.max_age_days} روز؛ **{freshness}**.",
+                f"دریافت نسخه: `{latest.known_at.isoformat()}`؛ ساعت انتشار تاریخی نامعلوم است.",
+                f"قراردادهای باز: {latest.open_interest:,}؛ "
+                f"تعداد تاریخ‌های منتخب: {len(cot.weeks):,}.",
+                "",
+                "| گروه | خالص قراردادها | خالص / OI، درصد | تغییر خالص هفت‌روزه |",
+                "| --- | ---: | ---: | ---: |",
+            ]
+            for group in latest.categories:
+                delta = (
+                    "محاسبه نشده" if group.net_change_7d is None else f"{group.net_change_7d:+,}"
+                )
+                lines.append(
+                    f"| {POSITION_NAMES[group.category]} | {group.net:+,} | "
+                    f"{number(group.net_percent_open_interest, 2)} | {delta} |"
+                )
+            lines += [
+                "",
+                f"{len(cot.irregular_intervals)} فاصلهٔ غیرهفت‌روزه و "
+                f"{len(cot.non_tuesday_labels)} برچسب غیرسه‌شنبه حفظ شده است. "
+                "تغییر هفت‌روزه فقط برای دو تاریخ دقیقاً هفت روز فاصله‌دار محاسبه می‌شود.",
+            ]
+        else:
+            lines.append(
+                "در این زمان برش، دادهٔ COT واجد شرایط نداریم؛ این وضعیت به معنی خالص صفر نیست."
+            )
+        lines += [
+            "",
+            "خالص، تعداد قرارداد است؛ جریان پول، احتمال رشد یا سیگنال معامله نیست. "
+            "زمان دسترسی به دریافت محدود است و دسته‌بندی تاریخی می‌تواند بازنگری شده باشد.",
+            "[گزارش کامل COT](details/positioning.fa.md) · "
+            "[تمام تاریخ‌ها و شناسهٔ شواهد](details/positioning.json).",
+            "",
+        ]
+    lines += [
         "",
         "## شاخص‌های کلان",
         "",
@@ -516,7 +647,7 @@ class ReportFile(Contract):
     bytes: int = Field(ge=0)
 
 
-class ReportManifest(Contract):
+class ReportManifestV1(Contract):
     schema_version: Literal["1.0.0"] = "1.0.0"
     software_version: str
     as_of: Timestamp
@@ -525,14 +656,19 @@ class ReportManifest(Contract):
 
     @model_validator(mode="after")
     def complete_file_set(self):
-        if {f.path for f in self.files} != FILES or len(self.files) != len(FILES):
+        expected = FILES_V1 if self.schema_version == "1.0.0" else FILES
+        if {f.path for f in self.files} != expected or len(self.files) != len(expected):
             raise ValueError("report manifest must contain the complete unique file set")
         return self
 
 
+class ReportManifest(ReportManifestV1):
+    schema_version: Literal["2.0.0"] = "2.0.0"
+
+
 def write_research_report(report, output_dir):
     # Validate again in case a nested dictionary was edited after model creation.
-    report = ResearchReport.model_validate(report.model_dump(mode="json"))
+    report = parse_research_report(report.model_dump(mode="json"))
     outputs = {
         "research-report.json": report.model_dump_json(indent=2) + "\n",
         "research-report.fa.md": render_research_report(report),
@@ -553,7 +689,11 @@ def write_research_report(report, output_dir):
             "details/revision-ledger.fa.md": render_revision_ledger(report.revisions),
         }
     )
-    manifest = ReportManifest(
+    if report.schema_version == "2.0.0":
+        outputs["details/positioning.json"] = report.positioning.model_dump_json(indent=2) + "\n"
+        outputs["details/positioning.fa.md"] = render_positioning(report.positioning)
+    manifest_type = ReportManifestV1 if report.schema_version == "1.0.0" else ReportManifest
+    manifest = manifest_type(
         software_version=report.software_version,
         as_of=report.as_of,
         report_fingerprint=report.fingerprint,
@@ -584,7 +724,11 @@ def write_research_report(report, output_dir):
 def load_verified_report(directory):
     """Return the same bytes and models that passed verification, without rereading."""
     directory = Path(directory).resolve()
-    manifest = ReportManifest.model_validate_json((directory / "manifest.json").read_bytes())
+    manifest = parse_versioned(
+        (directory / "manifest.json").read_bytes(),
+        {"1.0.0": ReportManifestV1, "2.0.0": ReportManifest},
+        "report manifest",
+    )
     contents = {}
     for item in manifest.files:
         path = (directory / item.path).resolve()
@@ -594,21 +738,25 @@ def load_verified_report(directory):
         if len(content) != item.bytes or hashlib.sha256(content).hexdigest() != item.sha256:
             raise ValueError("report artifact hash mismatch")
         contents[item.path] = content
-    report = ResearchReport.model_validate_json(contents["research-report.json"])
+    report = parse_research_report(contents["research-report.json"])
     if (
-        report.as_of != manifest.as_of
+        report.schema_version != manifest.schema_version
+        or report.as_of != manifest.as_of
         or report.software_version != manifest.software_version
         or report.fingerprint != manifest.report_fingerprint
     ):
         raise ValueError("manifest differs from the research report")
-    for key, name in (
+    detail_names = (
         ("quality", "quality"),
         ("macro", "macro"),
         ("calendar", "calendar"),
         ("monthly", "monthly-research"),
         ("releases", "release-values"),
         ("revisions", "revision-ledger"),
-    ):
+    )
+    if report.schema_version == "2.0.0":
+        detail_names += (("positioning", "positioning"),)
+    for key, name in detail_names:
         if json.loads(contents[f"details/{name}.json"]) != getattr(report, key).model_dump(
             mode="json"
         ):

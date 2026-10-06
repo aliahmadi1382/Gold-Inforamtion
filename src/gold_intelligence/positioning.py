@@ -1,6 +1,7 @@
 """As-known COT context with whole-capture reconciliation and explicit weekly gaps."""
 
 import hashlib
+import math
 import os
 from collections import defaultdict
 from datetime import UTC, date, datetime, timedelta
@@ -8,7 +9,7 @@ from pathlib import Path
 from typing import Literal
 from uuid import uuid4
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from . import __version__
 from .cftc import API, DATASET, GROUPS, MARKET, CotCapture, capture_records, raw_json
@@ -88,6 +89,100 @@ class PositioningContext(Contract):
         "Freshness uses date age and a configured threshold, not an official release SLA.",
         "Revision markers/counts detect visible API changes; no provider snapshot token.",
     )
+
+    @model_validator(mode="after")
+    def consistent_context(self):
+        # Saved bundles can verify arithmetic without access to the raw store.
+        # Reordering is harmless: date and category are the semantic identities.
+        weeks = sorted(self.weeks, key=lambda w: w.observed_date)
+        if len({w.observed_date for w in weeks}) != len(weeks):
+            raise ValueError("duplicate positioning observation date")
+        identifiers = [g.record_id for w in weeks for g in w.categories]
+        if len(set(identifiers)) != len(identifiers):
+            raise ValueError("duplicate positioning record evidence")
+        if self.superseded_record_versions != self.eligible_record_versions - len(identifiers):
+            raise ValueError("positioning version counts disagree")
+        if bool(weeks) != bool(self.eligible_captures) or (
+            not weeks and self.eligible_record_versions
+        ):
+            raise ValueError("positioning capture counts disagree")
+        if (
+            self.eligible_record_versions % 5
+            or self.eligible_captures > self.eligible_record_versions // 5
+        ):
+            raise ValueError("positioning captures must contain complete five-group dates")
+        if len({w.capture_sha256 for w in weeks}) > self.eligible_captures:
+            raise ValueError("selected positioning captures exceed eligible captures")
+        previous = None
+        irregular = []
+        for week in weeks:
+            if (
+                week.observed_date > week.known_at.astimezone(UTC).date()
+                or week.known_at > self.as_of
+            ):
+                raise ValueError("positioning evidence exceeds its cutoff or predates observation")
+            groups = {g.category: g for g in week.categories}
+            if set(groups) != set(GROUPS) or len(week.categories) != len(GROUPS):
+                raise ValueError("positioning requires all five unique categories")
+            exact = previous is not None and (week.observed_date - previous.observed_date).days == 7
+            if previous and not exact:
+                irregular.append((previous.observed_date, week.observed_date))
+            status = (
+                "seven_day_pair"
+                if exact
+                else ("irregular_interval" if previous else "first_observation")
+            )
+            if (
+                week.delta_status != status
+                or week.previous_observed_date != (previous.observed_date if previous else None)
+                or week.open_interest_change_7d
+                != (week.open_interest - previous.open_interest if exact else None)
+            ):
+                raise ValueError("positioning interval or OI delta disagrees with history")
+            prior = {g.category: g for g in previous.categories} if previous else {}
+            oi = week.open_interest
+            for name, group in groups.items():
+                if (group.spreading is None) != (GROUPS[name][2] is None):
+                    raise ValueError(
+                        "positioning spreading must preserve separately reported status"
+                    )
+                if (
+                    group.net != group.long - group.short
+                    or max(group.long, group.short, group.spreading or 0) > oi
+                ):
+                    raise ValueError("positioning net or position bounds disagree")
+                share = group.net_percent_open_interest
+                if (oi == 0 and share is not None) or (
+                    oi != 0
+                    and (
+                        share is None
+                        or not math.isclose(share, 100 * group.net / oi, abs_tol=1e-10)
+                    )
+                ):
+                    raise ValueError("positioning net/OI share disagrees")
+                if group.net_change_7d != (group.net - prior[name].net if exact else None):
+                    raise ValueError("positioning net delta disagrees")
+            if any(
+                sum(getattr(g, side) + (g.spreading or 0) for g in groups.values()) != oi
+                for side in ("long", "short")
+            ):
+                raise ValueError("positioning groups do not reconcile to open interest")
+            previous = week
+        if (
+            tuple(irregular) != self.irregular_intervals
+            or tuple(w.observed_date for w in weeks if w.observed_date.weekday() != 1)
+            != self.non_tuesday_labels
+        ):
+            raise ValueError("positioning calendar profile disagrees")
+        age = (self.as_of.astimezone(UTC).date() - weeks[-1].observed_date).days if weeks else None
+        status = (
+            "no_data"
+            if age is None
+            else ("stale" if age > self.max_age_days else "descriptive_only")
+        )
+        if self.latest_observation_age_days != age or self.status != status:
+            raise ValueError("positioning freshness summary disagrees")
+        return self
 
 
 def positioning_context(store, registry, as_of, max_age_days=14):
@@ -205,10 +300,11 @@ def render_positioning(report):
         "",
     ]
     if report.weeks:
-        latest = report.weeks[-1]
+        latest = max(report.weeks, key=lambda w: w.observed_date)
+        first = min(w.observed_date for w in report.weeks)
         lines.extend(
             [
-                f"پوشش مشاهده: {report.weeks[0].observed_date} تا {latest.observed_date}.",
+                f"پوشش مشاهده: {first} تا {latest.observed_date}.",
                 f"آخرین مشاهده: **{latest.observed_date}**؛ سن مشاهده: "
                 f"{report.latest_observation_age_days} روز؛ "
                 f"آستانهٔ داخلی: {report.max_age_days} روز.",
@@ -221,7 +317,7 @@ def render_positioning(report):
                 "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
             ]
         )
-        for group in latest.categories:
+        for group in sorted(latest.categories, key=lambda g: list(NAMES).index(g.category)):
             spread = "تفکیک نشده" if group.spreading is None else f"{group.spreading:,}"
             share = (
                 "تعریف‌نشده"

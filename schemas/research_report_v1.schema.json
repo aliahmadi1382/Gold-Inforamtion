@@ -310,87 +310,6 @@
       "title": "CaptureChange",
       "type": "object"
     },
-    "CategoryPosition": {
-      "additionalProperties": false,
-      "properties": {
-        "category": {
-          "enum": [
-            "producer_merchant_processor_user",
-            "swap_dealer",
-            "managed_money",
-            "other_reportable",
-            "nonreportable"
-          ],
-          "title": "Category",
-          "type": "string"
-        },
-        "long": {
-          "minimum": 0,
-          "title": "Long",
-          "type": "integer"
-        },
-        "short": {
-          "minimum": 0,
-          "title": "Short",
-          "type": "integer"
-        },
-        "spreading": {
-          "anyOf": [
-            {
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Spreading"
-        },
-        "net": {
-          "title": "Net",
-          "type": "integer"
-        },
-        "net_percent_open_interest": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Net Percent Open Interest"
-        },
-        "net_change_7d": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Net Change 7D"
-        },
-        "record_id": {
-          "pattern": "^[a-f0-9]{64}$",
-          "title": "Record Id",
-          "type": "string"
-        }
-      },
-      "required": [
-        "category",
-        "long",
-        "short",
-        "spreading",
-        "net",
-        "net_percent_open_interest",
-        "net_change_7d",
-        "record_id"
-      ],
-      "title": "CategoryPosition",
-      "type": "object"
-    },
     "CoreSeries": {
       "additionalProperties": false,
       "properties": {
@@ -1047,200 +966,6 @@
       "title": "MonthlyResearchPlan",
       "type": "object"
     },
-    "PositioningContext": {
-      "additionalProperties": false,
-      "properties": {
-        "schema_version": {
-          "const": "1.0.0",
-          "default": "1.0.0",
-          "title": "Schema Version",
-          "type": "string"
-        },
-        "generated_at": {
-          "format": "date-time",
-          "title": "Generated At",
-          "type": "string"
-        },
-        "as_of": {
-          "format": "date-time",
-          "title": "As Of",
-          "type": "string"
-        },
-        "software_version": {
-          "title": "Software Version",
-          "type": "string"
-        },
-        "source_id": {
-          "const": "cftc_disaggregated",
-          "default": "cftc_disaggregated",
-          "title": "Source Id",
-          "type": "string"
-        },
-        "source_url": {
-          "const": "https://publicreporting.cftc.gov/resource/72hh-3qpy.json",
-          "default": "https://publicreporting.cftc.gov/resource/72hh-3qpy.json",
-          "title": "Source Url",
-          "type": "string"
-        },
-        "dataset": {
-          "const": "cftc_disaggregated_futures_only_gold_v1",
-          "default": "cftc_disaggregated_futures_only_gold_v1",
-          "title": "Dataset",
-          "type": "string"
-        },
-        "market_code": {
-          "const": "088691",
-          "default": "088691",
-          "title": "Market Code",
-          "type": "string"
-        },
-        "report_type": {
-          "const": "disaggregated_futures_only",
-          "default": "disaggregated_futures_only",
-          "title": "Report Type",
-          "type": "string"
-        },
-        "unit": {
-          "const": "contracts_of_100_troy_ounces",
-          "default": "contracts_of_100_troy_ounces",
-          "title": "Unit",
-          "type": "string"
-        },
-        "max_age_days": {
-          "maximum": 365,
-          "minimum": 1,
-          "title": "Max Age Days",
-          "type": "integer"
-        },
-        "status": {
-          "enum": [
-            "descriptive_only",
-            "stale",
-            "no_data"
-          ],
-          "title": "Status",
-          "type": "string"
-        },
-        "latest_observation_age_days": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Latest Observation Age Days"
-        },
-        "eligible_captures": {
-          "minimum": 0,
-          "title": "Eligible Captures",
-          "type": "integer"
-        },
-        "eligible_record_versions": {
-          "minimum": 0,
-          "title": "Eligible Record Versions",
-          "type": "integer"
-        },
-        "superseded_record_versions": {
-          "minimum": 0,
-          "title": "Superseded Record Versions",
-          "type": "integer"
-        },
-        "source_registry_sha256": {
-          "pattern": "^[a-f0-9]{64}$",
-          "title": "Source Registry Sha256",
-          "type": "string"
-        },
-        "fingerprint": {
-          "pattern": "^[a-f0-9]{64}$",
-          "title": "Fingerprint",
-          "type": "string"
-        },
-        "weeks": {
-          "items": {
-            "$ref": "#/$defs/WeeklyPosition"
-          },
-          "title": "Weeks",
-          "type": "array"
-        },
-        "irregular_intervals": {
-          "items": {
-            "maxItems": 2,
-            "minItems": 2,
-            "prefixItems": [
-              {
-                "format": "date",
-                "type": "string"
-              },
-              {
-                "format": "date",
-                "type": "string"
-              }
-            ],
-            "type": "array"
-          },
-          "title": "Irregular Intervals",
-          "type": "array"
-        },
-        "non_tuesday_labels": {
-          "items": {
-            "format": "date",
-            "type": "string"
-          },
-          "title": "Non Tuesday Labels",
-          "type": "array"
-        },
-        "historical_release_ready": {
-          "const": false,
-          "default": false,
-          "title": "Historical Release Ready",
-          "type": "boolean"
-        },
-        "daily_backtest_ready": {
-          "const": false,
-          "default": false,
-          "title": "Daily Backtest Ready",
-          "type": "boolean"
-        },
-        "limitations": {
-          "default": [
-            "COMEX gold futures across maturities; not spot XAU/USD or futures-and-options combined.",
-            "Dates label positions; UTC midnight is a storage convention, not an observation instant.",
-            "Availability is retrieval-bound; Tuesday/Friday convention does not prove release time.",
-            "Current downloaded history; early backfill uses retrospective group classifications.",
-            "Classifications can change; net changes are not cash flows, trader counts or signals.",
-            "Spreading is not separately reported for producers or nonreportables; null is not zero.",
-            "Only exact seven-day pairs receive deltas; other intervals require review.",
-            "Freshness uses date age and a configured threshold, not an official release SLA.",
-            "Revision markers/counts detect visible API changes; no provider snapshot token."
-          ],
-          "items": {
-            "type": "string"
-          },
-          "title": "Limitations",
-          "type": "array"
-        }
-      },
-      "required": [
-        "generated_at",
-        "as_of",
-        "software_version",
-        "max_age_days",
-        "status",
-        "latest_observation_age_days",
-        "eligible_captures",
-        "eligible_record_versions",
-        "superseded_record_versions",
-        "source_registry_sha256",
-        "fingerprint",
-        "weeks",
-        "irregular_intervals",
-        "non_tuesday_labels"
-      ],
-      "title": "PositioningContext",
-      "type": "object"
-    },
     "PublishedValue": {
       "additionalProperties": false,
       "properties": {
@@ -1835,7 +1560,7 @@
       "title": "ReleaseValueReport",
       "type": "object"
     },
-    "ReportSection": {
+    "ReportSectionV1": {
       "additionalProperties": false,
       "properties": {
         "key": {
@@ -1846,8 +1571,7 @@
             "calendar",
             "monthly",
             "releases",
-            "revisions",
-            "positioning"
+            "revisions"
           ],
           "title": "Key",
           "type": "string"
@@ -1871,10 +1595,10 @@
         "status",
         "evidence_pointer"
       ],
-      "title": "ReportSection",
+      "title": "ReportSectionV1",
       "type": "object"
     },
-    "ReportSettings": {
+    "ReportSettingsV1": {
       "additionalProperties": false,
       "properties": {
         "macro_plan": {
@@ -1902,13 +1626,6 @@
           "maximum": 8760,
           "title": "Calendar Max Evidence Age Hours",
           "type": "number"
-        },
-        "positioning_max_age_days": {
-          "default": 14,
-          "maximum": 365,
-          "minimum": 1,
-          "title": "Positioning Max Age Days",
-          "type": "integer"
         }
       },
       "required": [
@@ -1917,7 +1634,7 @@
         "monthly_plan",
         "revision_plan"
       ],
-      "title": "ReportSettings",
+      "title": "ReportSettingsV1",
       "type": "object"
     },
     "RequiredStream": {
@@ -2619,89 +2336,13 @@
       ],
       "title": "ValueComparison",
       "type": "object"
-    },
-    "WeeklyPosition": {
-      "additionalProperties": false,
-      "properties": {
-        "observed_date": {
-          "format": "date",
-          "title": "Observed Date",
-          "type": "string"
-        },
-        "known_at": {
-          "format": "date-time",
-          "title": "Known At",
-          "type": "string"
-        },
-        "capture_sha256": {
-          "pattern": "^[a-f0-9]{64}$",
-          "title": "Capture Sha256",
-          "type": "string"
-        },
-        "open_interest": {
-          "minimum": 0,
-          "title": "Open Interest",
-          "type": "integer"
-        },
-        "delta_status": {
-          "enum": [
-            "first_observation",
-            "seven_day_pair",
-            "irregular_interval"
-          ],
-          "title": "Delta Status",
-          "type": "string"
-        },
-        "previous_observed_date": {
-          "anyOf": [
-            {
-              "format": "date",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Previous Observed Date"
-        },
-        "open_interest_change_7d": {
-          "anyOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "title": "Open Interest Change 7D"
-        },
-        "categories": {
-          "items": {
-            "$ref": "#/$defs/CategoryPosition"
-          },
-          "title": "Categories",
-          "type": "array"
-        }
-      },
-      "required": [
-        "observed_date",
-        "known_at",
-        "capture_sha256",
-        "open_interest",
-        "delta_status",
-        "previous_observed_date",
-        "open_interest_change_7d",
-        "categories"
-      ],
-      "title": "WeeklyPosition",
-      "type": "object"
     }
   },
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "2.0.0",
-      "default": "2.0.0",
+      "const": "1.0.0",
+      "default": "1.0.0",
       "title": "Schema Version",
       "type": "string"
     },
@@ -2730,7 +2371,7 @@
       "type": "string"
     },
     "settings": {
-      "$ref": "#/$defs/ReportSettings"
+      "$ref": "#/$defs/ReportSettingsV1"
     },
     "status": {
       "enum": [
@@ -2743,7 +2384,7 @@
     },
     "sections": {
       "items": {
-        "$ref": "#/$defs/ReportSection"
+        "$ref": "#/$defs/ReportSectionV1"
       },
       "title": "Sections",
       "type": "array"
@@ -2789,9 +2430,6 @@
       "default": false,
       "title": "First Release Verified",
       "type": "boolean"
-    },
-    "positioning": {
-      "$ref": "#/$defs/PositioningContext"
     }
   },
   "required": [
@@ -2808,9 +2446,8 @@
     "calendar",
     "monthly",
     "releases",
-    "revisions",
-    "positioning"
+    "revisions"
   ],
-  "title": "ResearchReport",
+  "title": "ResearchReportV1",
   "type": "object"
 }

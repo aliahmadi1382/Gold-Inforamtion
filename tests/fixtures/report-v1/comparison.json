@@ -1,0 +1,411 @@
+{
+  "schema_version": "1.0.0",
+  "comparator_version": "1.0.0",
+  "software_version": "0.10.0",
+  "generated_at": "2024-05-17T00:00:00Z",
+  "fingerprint": "c34623160a5f352ca257552cc901a75c57a0c58e496a08708334859dbe5b61cc",
+  "before": {
+    "location": "legacy-before",
+    "report_sha256": "15fc8e0df58810abc8d442dbd4e9978acfbc0e845dd71f109350981673ea1820",
+    "fingerprint": "5bf81a603bc404a2fcc984967bd19b6f9ec8947678377517d2dbd7d4c36c6cf2",
+    "as_of": "2024-04-16T00:00:00Z",
+    "generated_at": "2026-10-06T08:50:34.628760Z",
+    "software_version": "0.10.0",
+    "status": "partial"
+  },
+  "after": {
+    "location": "legacy-after",
+    "report_sha256": "4eb87e00ab17c09a8e4d3e3b05a614bb793a250f1b1fca03318bd69f149b25e1",
+    "fingerprint": "f5ed70e1198e1f9586b998f92d6f2d58c3d63ac874e1907de0efc82f9b52a46a",
+    "as_of": "2024-05-16T00:00:00Z",
+    "generated_at": "2026-10-06T08:50:34.659241Z",
+    "software_version": "0.10.0",
+    "status": "partial"
+  },
+  "status": "changed",
+  "context_changes": [
+    {
+      "path": "/as_of",
+      "category": "result",
+      "before_present": true,
+      "after_present": true,
+      "before": "2024-04-16T00:00:00Z",
+      "after": "2024-05-16T00:00:00Z"
+    }
+  ],
+  "sections": [
+    {
+      "key": "quality",
+      "before_status": "missing",
+      "after_status": "missing",
+      "added": 0,
+      "removed": 0,
+      "modified": 0,
+      "unchanged": 2,
+      "evidence_ids_added": [],
+      "evidence_ids_removed": []
+    },
+    {
+      "key": "price",
+      "before_status": "missing",
+      "after_status": "missing",
+      "added": 0,
+      "removed": 0,
+      "modified": 0,
+      "unchanged": 0,
+      "evidence_ids_added": [],
+      "evidence_ids_removed": []
+    },
+    {
+      "key": "macro",
+      "before_status": "missing",
+      "after_status": "missing",
+      "added": 0,
+      "removed": 0,
+      "modified": 0,
+      "unchanged": 8,
+      "evidence_ids_added": [],
+      "evidence_ids_removed": []
+    },
+    {
+      "key": "calendar",
+      "before_status": "missing",
+      "after_status": "missing",
+      "added": 0,
+      "removed": 0,
+      "modified": 0,
+      "unchanged": 1,
+      "evidence_ids_added": [],
+      "evidence_ids_removed": []
+    },
+    {
+      "key": "monthly",
+      "before_status": "missing",
+      "after_status": "missing",
+      "added": 6,
+      "removed": 0,
+      "modified": 0,
+      "unchanged": 34,
+      "evidence_ids_added": [],
+      "evidence_ids_removed": []
+    },
+    {
+      "key": "releases",
+      "before_status": "missing",
+      "after_status": "missing",
+      "added": 0,
+      "removed": 0,
+      "modified": 0,
+      "unchanged": 1,
+      "evidence_ids_added": [],
+      "evidence_ids_removed": []
+    },
+    {
+      "key": "revisions",
+      "before_status": "missing",
+      "after_status": "missing",
+      "added": 0,
+      "removed": 0,
+      "modified": 0,
+      "unchanged": 4,
+      "evidence_ids_added": [],
+      "evidence_ids_removed": []
+    }
+  ],
+  "changes": [
+    {
+      "section": "monthly",
+      "collection": "changes",
+      "identity": [
+        "2024-04-01",
+        "london_afternoon_fixing_average"
+      ],
+      "label": "2024-04-01 / london_afternoon_fixing_average",
+      "action": "added",
+      "before_pointer": null,
+      "after_pointer": "/monthly/changes/2",
+      "fields": [
+        {
+          "path": "",
+          "category": "result",
+          "before_present": false,
+          "after_present": true,
+          "before": null,
+          "after": {
+            "month": "2024-04-01",
+            "method": "london_afternoon_fixing_average",
+            "values": {
+              "WB_GOLD_MONTHLY": null,
+              "DTWEXBGS": null,
+              "DFII10": null,
+              "DGS10": null,
+              "CPIAUCSL": null
+            },
+            "exclusions": {
+              "WB_GOLD_MONTHLY": "current_missing",
+              "DTWEXBGS": "current_missing",
+              "DFII10": "current_missing",
+              "DGS10": "current_missing",
+              "CPIAUCSL": "current_missing"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "section": "monthly",
+      "collection": "levels",
+      "identity": [
+        "CPIAUCSL",
+        "2024-04-01",
+        "index_1982_1984_100_sa",
+        null
+      ],
+      "label": "سطح شاخص CPI تعدیل‌شده / 2024-04-01 / index_1982_1984_100_sa / نامشخص",
+      "action": "added",
+      "before_pointer": null,
+      "after_pointer": "/monthly/levels/19",
+      "fields": [
+        {
+          "path": "",
+          "category": "result",
+          "before_present": false,
+          "after_present": true,
+          "before": null,
+          "after": {
+            "series_id": "CPIAUCSL",
+            "month": "2024-04-01",
+            "unit": "index_1982_1984_100_sa",
+            "method": null,
+            "status": "missing",
+            "value": null,
+            "expected_labels": 1,
+            "valid_values": 0,
+            "missing_labels": [
+              "2024-04-01"
+            ],
+            "null_labels": [],
+            "record_ids": []
+          }
+        }
+      ]
+    },
+    {
+      "section": "monthly",
+      "collection": "levels",
+      "identity": [
+        "DFII10",
+        "2024-04-01",
+        "percent",
+        null
+      ],
+      "label": "بازده واقعی خزانهٔ ۱۰ساله / 2024-04-01 / percent / نامشخص",
+      "action": "added",
+      "before_pointer": null,
+      "after_pointer": "/monthly/levels/11",
+      "fields": [
+        {
+          "path": "",
+          "category": "result",
+          "before_present": false,
+          "after_present": true,
+          "before": null,
+          "after": {
+            "series_id": "DFII10",
+            "month": "2024-04-01",
+            "unit": "percent",
+            "method": null,
+            "status": "missing",
+            "value": null,
+            "expected_labels": 22,
+            "valid_values": 0,
+            "missing_labels": [
+              "2024-04-01",
+              "2024-04-02",
+              "2024-04-03",
+              "2024-04-04",
+              "2024-04-05",
+              "2024-04-08",
+              "2024-04-09",
+              "2024-04-10",
+              "2024-04-11",
+              "2024-04-12",
+              "2024-04-15",
+              "2024-04-16",
+              "2024-04-17",
+              "2024-04-18",
+              "2024-04-19",
+              "2024-04-22",
+              "2024-04-23",
+              "2024-04-24",
+              "2024-04-25",
+              "2024-04-26",
+              "2024-04-29",
+              "2024-04-30"
+            ],
+            "null_labels": [],
+            "record_ids": []
+          }
+        }
+      ]
+    },
+    {
+      "section": "monthly",
+      "collection": "levels",
+      "identity": [
+        "DGS10",
+        "2024-04-01",
+        "percent",
+        null
+      ],
+      "label": "بازده اسمی خزانهٔ ۱۰ساله / 2024-04-01 / percent / نامشخص",
+      "action": "added",
+      "before_pointer": null,
+      "after_pointer": "/monthly/levels/15",
+      "fields": [
+        {
+          "path": "",
+          "category": "result",
+          "before_present": false,
+          "after_present": true,
+          "before": null,
+          "after": {
+            "series_id": "DGS10",
+            "month": "2024-04-01",
+            "unit": "percent",
+            "method": null,
+            "status": "missing",
+            "value": null,
+            "expected_labels": 22,
+            "valid_values": 0,
+            "missing_labels": [
+              "2024-04-01",
+              "2024-04-02",
+              "2024-04-03",
+              "2024-04-04",
+              "2024-04-05",
+              "2024-04-08",
+              "2024-04-09",
+              "2024-04-10",
+              "2024-04-11",
+              "2024-04-12",
+              "2024-04-15",
+              "2024-04-16",
+              "2024-04-17",
+              "2024-04-18",
+              "2024-04-19",
+              "2024-04-22",
+              "2024-04-23",
+              "2024-04-24",
+              "2024-04-25",
+              "2024-04-26",
+              "2024-04-29",
+              "2024-04-30"
+            ],
+            "null_labels": [],
+            "record_ids": []
+          }
+        }
+      ]
+    },
+    {
+      "section": "monthly",
+      "collection": "levels",
+      "identity": [
+        "DTWEXBGS",
+        "2024-04-01",
+        "index_jan2006_100",
+        null
+      ],
+      "label": "شاخص گستردهٔ دلار، نه DXY / 2024-04-01 / index_jan2006_100 / نامشخص",
+      "action": "added",
+      "before_pointer": null,
+      "after_pointer": "/monthly/levels/7",
+      "fields": [
+        {
+          "path": "",
+          "category": "result",
+          "before_present": false,
+          "after_present": true,
+          "before": null,
+          "after": {
+            "series_id": "DTWEXBGS",
+            "month": "2024-04-01",
+            "unit": "index_jan2006_100",
+            "method": null,
+            "status": "missing",
+            "value": null,
+            "expected_labels": 22,
+            "valid_values": 0,
+            "missing_labels": [
+              "2024-04-01",
+              "2024-04-02",
+              "2024-04-03",
+              "2024-04-04",
+              "2024-04-05",
+              "2024-04-08",
+              "2024-04-09",
+              "2024-04-10",
+              "2024-04-11",
+              "2024-04-12",
+              "2024-04-15",
+              "2024-04-16",
+              "2024-04-17",
+              "2024-04-18",
+              "2024-04-19",
+              "2024-04-22",
+              "2024-04-23",
+              "2024-04-24",
+              "2024-04-25",
+              "2024-04-26",
+              "2024-04-29",
+              "2024-04-30"
+            ],
+            "null_labels": [],
+            "record_ids": []
+          }
+        }
+      ]
+    },
+    {
+      "section": "monthly",
+      "collection": "levels",
+      "identity": [
+        "WB_GOLD_MONTHLY",
+        "2024-04-01",
+        "currency_per_troy_ounce",
+        "london_afternoon_fixing_average"
+      ],
+      "label": "WB_GOLD_MONTHLY / 2024-04-01 / currency_per_troy_ounce / london_afternoon_fixing_average",
+      "action": "added",
+      "before_pointer": null,
+      "after_pointer": "/monthly/levels/3",
+      "fields": [
+        {
+          "path": "",
+          "category": "result",
+          "before_present": false,
+          "after_present": true,
+          "before": null,
+          "after": {
+            "series_id": "WB_GOLD_MONTHLY",
+            "month": "2024-04-01",
+            "unit": "currency_per_troy_ounce",
+            "method": "london_afternoon_fixing_average",
+            "status": "missing",
+            "value": null,
+            "expected_labels": 1,
+            "valid_values": 0,
+            "missing_labels": [
+              "2024-04-01"
+            ],
+            "null_labels": [],
+            "record_ids": []
+          }
+        }
+      ]
+    }
+  ],
+  "daily_backtest_ready": false,
+  "causal_attribution": false
+}

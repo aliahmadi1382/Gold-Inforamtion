@@ -1,0 +1,1028 @@
+{
+  "schema_version": "1.0.0",
+  "software_version": "0.10.0",
+  "generated_at": "2026-10-06T08:50:34.628760Z",
+  "as_of": "2024-04-16T00:00:00Z",
+  "fingerprint": "5bf81a603bc404a2fcc984967bd19b6f9ec8947678377517d2dbd7d4c36c6cf2",
+  "registry_sha256": "8982855fdd4fb38806a8391b290e9548cd0cb72213b6a9a25909b428d9d833b5",
+  "settings": {
+    "macro_plan": {
+      "series": [
+        {
+          "series_id": "DFF",
+          "unit": "percent",
+          "currency": null,
+          "frequency": "D",
+          "provider_units": "Percent",
+          "seasonal_adjustment": "NSA",
+          "max_age_days": 7.0
+        },
+        {
+          "series_id": "DGS10",
+          "unit": "percent",
+          "currency": null,
+          "frequency": "D",
+          "provider_units": "Percent",
+          "seasonal_adjustment": "NSA",
+          "max_age_days": 7.0
+        },
+        {
+          "series_id": "DFII10",
+          "unit": "percent",
+          "currency": null,
+          "frequency": "D",
+          "provider_units": "Percent",
+          "seasonal_adjustment": "NSA",
+          "max_age_days": 7.0
+        },
+        {
+          "series_id": "T10YIE",
+          "unit": "percent",
+          "currency": null,
+          "frequency": "D",
+          "provider_units": "Percent",
+          "seasonal_adjustment": "NSA",
+          "max_age_days": 7.0
+        },
+        {
+          "series_id": "DTWEXBGS",
+          "unit": "index_jan2006_100",
+          "currency": null,
+          "frequency": "D",
+          "provider_units": "Index Jan 2006=100",
+          "seasonal_adjustment": "NSA",
+          "max_age_days": 14.0
+        },
+        {
+          "series_id": "CPIAUCSL",
+          "unit": "index_1982_1984_100_sa",
+          "currency": null,
+          "frequency": "M",
+          "provider_units": "Index 1982-1984=100",
+          "seasonal_adjustment": "SA",
+          "max_age_days": 75.0
+        },
+        {
+          "series_id": "UNRATE",
+          "unit": "percent_sa",
+          "currency": null,
+          "frequency": "M",
+          "provider_units": "Percent",
+          "seasonal_adjustment": "SA",
+          "max_age_days": 75.0
+        }
+      ]
+    },
+    "quality_policy": {
+      "schema_version": "1.0.0",
+      "max_age_hours": {},
+      "daily_gap_warning_hours": 96.0,
+      "missing_fraction_warning_above": 0.0,
+      "required_streams": []
+    },
+    "monthly_plan": {
+      "start_month": "2024-02-01",
+      "minimum_valid_weekday_fraction": 0.8,
+      "minimum_pairs": 3,
+      "rolling_months": 3
+    },
+    "revision_plan": {
+      "schema_version": "1.0.0",
+      "declared_at": "2024-04-01T00:00:00Z",
+      "start_period": "2024-01",
+      "end_period": "2024-01",
+      "metrics": [
+        "cpi_all_items_sa_mom"
+      ],
+      "selection_reason": "Empty-store compatibility fixture; no market observations",
+      "method": "adjacent_document_display"
+    },
+    "calendar_horizon_days": 90,
+    "calendar_max_evidence_age_hours": 168.0
+  },
+  "status": "partial",
+  "sections": [
+    {
+      "key": "quality",
+      "status": "missing",
+      "evidence_pointer": "/quality"
+    },
+    {
+      "key": "price",
+      "status": "missing",
+      "evidence_pointer": "/quality/streams"
+    },
+    {
+      "key": "macro",
+      "status": "missing",
+      "evidence_pointer": "/macro"
+    },
+    {
+      "key": "calendar",
+      "status": "missing",
+      "evidence_pointer": "/calendar"
+    },
+    {
+      "key": "monthly",
+      "status": "missing",
+      "evidence_pointer": "/monthly"
+    },
+    {
+      "key": "releases",
+      "status": "missing",
+      "evidence_pointer": "/releases"
+    },
+    {
+      "key": "revisions",
+      "status": "missing",
+      "evidence_pointer": "/revisions"
+    }
+  ],
+  "quality": {
+    "schema_version": "1.1.0",
+    "as_of": "2024-04-16T00:00:00Z",
+    "replay_mode": "system",
+    "status": "fail",
+    "data_mode": "empty",
+    "policy_sha256": "ab41be87aca72158788770bc2bc896a5d61f1ab37ab48ee6d0a03683959b64aa",
+    "total_records": 0,
+    "valid_records": 0,
+    "eligible_records": 0,
+    "excluded_by_time": 0,
+    "streams": [],
+    "issues": [
+      {
+        "severity": "error",
+        "code": "NO_ELIGIBLE_DATA",
+        "message": "No valid records are available at the requested cutoff.",
+        "stream_id": null,
+        "record_ids": []
+      }
+    ],
+    "interpretation": "Operational checks only. No guarantee of source accuracy, market completeness, historical release correctness or trading fitness."
+  },
+  "macro": {
+    "schema_version": "1.0.0",
+    "as_of": "2024-04-16T00:00:00Z",
+    "mode": "system",
+    "vintage": null,
+    "status": "incomplete",
+    "entries": [
+      {
+        "series_id": "DFF",
+        "unit": "percent",
+        "frequency": "D",
+        "status": "missing",
+        "value": null,
+        "reference_at": null,
+        "available_at": null,
+        "retrieved_at": null,
+        "availability_basis": null,
+        "reference_age_days": null,
+        "max_age_days": 7.0,
+        "record_id": null
+      },
+      {
+        "series_id": "DGS10",
+        "unit": "percent",
+        "frequency": "D",
+        "status": "missing",
+        "value": null,
+        "reference_at": null,
+        "available_at": null,
+        "retrieved_at": null,
+        "availability_basis": null,
+        "reference_age_days": null,
+        "max_age_days": 7.0,
+        "record_id": null
+      },
+      {
+        "series_id": "DFII10",
+        "unit": "percent",
+        "frequency": "D",
+        "status": "missing",
+        "value": null,
+        "reference_at": null,
+        "available_at": null,
+        "retrieved_at": null,
+        "availability_basis": null,
+        "reference_age_days": null,
+        "max_age_days": 7.0,
+        "record_id": null
+      },
+      {
+        "series_id": "T10YIE",
+        "unit": "percent",
+        "frequency": "D",
+        "status": "missing",
+        "value": null,
+        "reference_at": null,
+        "available_at": null,
+        "retrieved_at": null,
+        "availability_basis": null,
+        "reference_age_days": null,
+        "max_age_days": 7.0,
+        "record_id": null
+      },
+      {
+        "series_id": "DTWEXBGS",
+        "unit": "index_jan2006_100",
+        "frequency": "D",
+        "status": "missing",
+        "value": null,
+        "reference_at": null,
+        "available_at": null,
+        "retrieved_at": null,
+        "availability_basis": null,
+        "reference_age_days": null,
+        "max_age_days": 14.0,
+        "record_id": null
+      },
+      {
+        "series_id": "CPIAUCSL",
+        "unit": "index_1982_1984_100_sa",
+        "frequency": "M",
+        "status": "missing",
+        "value": null,
+        "reference_at": null,
+        "available_at": null,
+        "retrieved_at": null,
+        "availability_basis": null,
+        "reference_age_days": null,
+        "max_age_days": 75.0,
+        "record_id": null
+      },
+      {
+        "series_id": "UNRATE",
+        "unit": "percent_sa",
+        "frequency": "M",
+        "status": "missing",
+        "value": null,
+        "reference_at": null,
+        "available_at": null,
+        "retrieved_at": null,
+        "availability_basis": null,
+        "reference_age_days": null,
+        "max_age_days": 75.0,
+        "record_id": null
+      }
+    ],
+    "note": "Reference dates are period labels, not release times. Historical vintages retain retrieval-time availability unless a release timestamp is independently verified. Latest nulls remain missing; no backward fill or trading signal is produced."
+  },
+  "calendar": {
+    "schema_version": "1.0.0",
+    "as_of": "2024-04-16T00:00:00Z",
+    "horizon_days": 90,
+    "max_evidence_age_hours": 168.0,
+    "eligible_events": 0,
+    "upcoming": [],
+    "status": "no_upcoming_evidence",
+    "limitations": [
+      "Stored schedule snapshot; updates and cancellations require another source review.",
+      "Announced/embargo times do not establish actual delivery or first-release values.",
+      "No economic value or FRED availability timestamp is changed by calendar evidence."
+    ]
+  },
+  "monthly": {
+    "schema_version": "1.0.0",
+    "generated_at": "2026-10-06T08:50:34.625234Z",
+    "as_of": "2024-04-16T00:00:00Z",
+    "software_version": "0.10.0",
+    "plan": {
+      "start_month": "2024-02-01",
+      "minimum_valid_weekday_fraction": 0.8,
+      "minimum_pairs": 3,
+      "rolling_months": 3
+    },
+    "fingerprint": "b3dabdb8795ca68b8de5b382044a5db53da4bd2843223fb447da1c607dde979d",
+    "status": "insufficient_data",
+    "daily_backtest_ready": false,
+    "levels": [
+      {
+        "series_id": "WB_GOLD_MONTHLY",
+        "month": "2024-01-01",
+        "unit": "currency_per_troy_ounce",
+        "method": "london_afternoon_fixing_average",
+        "status": "missing",
+        "value": null,
+        "expected_labels": 1,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-01-01"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "WB_GOLD_MONTHLY",
+        "month": "2024-02-01",
+        "unit": "currency_per_troy_ounce",
+        "method": "london_afternoon_fixing_average",
+        "status": "missing",
+        "value": null,
+        "expected_labels": 1,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-02-01"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "WB_GOLD_MONTHLY",
+        "month": "2024-03-01",
+        "unit": "currency_per_troy_ounce",
+        "method": "london_afternoon_fixing_average",
+        "status": "missing",
+        "value": null,
+        "expected_labels": 1,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-03-01"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "DTWEXBGS",
+        "month": "2024-01-01",
+        "unit": "index_jan2006_100",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 23,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-01-01",
+          "2024-01-02",
+          "2024-01-03",
+          "2024-01-04",
+          "2024-01-05",
+          "2024-01-08",
+          "2024-01-09",
+          "2024-01-10",
+          "2024-01-11",
+          "2024-01-12",
+          "2024-01-15",
+          "2024-01-16",
+          "2024-01-17",
+          "2024-01-18",
+          "2024-01-19",
+          "2024-01-22",
+          "2024-01-23",
+          "2024-01-24",
+          "2024-01-25",
+          "2024-01-26",
+          "2024-01-29",
+          "2024-01-30",
+          "2024-01-31"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "DTWEXBGS",
+        "month": "2024-02-01",
+        "unit": "index_jan2006_100",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 21,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-02-01",
+          "2024-02-02",
+          "2024-02-05",
+          "2024-02-06",
+          "2024-02-07",
+          "2024-02-08",
+          "2024-02-09",
+          "2024-02-12",
+          "2024-02-13",
+          "2024-02-14",
+          "2024-02-15",
+          "2024-02-16",
+          "2024-02-19",
+          "2024-02-20",
+          "2024-02-21",
+          "2024-02-22",
+          "2024-02-23",
+          "2024-02-26",
+          "2024-02-27",
+          "2024-02-28",
+          "2024-02-29"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "DTWEXBGS",
+        "month": "2024-03-01",
+        "unit": "index_jan2006_100",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 21,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-03-01",
+          "2024-03-04",
+          "2024-03-05",
+          "2024-03-06",
+          "2024-03-07",
+          "2024-03-08",
+          "2024-03-11",
+          "2024-03-12",
+          "2024-03-13",
+          "2024-03-14",
+          "2024-03-15",
+          "2024-03-18",
+          "2024-03-19",
+          "2024-03-20",
+          "2024-03-21",
+          "2024-03-22",
+          "2024-03-25",
+          "2024-03-26",
+          "2024-03-27",
+          "2024-03-28",
+          "2024-03-29"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "DFII10",
+        "month": "2024-01-01",
+        "unit": "percent",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 23,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-01-01",
+          "2024-01-02",
+          "2024-01-03",
+          "2024-01-04",
+          "2024-01-05",
+          "2024-01-08",
+          "2024-01-09",
+          "2024-01-10",
+          "2024-01-11",
+          "2024-01-12",
+          "2024-01-15",
+          "2024-01-16",
+          "2024-01-17",
+          "2024-01-18",
+          "2024-01-19",
+          "2024-01-22",
+          "2024-01-23",
+          "2024-01-24",
+          "2024-01-25",
+          "2024-01-26",
+          "2024-01-29",
+          "2024-01-30",
+          "2024-01-31"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "DFII10",
+        "month": "2024-02-01",
+        "unit": "percent",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 21,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-02-01",
+          "2024-02-02",
+          "2024-02-05",
+          "2024-02-06",
+          "2024-02-07",
+          "2024-02-08",
+          "2024-02-09",
+          "2024-02-12",
+          "2024-02-13",
+          "2024-02-14",
+          "2024-02-15",
+          "2024-02-16",
+          "2024-02-19",
+          "2024-02-20",
+          "2024-02-21",
+          "2024-02-22",
+          "2024-02-23",
+          "2024-02-26",
+          "2024-02-27",
+          "2024-02-28",
+          "2024-02-29"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "DFII10",
+        "month": "2024-03-01",
+        "unit": "percent",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 21,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-03-01",
+          "2024-03-04",
+          "2024-03-05",
+          "2024-03-06",
+          "2024-03-07",
+          "2024-03-08",
+          "2024-03-11",
+          "2024-03-12",
+          "2024-03-13",
+          "2024-03-14",
+          "2024-03-15",
+          "2024-03-18",
+          "2024-03-19",
+          "2024-03-20",
+          "2024-03-21",
+          "2024-03-22",
+          "2024-03-25",
+          "2024-03-26",
+          "2024-03-27",
+          "2024-03-28",
+          "2024-03-29"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "DGS10",
+        "month": "2024-01-01",
+        "unit": "percent",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 23,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-01-01",
+          "2024-01-02",
+          "2024-01-03",
+          "2024-01-04",
+          "2024-01-05",
+          "2024-01-08",
+          "2024-01-09",
+          "2024-01-10",
+          "2024-01-11",
+          "2024-01-12",
+          "2024-01-15",
+          "2024-01-16",
+          "2024-01-17",
+          "2024-01-18",
+          "2024-01-19",
+          "2024-01-22",
+          "2024-01-23",
+          "2024-01-24",
+          "2024-01-25",
+          "2024-01-26",
+          "2024-01-29",
+          "2024-01-30",
+          "2024-01-31"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "DGS10",
+        "month": "2024-02-01",
+        "unit": "percent",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 21,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-02-01",
+          "2024-02-02",
+          "2024-02-05",
+          "2024-02-06",
+          "2024-02-07",
+          "2024-02-08",
+          "2024-02-09",
+          "2024-02-12",
+          "2024-02-13",
+          "2024-02-14",
+          "2024-02-15",
+          "2024-02-16",
+          "2024-02-19",
+          "2024-02-20",
+          "2024-02-21",
+          "2024-02-22",
+          "2024-02-23",
+          "2024-02-26",
+          "2024-02-27",
+          "2024-02-28",
+          "2024-02-29"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "DGS10",
+        "month": "2024-03-01",
+        "unit": "percent",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 21,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-03-01",
+          "2024-03-04",
+          "2024-03-05",
+          "2024-03-06",
+          "2024-03-07",
+          "2024-03-08",
+          "2024-03-11",
+          "2024-03-12",
+          "2024-03-13",
+          "2024-03-14",
+          "2024-03-15",
+          "2024-03-18",
+          "2024-03-19",
+          "2024-03-20",
+          "2024-03-21",
+          "2024-03-22",
+          "2024-03-25",
+          "2024-03-26",
+          "2024-03-27",
+          "2024-03-28",
+          "2024-03-29"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "CPIAUCSL",
+        "month": "2024-01-01",
+        "unit": "index_1982_1984_100_sa",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 1,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-01-01"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "CPIAUCSL",
+        "month": "2024-02-01",
+        "unit": "index_1982_1984_100_sa",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 1,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-02-01"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      },
+      {
+        "series_id": "CPIAUCSL",
+        "month": "2024-03-01",
+        "unit": "index_1982_1984_100_sa",
+        "method": null,
+        "status": "missing",
+        "value": null,
+        "expected_labels": 1,
+        "valid_values": 0,
+        "missing_labels": [
+          "2024-03-01"
+        ],
+        "null_labels": [],
+        "record_ids": []
+      }
+    ],
+    "changes": [
+      {
+        "month": "2024-02-01",
+        "method": "london_afternoon_fixing_average",
+        "values": {
+          "WB_GOLD_MONTHLY": null,
+          "DTWEXBGS": null,
+          "DFII10": null,
+          "DGS10": null,
+          "CPIAUCSL": null
+        },
+        "exclusions": {
+          "WB_GOLD_MONTHLY": "current_missing",
+          "DTWEXBGS": "current_missing",
+          "DFII10": "current_missing",
+          "DGS10": "current_missing",
+          "CPIAUCSL": "current_missing"
+        }
+      },
+      {
+        "month": "2024-03-01",
+        "method": "london_afternoon_fixing_average",
+        "values": {
+          "WB_GOLD_MONTHLY": null,
+          "DTWEXBGS": null,
+          "DFII10": null,
+          "DGS10": null,
+          "CPIAUCSL": null
+        },
+        "exclusions": {
+          "WB_GOLD_MONTHLY": "current_missing",
+          "DTWEXBGS": "current_missing",
+          "DFII10": "current_missing",
+          "DGS10": "current_missing",
+          "CPIAUCSL": "current_missing"
+        }
+      }
+    ],
+    "associations": [
+      {
+        "series_id": "DTWEXBGS",
+        "population": "pairwise",
+        "method": "london_afternoon_fixing_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DFII10",
+        "population": "pairwise",
+        "method": "london_afternoon_fixing_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DGS10",
+        "population": "pairwise",
+        "method": "london_afternoon_fixing_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "CPIAUCSL",
+        "population": "pairwise",
+        "method": "london_afternoon_fixing_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DTWEXBGS",
+        "population": "common",
+        "method": "london_afternoon_fixing_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DFII10",
+        "population": "common",
+        "method": "london_afternoon_fixing_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DGS10",
+        "population": "common",
+        "method": "london_afternoon_fixing_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "CPIAUCSL",
+        "population": "common",
+        "method": "london_afternoon_fixing_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DTWEXBGS",
+        "population": "pairwise",
+        "method": "spot_daily_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DFII10",
+        "population": "pairwise",
+        "method": "spot_daily_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DGS10",
+        "population": "pairwise",
+        "method": "spot_daily_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "CPIAUCSL",
+        "population": "pairwise",
+        "method": "spot_daily_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DTWEXBGS",
+        "population": "common",
+        "method": "spot_daily_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DFII10",
+        "population": "common",
+        "method": "spot_daily_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "DGS10",
+        "population": "common",
+        "method": "spot_daily_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      },
+      {
+        "series_id": "CPIAUCSL",
+        "population": "common",
+        "method": "spot_daily_average",
+        "months": [],
+        "n": 0,
+        "status": "no_overlap",
+        "pearson": null,
+        "spearman": null
+      }
+    ],
+    "rolling": [],
+    "definitions": {
+      "WB_GOLD_MONTHLY": "تغییر میانگین قیمت طلا، درصد",
+      "DTWEXBGS": "تغییر میانگین شاخص گستردهٔ دلار، درصد",
+      "DFII10": "تغییر میانگین بازده واقعی ۱۰ساله، واحد درصد",
+      "DGS10": "تغییر میانگین بازده اسمی ۱۰ساله، واحد درصد",
+      "CPIAUCSL": "تورم ماهانهٔ CPI تعدیل‌شده، درصد"
+    },
+    "sources": {
+      "WB_GOLD_MONTHLY": "https://www.worldbank.org/en/research/commodity-markets",
+      "DTWEXBGS": "https://fred.stlouisfed.org/series/DTWEXBGS",
+      "DFII10": "https://fred.stlouisfed.org/series/DFII10",
+      "DGS10": "https://fred.stlouisfed.org/series/DGS10",
+      "CPIAUCSL": "https://fred.stlouisfed.org/series/CPIAUCSL"
+    },
+    "limitations": [
+      "Latest versions known at the cutoff; not an original-release historical replay.",
+      "Gold uses monthly average prices, not executable close-to-close returns.",
+      "Contemporaneous association is neither causation nor a forecasting test.",
+      "June 2025 gold change crosses a methodology break and is excluded.",
+      "Daily coverage uses weekday labels, not a verified trading/holiday calendar.",
+      "No imputation; missing months invalidate adjacent changes and rolling windows.",
+      "The minimum sample is a reporting policy, not a statistical power guarantee.",
+      "Overlapping rolling windows are dependent; no p-values or confidence claims.",
+      "No lag search, fitted strategy, transaction costs or out-of-sample evaluation."
+    ]
+  },
+  "releases": {
+    "schema_version": "1.0.0",
+    "generated_at": "2026-10-06T08:50:34.626234Z",
+    "as_of": "2024-04-16T00:00:00Z",
+    "software_version": "0.10.0",
+    "fingerprint": "64b9944373e96e26412d7fbf2125d3ba6606905804b1ac512c838a12ead393d3",
+    "status": "no_evidence",
+    "documents": [],
+    "intraday_replay_ready": false,
+    "limitations": [
+      "Official archive values are manually reviewed extracts, not original HTML bytes.",
+      "An archive may have been reissued; the capture date identifies the inspected version.",
+      "An embargo header and a date-only FRED vintage do not prove intraday delivery time.",
+      "Same-day FRED consistency is not independent confirmation or proof of first release.",
+      "CPI MoM uses two index levels from the same vintage and compares at display precision.",
+      "Current-revision differences are not release surprises; no consensus input is present.",
+      "Historical availability is not backdated; replay remains retrieval bounded."
+    ]
+  },
+  "revisions": {
+    "schema_version": "1.0.0",
+    "software_version": "0.10.0",
+    "generated_at": "2026-10-06T08:50:34.627743Z",
+    "as_of": "2024-04-16T00:00:00Z",
+    "fingerprint": "bd836fee857fd34cb88782ffa936f5c85b2f52853bcadc7583fecce279bef5e1",
+    "plan": {
+      "schema_version": "1.0.0",
+      "declared_at": "2024-04-01T00:00:00Z",
+      "start_period": "2024-01",
+      "end_period": "2024-01",
+      "metrics": [
+        "cpi_all_items_sa_mom"
+      ],
+      "selection_reason": "Empty-store compatibility fixture; no market observations",
+      "method": "adjacent_document_display"
+    },
+    "status": "no_evidence",
+    "expected_pairs": 1,
+    "compared_pairs": 0,
+    "vintage_matched_pairs": 0,
+    "changed_display_pairs": 0,
+    "document_slots": [
+      {
+        "metric": "cpi_all_items_sa_mom",
+        "headline_period": "2024-01",
+        "status": "missing",
+        "candidate_capture_ids": []
+      },
+      {
+        "metric": "cpi_all_items_sa_mom",
+        "headline_period": "2024-02",
+        "status": "missing",
+        "candidate_capture_ids": []
+      }
+    ],
+    "captures": [],
+    "pairs": [
+      {
+        "metric": "cpi_all_items_sa_mom",
+        "reference_period": "2024-01",
+        "next_headline_period": "2024-02",
+        "status": "missing_document",
+        "before": null,
+        "after": null,
+        "difference_pp": null,
+        "before_vintage": null,
+        "after_vintage": null,
+        "vintage_difference_pp": null
+      }
+    ],
+    "capture_changes": [],
+    "first_release_verified": false,
+    "intraday_replay_ready": false,
+    "limitations": [
+      "Equality is only at the one-decimal display precision and only for adjacent documents.",
+      "Archive captures may be reissued; their header clocks do not date observed revisions.",
+      "Same-document recapture differences are separate from cross-document differences.",
+      "Missing and ambiguous document slots remain in the declared coverage denominator.",
+      "FRED vintages are day-resolution and share the underlying BLS statistical source.",
+      "Availability remains retrieval bounded; no historical availability is inferred.",
+      "The plan declaration is operator supplied, not independently certified preregistration.",
+      "Differences are not market surprises and do not estimate tradable gold responses."
+    ]
+  },
+  "data_basis": "stored_data_single_snapshot",
+  "daily_backtest_ready": false,
+  "intraday_replay_ready": false,
+  "first_release_verified": false
+}

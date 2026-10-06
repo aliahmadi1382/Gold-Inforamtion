@@ -32,8 +32,8 @@
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "2.0.0",
-      "default": "2.0.0",
+      "const": "1.0.0",
+      "default": "1.0.0",
       "title": "Schema Version",
       "type": "string"
     },
@@ -65,6 +65,6 @@
     "report_fingerprint",
     "files"
   ],
-  "title": "ReportManifest",
+  "title": "ReportManifestV1",
   "type": "object"
 }

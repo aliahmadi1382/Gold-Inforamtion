@@ -58,7 +58,7 @@ def test_empty_store_produces_honest_partial_bundle(store, registry, settings, t
     assert all(getattr(report, name).as_of == ASOF for name in PARTS)
     assert not report.daily_backtest_ready and not report.intraday_replay_ready
     directory = write_research_report(report, tmp_path / "reports")
-    assert verify_research_bundle(directory)["files"] == 11
+    assert verify_research_bundle(directory)["files"] == 13
     text = (directory / "research-report.fa.md").read_text(encoding="utf-8")
     assert "به معنی نبود رویداد نیست" in text and "با صفر جایگزین نشده" in text
     for link in re.findall(r"\]\(([^)]+)\)", text):

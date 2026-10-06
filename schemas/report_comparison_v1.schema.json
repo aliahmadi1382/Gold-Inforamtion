@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {
-    "EntityChange": {
+    "EntityChangeV1": {
       "additionalProperties": false,
       "properties": {
         "section": {
@@ -12,8 +12,7 @@
             "calendar",
             "monthly",
             "releases",
-            "revisions",
-            "positioning"
+            "revisions"
           ],
           "title": "Section",
           "type": "string"
@@ -90,7 +89,7 @@
         "after_pointer",
         "fields"
       ],
-      "title": "EntityChange",
+      "title": "EntityChangeV1",
       "type": "object"
     },
     "FieldChange": {
@@ -136,7 +135,7 @@
       "type": "object"
     },
     "JsonValue": {},
-    "ReportReferenceV2": {
+    "ReportReference": {
       "additionalProperties": false,
       "properties": {
         "location": {
@@ -170,14 +169,6 @@
         "status": {
           "title": "Status",
           "type": "string"
-        },
-        "report_schema_version": {
-          "enum": [
-            "1.0.0",
-            "2.0.0"
-          ],
-          "title": "Report Schema Version",
-          "type": "string"
         }
       },
       "required": [
@@ -187,13 +178,12 @@
         "as_of",
         "generated_at",
         "software_version",
-        "status",
-        "report_schema_version"
+        "status"
       ],
-      "title": "ReportReferenceV2",
+      "title": "ReportReference",
       "type": "object"
     },
-    "SectionComparison": {
+    "SectionComparisonV1": {
       "additionalProperties": false,
       "properties": {
         "key": {
@@ -204,8 +194,7 @@
             "calendar",
             "monthly",
             "releases",
-            "revisions",
-            "positioning"
+            "revisions"
           ],
           "title": "Key",
           "type": "string"
@@ -253,16 +242,6 @@
           },
           "title": "Evidence Ids Removed",
           "type": "array"
-        },
-        "comparison_basis": {
-          "enum": [
-            "both_present",
-            "not_in_before_schema",
-            "not_in_after_schema",
-            "neither_schema"
-          ],
-          "title": "Comparison Basis",
-          "type": "string"
         }
       },
       "required": [
@@ -274,24 +253,23 @@
         "modified",
         "unchanged",
         "evidence_ids_added",
-        "evidence_ids_removed",
-        "comparison_basis"
+        "evidence_ids_removed"
       ],
-      "title": "SectionComparison",
+      "title": "SectionComparisonV1",
       "type": "object"
     }
   },
   "additionalProperties": false,
   "properties": {
     "schema_version": {
-      "const": "2.0.0",
-      "default": "2.0.0",
+      "const": "1.0.0",
+      "default": "1.0.0",
       "title": "Schema Version",
       "type": "string"
     },
     "comparator_version": {
-      "const": "2.0.0",
-      "default": "2.0.0",
+      "const": "1.0.0",
+      "default": "1.0.0",
       "title": "Comparator Version",
       "type": "string"
     },
@@ -310,10 +288,10 @@
       "type": "string"
     },
     "before": {
-      "$ref": "#/$defs/ReportReferenceV2"
+      "$ref": "#/$defs/ReportReference"
     },
     "after": {
-      "$ref": "#/$defs/ReportReferenceV2"
+      "$ref": "#/$defs/ReportReference"
     },
     "status": {
       "enum": [
@@ -333,14 +311,14 @@
     },
     "sections": {
       "items": {
-        "$ref": "#/$defs/SectionComparison"
+        "$ref": "#/$defs/SectionComparisonV1"
       },
       "title": "Sections",
       "type": "array"
     },
     "changes": {
       "items": {
-        "$ref": "#/$defs/EntityChange"
+        "$ref": "#/$defs/EntityChangeV1"
       },
       "title": "Changes",
       "type": "array"
@@ -369,6 +347,6 @@
     "sections",
     "changes"
   ],
-  "title": "ReportComparison",
+  "title": "ReportComparisonV1",
   "type": "object"
 }

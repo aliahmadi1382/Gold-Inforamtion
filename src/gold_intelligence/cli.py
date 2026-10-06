@@ -39,13 +39,16 @@ from .release_values import (
 from .report_comparison import (
     ComparisonManifest,
     ReportComparison,
+    ReportComparisonV1,
     compare_reports,
     verify_comparison,
 )
 from .research_report import (
     ReportManifest,
+    ReportManifestV1,
     ReportSettings,
     ResearchReport,
+    ResearchReportV1,
     build_research_report,
     verify_research_bundle,
     write_research_report,
@@ -100,6 +103,7 @@ def parser() -> argparse.ArgumentParser:
     c.add_argument("--policy", type=Path, default=Path("config/quality_history.yaml"))
     c.add_argument("--horizon-days", type=int, default=90)
     c.add_argument("--calendar-max-age-hours", type=float, default=168)
+    c.add_argument("--positioning-max-age-days", type=int, default=14)
     c.add_argument("--output-dir", type=Path, default=Path("local/reports/unified"))
     c = sub.add_parser("verify-report", help="verify a saved report bundle's hashes and coherence")
     c.add_argument("directory", type=Path)
@@ -265,6 +269,9 @@ def run(args) -> dict:
             "comparison_manifest": ComparisonManifest,
             "cot_capture": CotCapture,
             "positioning_context": PositioningContext,
+            "research_report_v1": ResearchReportV1,
+            "report_manifest_v1": ReportManifestV1,
+            "report_comparison_v1": ReportComparisonV1,
         }
         for name, model in models.items():
             schema = {
@@ -297,6 +304,7 @@ def run(args) -> dict:
                 revision_plan=load_revision_plan(args.revision_plan),
                 calendar_horizon_days=args.horizon_days,
                 calendar_max_evidence_age_hours=args.calendar_max_age_hours,
+                positioning_max_age_days=args.positioning_max_age_days,
             )
             report = build_research_report(store, registry, settings, args.as_of)
             directory = write_research_report(report, args.output_dir)

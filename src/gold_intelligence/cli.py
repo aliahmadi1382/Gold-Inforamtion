@@ -11,6 +11,7 @@ from .acquisition import SAFE_PARAMETERS, AcquisitionRun, acquire, list_runs
 from .alpha_vantage import ingest_alpha_gold
 from .analysis import event_study
 from .brief import ResearchBrief, build_brief, render_persian
+from .cftc import FIRST_DATE, CotCapture, ingest_cftc_gold
 from .comparison import compare_monthly
 from .credentials import credential_environment
 from .demo import demo
@@ -24,6 +25,7 @@ from .monthly_research import (
     monthly_research,
     render_monthly_persian,
 )
+from .positioning import PositioningContext, positioning_context, write_positioning
 from .quality import QualityPolicy, QualityReport, assess, load_policy
 from .registry import Registry, export_public, load_registry
 from .release_calendar import CalendarContext, ReleaseEvidence, calendar_context, import_evidence
@@ -77,6 +79,13 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    c = sub.add_parser("fetch-cftc-gold", help="public disaggregated COMEX gold futures history")
+    c.add_argument("--start", type=date.fromisoformat, default=FIRST_DATE)
+    c.add_argument("--end", type=date.fromisoformat, required=True)
+    c = sub.add_parser("positioning-context", help="reconciled weekly COT context known at cutoff")
+    c.add_argument("--as-of", type=timestamp, required=True)
+    c.add_argument("--max-age-days", type=int, default=14)
+    c.add_argument("--output-dir", type=Path, default=Path("local/reports/positioning"))
     c = sub.add_parser("compare-reports", help="compare two verified saved research bundles")
     c.add_argument("before", type=Path)
     c.add_argument("after", type=Path)
@@ -254,6 +263,8 @@ def run(args) -> dict:
             "report_manifest": ReportManifest,
             "report_comparison": ReportComparison,
             "comparison_manifest": ComparisonManifest,
+            "cot_capture": CotCapture,
+            "positioning_context": PositioningContext,
         }
         for name, model in models.items():
             schema = {
@@ -267,6 +278,17 @@ def run(args) -> dict:
     if args.command == "demo":
         return demo(args.output, registry)
     with Store(args.store) as store:
+        if args.command == "positioning-context":
+            report = positioning_context(store, registry, args.as_of, args.max_age_days)
+            directory = write_positioning(report, args.output_dir)
+            return {
+                "status": report.status,
+                "report": str(directory / "positioning.fa.md"),
+                "weeks": len(report.weeks),
+                "fingerprint": report.fingerprint,
+                "irregular_intervals": len(report.irregular_intervals),
+                "historical_release_ready": False,
+            }
         if args.command == "research-report":
             settings = ReportSettings(
                 macro_plan=load_plan(args.macro_plan),
@@ -407,6 +429,7 @@ def run(args) -> dict:
             "fetch-fred",
             "fetch-alpha-gold",
             "fetch-worldbank-gold",
+            "fetch-cftc-gold",
             "import-release-evidence",
             "import-release-values",
         }:
@@ -425,6 +448,8 @@ def run(args) -> dict:
                 parameters.update(
                     source="world_bank_pink_sheet", instrument="GOLD", timeframe="1mo"
                 )
+            if args.command == "fetch-cftc-gold":
+                parameters.update(source="cftc_disaggregated", market_code="088691")
             return acquire(
                 store, args.command, parameters, lambda: perform_ingestion(args, store, registry)
             )
@@ -465,6 +490,8 @@ def run(args) -> dict:
 
 
 def perform_ingestion(args, store, registry) -> int:
+    if args.command == "fetch-cftc-gold":
+        return ingest_cftc_gold(store, registry.get("cftc_disaggregated"), args.start, args.end)
     if args.command == "import-release-values":
         return import_release_values(store, args.path, registry.get("bls"), reviewed=args.reviewed)
     if args.command == "import-release-evidence":
@@ -526,6 +553,8 @@ def main(argv=None) -> int:
         if args.command == "fetch-fred-core" and result["status"] != "succeeded":
             return 3
         if args.command == "monthly-research" and result["status"] == "insufficient_data":
+            return 3
+        if args.command == "positioning-context" and result["status"] != "descriptive_only":
             return 3
         if args.command == "release-value-report" and result["status"] != "compared":
             return 3

@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "CotPage": {
+      "additionalProperties": false,
+      "properties": {
+        "offset": {
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "offset",
+        "sha256"
+      ],
+      "title": "CotPage",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "dataset": {
+      "const": "cftc_disaggregated_futures_only_gold_v1",
+      "default": "cftc_disaggregated_futures_only_gold_v1",
+      "title": "Dataset",
+      "type": "string"
+    },
+    "resource": {
+      "const": "72hh-3qpy",
+      "default": "72hh-3qpy",
+      "title": "Resource",
+      "type": "string"
+    },
+    "start": {
+      "format": "date",
+      "title": "Start",
+      "type": "string"
+    },
+    "end": {
+      "format": "date",
+      "title": "End",
+      "type": "string"
+    },
+    "retrieved_at": {
+      "format": "date-time",
+      "title": "Retrieved At",
+      "type": "string"
+    },
+    "metadata_before": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Metadata Before",
+      "type": "string"
+    },
+    "metadata_after": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Metadata After",
+      "type": "string"
+    },
+    "count_before": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Count Before",
+      "type": "string"
+    },
+    "count_after": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Count After",
+      "type": "string"
+    },
+    "expected_rows": {
+      "exclusiveMinimum": 0,
+      "maximum": 10000,
+      "title": "Expected Rows",
+      "type": "integer"
+    },
+    "pages": {
+      "items": {
+        "$ref": "#/$defs/CotPage"
+      },
+      "title": "Pages",
+      "type": "array"
+    }
+  },
+  "required": [
+    "start",
+    "end",
+    "retrieved_at",
+    "metadata_before",
+    "metadata_after",
+    "count_before",
+    "count_after",
+    "expected_rows",
+    "pages"
+  ],
+  "title": "CotCapture",
+  "type": "object"
+}

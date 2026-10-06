@@ -50,6 +50,7 @@ class AcquisitionRun(Contract):
         "fetch-alpha-gold",
         "fetch-fred-reviewed",
         "fetch-worldbank-gold",
+        "fetch-cftc-gold",
         "import-release-evidence",
         "import-release-values",
     ]

@@ -56,3 +56,9 @@ World Bank monthly gold uses `Observation`, layer `price`, series `WB_GOLD_MONTH
 ## Reviewed timing evidence (0.5)
 
 `ReleaseEvidence` is an attested selected web transcription, not a raw HTML claim. It creates existing `CalendarRelease` records with dataset `bls_reviewed_schedule_v1` or `bls_reviewed_header_v1`, unit `release_event` and raw pointer `entries:<index>`. Reference-month UTC labels and announced New York instants remain distinct. Raw capture time does not backdate local ingestion availability. Actual/previous/consensus and actual delivery time remain null. `CalendarContext` selects the newest captured eligible event version before horizon filtering and exposes evidence age plus UTC/New York/Tehran times. `ResearchBrief` composes quality, macro and calendar output, with daily-backtest readiness fixed false in this release. No existing record contract or content hash has been migrated.
+
+## COT public API capture and context (0.11)
+
+`CotCapture` pins the reviewed disaggregated futures-only gold resource, requested date range, completed retrieval time, before/after metadata and count hashes, and ordered page offsets/hashes. `Positioning` rows use date-label UTC midnight, market 088691, one of five explicit categories, integer contracts, and `available_at = retrieved_at`; raw pointers identify the capture plus row/category. Non-separated spreading is null. Complete eligible captures must reconstruct exactly before report selection.
+
+`PositioningContext` contains selected weekly observations, per-group long/short/spread/net/net-OI shares, exact-seven-day deltas, irregular intervals, non-Tuesday labels, age policy, version counts, evidence IDs and a fingerprint. Zero OI yields a null share; no calendar labels are filled or moved. These are 100-troy-ounce gold futures contracts across maturities, not spot prices, dollar flows or trader counts. The standalone report does not change existing seven-section unified bundles.

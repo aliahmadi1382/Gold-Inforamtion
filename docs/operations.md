@@ -223,13 +223,34 @@ Price coverage cannot establish equality of underlying prices. Added/removed evi
 
 ## CFTC positioning
 
+The public API connector needs no key. It is restricted to **COMEX gold 088691 / Disaggregated / Futures Only / 100-troy-ounce contracts / all maturities**:
+
+```sh
+uv run gold fetch-cftc-gold --start 2006-06-13 --end 2026-10-06
+uv run gold positioning-context --as-of 2026-10-06T12:00:00Z --max-age-days 14
+```
+
+The dates above are an example; choose the desired observation interval and an explicit cutoff at or after your actual acquisition. A past cutoff excludes newly fetched history. No Friday availability is inferred. The connector checks source metadata, bounded ordered pages, before/after counts and revision markers, complete row identity, integer counts and both OI balances before committing the normalized batch. A failed acquisition preserves already-saved raw evidence and a failure manifest; it adds no partial normalized batch. Retry the entire interval after a visible provider update. There is no continuous job.
+
+`positioning-context` reconciles complete eligible captures against all their normalized records, chooses the newest whole five-group version per observation date, and writes a new directory with Persian Markdown and full JSON. Missing categories, raw tampering and ambiguous same-time captures fail. Only pairs exactly seven days apart receive deltas. Irregular intervals and non-Tuesday labels remain visible; age is measured from the observation date using the configured threshold. Exit code 3 means `no_data` or `stale`; 2 means an error, and 0 means descriptive output within that age policy. None means trading readiness.
+
+For an independent arithmetic check, replace the report path with the one printed by the command:
+
+```sh
+uv run python scripts/inspect_positioning.py --report local/reports/positioning/positioning-RUN/positioning.json --output local/reports/positioning-validation.json
+```
+
+The inspector checks selected coverage, raw cells, nets, OI shares, deltas and profile counts. `gold audit` verifies the immediate record-to-capture hash; `positioning-context` and the inspector also follow capture links to pages and metadata. This standalone context is not yet a detail section of `research-report` or `compare-reports`. See [method and live evidence](source-methodology/cot-positioning.fa.md) and [lesson twelve](education/12-cot-positioning.fa.md).
+
+### Manual legacy import
+
 Use the official [compressed archive](https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm). Choose **Legacy / Futures Only / Text**, unzip locally, then:
 
 ```sh
 uv run gold import-cftc local/annual.txt --market-code 088691 --futures-only
 ```
 
-The importer retains non-commercial, commercial and non-reportable long/short positions, non-commercial spreading and total OI. It rejects unsupported headers, explicit combined-report markers and duplicate report dates. Legacy combined files can have the same column names, so `--futures-only` attests that the correct archive family was selected; headers alone cannot prove it. Disaggregated/combined ingestion is not implemented. Annual archives do not establish historical release instants, so availability is retrieval time. Source replay does not bypass that limitation. Preserve the downloaded archive and acquisition details locally. The archive download returned HTTP 403 in the implementation environment; tests cover documented column formats with fictional values, not a successful live archive fetch.
+The importer retains non-commercial, commercial and non-reportable long/short positions, non-commercial spreading and total OI. It rejects unsupported headers, explicit combined-report markers and duplicate report dates. Legacy combined files can have the same column names, so `--futures-only` attests that the correct archive family was selected; headers alone cannot prove it. This CSV importer does not accept disaggregated or combined files; the separate API connector above handles disaggregated gold futures only. Annual archives do not establish historical release instants, so availability is retrieval time. Source replay does not bypass that limitation. Preserve the downloaded archive and acquisition details locally. The compressed archive download returned HTTP 403 during initial implementation; its parser tests use fictional values. The later API acquisition is a separate, successfully tested access path.
 
 ## Other layers via normalized records
 

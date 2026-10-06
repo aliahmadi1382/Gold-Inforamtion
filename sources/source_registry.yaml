@@ -1,5 +1,5 @@
 schema_version: 1.0.0
-reviewed_on: '2026-10-05'
+reviewed_on: '2026-10-06'
 sources:
   - source_id: synthetic_demo
     provider: Gold Market Intelligence test generator
@@ -77,16 +77,16 @@ sources:
     notes: Gold code 088691. Annual CSV parser implemented. Release time defaults to retrieval.
   - source_id: cftc_disaggregated
     provider: Commodity Futures Trading Commission
-    url: https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalViewable/index.htm
+    url: https://publicreporting.cftc.gov/resource/72hh-3qpy.json
     layers: [positioning]
     access: public
     license_status: OPEN_PUBLIC
     license_id: CFTC-public-data-review-required
     terms_url: https://www.cftc.gov/WebPolicy/index.htm
-    implementation: planned
-    coverage: Published since September 2009; historical backfill includes June 2006 onward
+    implementation: implemented
+    coverage: COMEX gold 088691, disaggregated futures only; historical backfill from June 2006
     frequency: Weekly
-    notes: Keep producer, swap dealer, managed money and other reportable categories separate.
+    notes: Public API without token. Five groups including nonreportables; 100 troy ounce contracts, all maturities. Full capture reconciliation, retrieval-bound availability; no inferred historical Friday release. Early backfill uses retrospective classifications.
   - source_id: lbma_iba
     provider: ICE Benchmark Administration / LBMA
     url: https://www.lbma.org.uk/prices-and-data/lbma-gold-price

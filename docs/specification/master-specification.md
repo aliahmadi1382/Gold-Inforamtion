@@ -1,6 +1,6 @@
 # Master Data & Research Specification
 
-Version 1.6.0 · reviewed 2026-10-05 · implementation release 0.10.0.
+Version 1.7.0 · reviewed 2026-10-06 · implementation release 0.11.0.
 The supplied brief is preserved verbatim in `original-brief.md` as an input artifact, not a verified factual source or a promise of working integrations. This specification and the source audit take precedence for implementation status.
 
 ## Objective and scope
@@ -66,3 +66,5 @@ Release 0.8 expands the reviewed archive coverage to a declared January–June 2
 Release 0.9 composes the existing research engines at one explicit system cutoff in one SQLite read transaction. Its seven-section overview links to the exact nested evidence, preserves missing/limited states and keeps daily backtest, first-release and intraday readiness false. Acceptance includes concurrent-ingestion isolation, atomic publication of a new run directory, non-overwrite of previous runs, complete manifests, hashes and semantic coherence, plus independent reconciliation of real monthly/ledger details. No source data acquisition, LLM analyst or economic-authenticity guarantee is added. See [unified report evidence](../source-methodology/unified-research-report.fa.md).
 
 Release 0.10 compares verified report bundles by semantic row identities, keeping cutoff/settings/software/registry changes separate from report content. Acceptance includes reorder invariance, explicit missing/null/zero distinctions, unit/method separation, sample membership, recapture vs value differences, view exits, exact verified input bytes, tamper rejection, preserved prior runs and standalone recomputation from copied input JSON. Completeness is bounded by what source reports contain: daily-price coverage cannot certify all prices or the entire database. Causal attribution remains false. See [comparison evidence](../source-methodology/report-comparison.fa.md).
+
+Release 0.11 acquires the public CFTC disaggregated futures-only COMEX gold dataset without a key. Acceptance covers reviewed metadata and units, bounded ordered pages, visible revision/count checks, complete integer/balance validation, atomic normalized batches, linked raw captures, whole-capture reconstruction and cutoff-aware five-group selection. The standalone Persian context shows net positions, OI shares, exact-seven-day deltas, age, irregular intervals and evidence. Live acquisition and independent raw arithmetic reconcile 1,060 dates and 5,300 records. Availability remains retrieval-bound; historical release instants and classifications are not certified. Integration into the unified report/comparison is a later versioned increment. See [positioning evidence](../source-methodology/cot-positioning.fa.md).

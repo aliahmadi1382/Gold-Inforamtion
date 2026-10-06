@@ -79,7 +79,7 @@ class AcquisitionRun(Contract):
         return self
 
 
-def write_manifest(path: Path, run: AcquisitionRun) -> None:
+def write_manifest(path: Path, run: Contract) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     # Replace within the same directory so readers never see partially written JSON.
     temp_path = None
@@ -95,9 +95,16 @@ def write_manifest(path: Path, run: AcquisitionRun) -> None:
             temp_path.unlink()
 
 
-def acquire(store: Store, operation: str, parameters: dict, execute: Callable[[], int]) -> dict:
+def acquire(
+    store: Store,
+    operation: str,
+    parameters: dict,
+    execute: Callable[[], int],
+    *,
+    run_id: str | None = None,
+) -> dict:
     run = AcquisitionRun(
-        run_id=uuid4().hex,
+        run_id=run_id if run_id is not None else uuid4().hex,
         operation=operation,
         application_version=__version__,
         started_at=datetime.now(UTC),
@@ -105,7 +112,18 @@ def acquire(store: Store, operation: str, parameters: dict, execute: Callable[[]
         parameters=parameters,
     )
     path = store.root / "runs" / f"{run.run_id}.json"
-    write_manifest(path, run)
+    # Reserve outside the JSON namespace: readers must not see an empty manifest,
+    # and concurrent callers must never overwrite a caller-supplied run ID.
+    path.parent.mkdir(parents=True, exist_ok=True)
+    reservation = path.with_suffix(".reserve")
+    with reservation.open("x", encoding="utf-8"):
+        pass
+    try:
+        if path.exists():
+            raise FileExistsError("acquisition run ID already exists")
+        write_manifest(path, run)
+    finally:
+        reservation.unlink()
     failure = None
     with store.capture_ingestion() as evidence:
         try:

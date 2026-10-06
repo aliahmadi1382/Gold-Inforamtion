@@ -1,0 +1,788 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "CoreSeries": {
+      "additionalProperties": false,
+      "properties": {
+        "series_id": {
+          "pattern": "^[A-Z0-9_]+$",
+          "title": "Series Id",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        },
+        "frequency": {
+          "enum": [
+            "D",
+            "W",
+            "M",
+            "Q"
+          ],
+          "title": "Frequency",
+          "type": "string"
+        },
+        "provider_units": {
+          "minLength": 1,
+          "title": "Provider Units",
+          "type": "string"
+        },
+        "seasonal_adjustment": {
+          "enum": [
+            "SA",
+            "NSA",
+            "SAAR"
+          ],
+          "title": "Seasonal Adjustment",
+          "type": "string"
+        },
+        "max_age_days": {
+          "exclusiveMinimum": 0,
+          "title": "Max Age Days",
+          "type": "number"
+        }
+      },
+      "required": [
+        "series_id",
+        "unit",
+        "frequency",
+        "provider_units",
+        "seasonal_adjustment",
+        "max_age_days"
+      ],
+      "title": "CoreSeries",
+      "type": "object"
+    },
+    "EvidenceFreshness": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "current",
+            "stale",
+            "missing",
+            "missing_value",
+            "unchecked"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "reference_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reference At"
+        },
+        "age_days": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Age Days"
+        },
+        "limit_days": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Limit Days"
+        }
+      },
+      "required": [
+        "key",
+        "status",
+        "reference_at",
+        "age_days",
+        "limit_days"
+      ],
+      "title": "EvidenceFreshness",
+      "type": "object"
+    },
+    "MacroPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "series": {
+          "items": {
+            "$ref": "#/$defs/CoreSeries"
+          },
+          "minItems": 1,
+          "title": "Series",
+          "type": "array"
+        }
+      },
+      "required": [
+        "series"
+      ],
+      "title": "MacroPlan",
+      "type": "object"
+    },
+    "MonthlyResearchPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "start_month": {
+          "default": "2006-02-01",
+          "format": "date",
+          "title": "Start Month",
+          "type": "string"
+        },
+        "minimum_valid_weekday_fraction": {
+          "default": 0.8,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Minimum Valid Weekday Fraction",
+          "type": "number"
+        },
+        "minimum_pairs": {
+          "default": 36,
+          "minimum": 3,
+          "title": "Minimum Pairs",
+          "type": "integer"
+        },
+        "rolling_months": {
+          "default": 60,
+          "minimum": 3,
+          "title": "Rolling Months",
+          "type": "integer"
+        }
+      },
+      "title": "MonthlyResearchPlan",
+      "type": "object"
+    },
+    "QualityPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "max_age_hours": {
+          "additionalProperties": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "title": "Max Age Hours",
+          "type": "object"
+        },
+        "daily_gap_warning_hours": {
+          "default": 96,
+          "exclusiveMinimum": 0,
+          "title": "Daily Gap Warning Hours",
+          "type": "number"
+        },
+        "missing_fraction_warning_above": {
+          "default": 0,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Missing Fraction Warning Above",
+          "type": "number"
+        },
+        "required_streams": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RequiredStream"
+          },
+          "title": "Required Streams",
+          "type": "array"
+        }
+      },
+      "title": "QualityPolicy",
+      "type": "object"
+    },
+    "RefreshPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "fred_overlap_days": {
+          "default": 120,
+          "maximum": 3650,
+          "minimum": 1,
+          "title": "Fred Overlap Days",
+          "type": "integer"
+        },
+        "cot_overlap_days": {
+          "default": 90,
+          "maximum": 3650,
+          "minimum": 14,
+          "title": "Cot Overlap Days",
+          "type": "integer"
+        },
+        "full_history": {
+          "default": false,
+          "title": "Full History",
+          "type": "boolean"
+        }
+      },
+      "title": "RefreshPolicy",
+      "type": "object"
+    },
+    "RefreshReport": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "running",
+            "succeeded",
+            "failed",
+            "skipped"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "as_of": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "As Of"
+        },
+        "bundle": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bundle"
+        },
+        "fingerprint": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fingerprint"
+        },
+        "research_status": {
+          "anyOf": [
+            {
+              "enum": [
+                "compiled",
+                "with_limits",
+                "partial"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Research Status"
+        },
+        "freshness": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EvidenceFreshness"
+          },
+          "title": "Freshness",
+          "type": "array"
+        },
+        "calendar_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Calendar Status"
+        },
+        "failure_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Type"
+        }
+      },
+      "title": "RefreshReport",
+      "type": "object"
+    },
+    "RefreshStep": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "pattern": "^(alpha_vantage_gold|world_bank_pink_sheet|cftc_disaggregated|fred:[A-Z0-9_]+)$",
+          "title": "Key",
+          "type": "string"
+        },
+        "run_id": {
+          "pattern": "^[a-f0-9]{32}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start"
+        },
+        "end": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End"
+        },
+        "status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "running",
+            "succeeded",
+            "failed",
+            "interrupted"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "acquisition_status": {
+          "default": "not_started",
+          "enum": [
+            "not_started",
+            "unavailable",
+            "running",
+            "succeeded",
+            "failed"
+          ],
+          "title": "Acquisition Status",
+          "type": "string"
+        },
+        "inserted_records": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Inserted Records"
+        },
+        "referenced_records": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Referenced Records"
+        },
+        "failure_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Type"
+        },
+        "failure_reason": {
+          "anyOf": [
+            {
+              "pattern": "^(HTTP_[45][0-9]{2}|MISSING_CREDENTIALS|CONNECTION_FAILED|VALIDATION_FAILED|STORAGE_ERROR|INTERRUPTED|UNEXPECTED_ERROR)$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Reason"
+        }
+      },
+      "required": [
+        "key",
+        "run_id"
+      ],
+      "title": "RefreshStep",
+      "type": "object"
+    },
+    "ReportSettings": {
+      "additionalProperties": false,
+      "properties": {
+        "macro_plan": {
+          "$ref": "#/$defs/MacroPlan"
+        },
+        "quality_policy": {
+          "$ref": "#/$defs/QualityPolicy"
+        },
+        "monthly_plan": {
+          "$ref": "#/$defs/MonthlyResearchPlan"
+        },
+        "revision_plan": {
+          "$ref": "#/$defs/RevisionPlan"
+        },
+        "calendar_horizon_days": {
+          "default": 90,
+          "maximum": 366,
+          "minimum": 1,
+          "title": "Calendar Horizon Days",
+          "type": "integer"
+        },
+        "calendar_max_evidence_age_hours": {
+          "default": 168,
+          "exclusiveMinimum": 0,
+          "maximum": 8760,
+          "title": "Calendar Max Evidence Age Hours",
+          "type": "number"
+        },
+        "positioning_max_age_days": {
+          "default": 14,
+          "maximum": 365,
+          "minimum": 1,
+          "title": "Positioning Max Age Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "macro_plan",
+        "quality_policy",
+        "monthly_plan",
+        "revision_plan"
+      ],
+      "title": "ReportSettings",
+      "type": "object"
+    },
+    "RequiredStream": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "price_bar",
+            "price_close",
+            "observation",
+            "positioning",
+            "news_event",
+            "calendar_release"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        },
+        "dataset": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset"
+        },
+        "instrument": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instrument"
+        },
+        "series_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Series Id"
+        },
+        "timeframe": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timeframe"
+        },
+        "min_observations": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Min Observations",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "RequiredStream",
+      "type": "object"
+    },
+    "RevisionPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "1.0.0",
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "declared_at": {
+          "format": "date-time",
+          "title": "Declared At",
+          "type": "string"
+        },
+        "start_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "Start Period",
+          "type": "string"
+        },
+        "end_period": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "End Period",
+          "type": "string"
+        },
+        "metrics": {
+          "items": {
+            "enum": [
+              "cpi_all_items_sa_mom",
+              "unemployment_rate_sa"
+            ],
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "title": "Metrics",
+          "type": "array"
+        },
+        "selection_reason": {
+          "minLength": 1,
+          "title": "Selection Reason",
+          "type": "string"
+        },
+        "method": {
+          "const": "adjacent_document_display",
+          "default": "adjacent_document_display",
+          "title": "Method",
+          "type": "string"
+        }
+      },
+      "required": [
+        "declared_at",
+        "start_period",
+        "end_period",
+        "metrics",
+        "selection_reason"
+      ],
+      "title": "RevisionPlan",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "application_version": {
+      "title": "Application Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^[a-f0-9]{32}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "store_root": {
+      "title": "Store Root",
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "finished_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Finished At"
+    },
+    "status": {
+      "default": "running",
+      "enum": [
+        "running",
+        "succeeded",
+        "partial",
+        "failed",
+        "interrupted"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "policy": {
+      "$ref": "#/$defs/RefreshPolicy"
+    },
+    "report_settings": {
+      "$ref": "#/$defs/ReportSettings"
+    },
+    "registry_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Registry Sha256",
+      "type": "string"
+    },
+    "steps": {
+      "items": {
+        "$ref": "#/$defs/RefreshStep"
+      },
+      "title": "Steps",
+      "type": "array"
+    },
+    "report": {
+      "$ref": "#/$defs/RefreshReport"
+    },
+    "manual_inputs": {
+      "default": [
+        "bls_release_evidence",
+        "bls_release_values",
+        "fred_exact_vintages"
+      ],
+      "items": {
+        "enum": [
+          "bls_release_evidence",
+          "bls_release_values",
+          "fred_exact_vintages"
+        ],
+        "type": "string"
+      },
+      "title": "Manual Inputs",
+      "type": "array"
+    },
+    "daily_backtest_ready": {
+      "const": false,
+      "default": false,
+      "title": "Daily Backtest Ready",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "application_version",
+    "run_id",
+    "store_root",
+    "started_at",
+    "policy",
+    "report_settings",
+    "registry_sha256",
+    "steps"
+  ],
+  "title": "RefreshRun",
+  "type": "object"
+}

@@ -25,7 +25,8 @@
 | Risk controls, kill switch and broker isolation | `docs/trading-methodology/` | Execution acceptance requirements; no live order code |
 | Source, timestamp, unit, license, confidence, lineage | `models.Provenance`, `storage.py`, `registry.py` | Validated contracts and raw-to-record audit |
 | Acquisition history and coverage | `acquisition.py`, `quality.py`, `config/quality_policy.yaml` | Per-run manifests and per-stream as-of inventories; revision, missingness, integrity and age checks |
-| Phased development and owner education | `docs/phases.fa.md`, `docs/education/` | Dependency-aware deliveries, thirteen Persian chapters, glossary and exercises |
+| Manual source refresh and report | `refresh.py`, `gold refresh-report` | Independent source/series results, checkpoints, bounded overlap/full-history requests, OS lock, post-acquisition cutoff and explicit freshness; reviewed BLS evidence and exact-date vintages remain manual |
+| Phased development and owner education | `docs/phases.fa.md`, `docs/education/` | Dependency-aware deliveries, fourteen Persian chapters, glossary and exercises |
 | Cross-document revisions and coverage | `revision_ledger.py`, `config/revision_ledger.yaml` | Fixed-window adjacent-document comparisons with exact-date vintages; complete-capture selection, ambiguity/missingness and separate recapture history; no first-release or delivery-time certification |
 | Monthly gold/macro relationships | `monthly_research.py`, `config/monthly_research.yaml` | Current-revision descriptive changes, common/pairwise samples, Pearson/Spearman, contiguous rolling windows, method-break and missingness gates; not causal or predictive research |
 | Readable local research status | `brief.py`, `gold research-brief` | Persian Markdown plus evidence JSON; macro and calendar states, missingness and limitations; no trading narrative or recommendation |

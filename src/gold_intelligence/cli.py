@@ -27,6 +27,7 @@ from .monthly_research import (
 )
 from .positioning import PositioningContext, positioning_context, write_positioning
 from .quality import QualityPolicy, QualityReport, assess, load_policy
+from .refresh import RefreshPolicy, RefreshRun, refresh_and_report
 from .registry import Registry, export_public, load_registry
 from .release_calendar import CalendarContext, ReleaseEvidence, calendar_context, import_evidence
 from .release_values import (
@@ -95,16 +96,33 @@ def parser() -> argparse.ArgumentParser:
     c.add_argument("--output-dir", type=Path, default=Path("local/reports/comparisons"))
     c = sub.add_parser("verify-comparison", help="verify and recompute a saved comparison")
     c.add_argument("directory", type=Path)
-    c = sub.add_parser("research-report", help="compose local research with one shared cutoff")
-    c.add_argument("--as-of", type=timestamp, required=True)
-    c.add_argument("--macro-plan", type=Path, default=Path("config/macro_core.yaml"))
-    c.add_argument("--monthly-plan", type=Path, default=Path("config/monthly_research.yaml"))
-    c.add_argument("--revision-plan", type=Path, default=Path("config/revision_ledger.yaml"))
-    c.add_argument("--policy", type=Path, default=Path("config/quality_history.yaml"))
-    c.add_argument("--horizon-days", type=int, default=90)
-    c.add_argument("--calendar-max-age-hours", type=float, default=168)
-    c.add_argument("--positioning-max-age-days", type=int, default=14)
-    c.add_argument("--output-dir", type=Path, default=Path("local/reports/unified"))
+    for name in ("research-report", "refresh-report"):
+        c = sub.add_parser(
+            name,
+            help="compose stored research"
+            if name == "research-report"
+            else "manually refresh sources and build a report",
+        )
+        if name == "research-report":
+            c.add_argument("--as-of", type=timestamp, required=True)
+        else:
+            c.add_argument("--fred-overlap-days", type=int, default=120)
+            c.add_argument("--cot-overlap-days", type=int, default=90)
+            c.add_argument("--full-history", action="store_true")
+        c.add_argument("--macro-plan", type=Path, default=Path("config/macro_core.yaml"))
+        c.add_argument("--monthly-plan", type=Path, default=Path("config/monthly_research.yaml"))
+        c.add_argument("--revision-plan", type=Path, default=Path("config/revision_ledger.yaml"))
+        c.add_argument("--policy", type=Path, default=Path("config/quality_history.yaml"))
+        c.add_argument("--horizon-days", type=int, default=90)
+        c.add_argument("--calendar-max-age-hours", type=float, default=168)
+        c.add_argument("--positioning-max-age-days", type=int, default=14)
+        c.add_argument(
+            "--output-dir",
+            type=Path,
+            default=Path(
+                "local/reports/unified" if name == "research-report" else "local/reports/refresh"
+            ),
+        )
     c = sub.add_parser("verify-report", help="verify a saved report bundle's hashes and coherence")
     c.add_argument("directory", type=Path)
     c = sub.add_parser("revision-ledger", help="fixed-window adjacent-document revision ledger")
@@ -272,6 +290,7 @@ def run(args) -> dict:
             "research_report_v1": ResearchReportV1,
             "report_manifest_v1": ReportManifestV1,
             "report_comparison_v1": ReportComparisonV1,
+            "refresh_run": RefreshRun,
         }
         for name, model in models.items():
             schema = {
@@ -296,7 +315,7 @@ def run(args) -> dict:
                 "irregular_intervals": len(report.irregular_intervals),
                 "historical_release_ready": False,
             }
-        if args.command == "research-report":
+        if args.command in {"research-report", "refresh-report"}:
             settings = ReportSettings(
                 macro_plan=load_plan(args.macro_plan),
                 quality_policy=load_policy(args.policy),
@@ -306,6 +325,32 @@ def run(args) -> dict:
                 calendar_max_evidence_age_hours=args.calendar_max_age_hours,
                 positioning_max_age_days=args.positioning_max_age_days,
             )
+            if args.command == "refresh-report":
+                workflow, directory = refresh_and_report(
+                    store,
+                    registry,
+                    settings,
+                    RefreshPolicy(
+                        fred_overlap_days=args.fred_overlap_days,
+                        cot_overlap_days=args.cot_overlap_days,
+                        full_history=args.full_history,
+                    ),
+                    args.output_dir,
+                )
+                bundle = directory / workflow.report.bundle if workflow.report.bundle else None
+                return {
+                    "status": workflow.status,
+                    "run_id": workflow.run_id,
+                    "manifest": str(directory / "refresh-run.json"),
+                    "summary": str(directory / "refresh.fa.md"),
+                    "sources": {s.key: s.status for s in workflow.steps},
+                    "report_status": workflow.report.status,
+                    "research_status": workflow.report.research_status,
+                    "bundle": str(bundle) if bundle else None,
+                    "report": str(bundle / "research-report.fa.md") if bundle else None,
+                    "freshness": {f.key: f.status for f in workflow.report.freshness},
+                    "daily_backtest_ready": False,
+                }
             report = build_research_report(store, registry, settings, args.as_of)
             directory = write_research_report(report, args.output_dir)
             return {
@@ -558,6 +603,8 @@ def main(argv=None) -> int:
         with credential_environment(args.credentials_file):
             result = run(args)
         print(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False))
+        if args.command == "refresh-report" and result["status"] != "succeeded":
+            return 3
         if args.command == "fetch-fred-core" and result["status"] != "succeeded":
             return 3
         if args.command == "monthly-research" and result["status"] == "insufficient_data":

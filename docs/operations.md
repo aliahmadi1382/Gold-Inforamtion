@@ -257,6 +257,30 @@ uv run gold import-cftc local/annual.txt --market-code 088691 --futures-only
 
 The importer retains non-commercial, commercial and non-reportable long/short positions, non-commercial spreading and total OI. It rejects unsupported headers, explicit combined-report markers and duplicate report dates. Legacy combined files can have the same column names, so `--futures-only` attests that the correct archive family was selected; headers alone cannot prove it. This CSV importer does not accept disaggregated or combined files; the separate API connector above handles disaggregated gold futures only. Annual archives do not establish historical release instants, so availability is retrieval time. Source replay does not bypass that limitation. Preserve the downloaded archive and acquisition details locally. The compressed archive download returned HTTP 403 during initial implementation; its parser tests use fictional values. The later API acquisition is a separate, successfully tested access path.
 
+## Manual refresh and report (0.13)
+
+Run once from the repository root with the existing local key file:
+
+```powershell
+uv run gold --credentials-file local/credentials.env refresh-report
+```
+
+The default reviewed plan produces ten independent acquisitions: Alpha Vantage, World Bank, seven FRED series and CFTC. Each gets its own acquisition manifest even on failure. Ordinary source errors are isolated; completed inserts remain committed. The report is then built from eligible stored evidence at a cutoff taken after all acquisition attempts. A failed refresh can therefore leave usable older data in the report; the Persian summary explicitly separates acquisition outcomes from reference-period freshness. Missing values remain missing.
+
+The printed `summary` path is the entry point. `manifest` contains checkpoints, settings, actual requested ranges, acquisition run IDs, failure types and output status; no key values or provider exception messages. The printed `bundle` points to a normal schema-2 research bundle for `verify-report` or `compare-reports`. Each run has a new directory under ignored `local/reports/refresh/`; older runs are preserved. The workflow manifest itself is not part of the research bundle's hash verification.
+
+Defaults request FRED from 120 days before each latest eligible current observation through today's UTC date, and COT from 90 days before its latest eligible observation. A long gap since the previous acquisition remains included. With no eligible local series, history starts at FRED's lower API date or CFTC's reviewed first date. `--full-history` requests the entire current history. `--fred-overlap-days` (1–3650) and `--cot-overlap-days` (14–3650) customize overlap. Revisions outside the chosen interval are not detected. Alpha Vantage and World Bank always retrieve their full response history; Alpha Vantage is attempted once per invocation.
+
+FRED start bounds are rounded back to the month/quarter start, or to the latest observed weekly label's weekday, before requesting data. Out-of-range rows still fail validation. The latest compatible World Bank period supplies freshness across its two known methodological eras, while the full report keeps those streams separate. Safe reason codes include `HTTP_403`, `HTTP_429`, `CONNECTION_FAILED`, `MISSING_CREDENTIALS`, `VALIDATION_FAILED`, `STORAGE_ERROR` and `UNEXPECTED_ERROR`; arbitrary exception text is never serialized. An HTTP code records rejection, not its underlying cause.
+
+The report uses the existing `--macro-plan`, `--monthly-plan`, `--revision-plan`, `--policy`, `--horizon-days`, `--calendar-max-age-hours` and `--positioning-max-age-days` options. Invalid settings fail before network acquisition. No `--as-of` is accepted: the post-acquisition cutoff is explicit in the output. Use the separate offline `research-report` for a caller-chosen historical cutoff.
+
+Exit 0 means all acquisition traces succeeded, the research bundle verified, automatic inputs have current reference age under their policies, calendar evidence is usable and the research report is not partial. Research status `with_limits` can still occur. Exit 3 means `partial` (a failed source, missing/stale/unchecked freshness or partial research/calendar coverage) or `failed` (report build/write/verification failed). Preflight/configuration/lock/storage errors exit 2. BLS schedules, reviewed release-value extracts and exact-date FRED vintages are explicitly not auto-refreshed.
+
+Checkpoints are atomically replaced before and after steps. Ctrl+C records interruption where possible and stops further requests; forced termination can leave `running`, which must never be interpreted as success. There is no resume or automatic whole-workflow retry. A new invocation keeps completed data and creates a new run. An OS lock rejects another `refresh-report` on the same store and is released when the process ends; the persistent `refresh.lock` file is not itself evidence of an active process. Do not delete it or run separate acquisition commands concurrently against the same store: those commands do not participate in this lock.
+
+See [method and limits](source-methodology/manual-refresh.fa.md) and [Persian lesson fourteen](education/14-manual-refresh.fa.md). No scheduler or broker connection is installed.
+
 ## Other layers via normalized records
 
 Prepare JSONL conforming to a runtime record contract and a directory of original raw evidence files named by SHA-256. Provider, license, layer and synthetic flags must match the registry:

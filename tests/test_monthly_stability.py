@@ -56,3 +56,20 @@ def test_constant_and_empty_samples_have_no_coefficient():
     rows = monthly_stability(parent([change(2010, m, 1) for m in range(1, 4)]))["rows"]
     assert all(r["status"] == "constant" and r["spearman"] is None for r in rows)
     assert monthly_stability(parent([]))["rows"] == []
+
+
+def test_audit_accounts_for_every_candidate_without_double_counting_missing_series():
+    incomplete = change(2010, 2, 2, missing=True)
+    incomplete.values["DFII10"] = None
+    incomplete.exclusions["DFII10"] = "previous_missing"
+    result = monthly_stability(parent([change(2010, 1, 1), incomplete, change(2010, 3, 3)]))
+    audit = result["sample_audit"][0]
+    assert audit["candidate_months"] == len(audit["included_months"]) + len(audit["excluded"])
+    assert audit["included_months"] == ["2010-01-01", "2010-03-01"]
+    assert audit["excluded"] == [
+        dict(
+            month="2010-02-01",
+            missing_series={"DFII10": "previous_missing", "DGS10": "reason_not_recorded"},
+        )
+    ]
+    assert all(r["excluded_months"] == 1 for r in result["rows"])

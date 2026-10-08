@@ -787,6 +787,49 @@ async function showReport() {
         ]),
       );
       $("report-relations").append(node);
+      const audit = el("details");
+      audit.append(el("summary", "ماه‌های کنارگذاشته‌شده و علت حذف"));
+      audit.append(
+        el(
+          "p",
+          "هر ماه یک‌بار شمرده می‌شود، حتی اگر چند متغیر ناقص باشد. علت از گزارش مبنا نقل می‌شود؛ دلیل ثبت‌نشده حدس زده نمی‌شود.",
+          "muted",
+        ),
+      );
+      const reasons = {
+        methodology_break: "تغییر روش قیمت",
+        current_missing: "مقدار ماه جاری مفقود",
+        previous_missing: "مقدار ماه قبل مفقود",
+        current_insufficient_daily_coverage: "پوشش روزانهٔ ماه جاری ناکافی",
+        previous_insufficient_daily_coverage: "پوشش روزانهٔ ماه قبل ناکافی",
+        reason_not_recorded: "علت در گزارش ثبت نشده",
+      };
+      const auditRows = (stability.sample_audit || []).flatMap((a) =>
+        a.excluded.map((b) => [
+          b.month.slice(0, 7),
+          a.calendar_window,
+          title(a.method),
+          Object.entries(b.missing_series)
+            .map(([s, why]) => title(s) + ": " + (reasons[why] || why))
+            .join("؛ "),
+        ]),
+      );
+      if (auditRows.length) {
+        const auditTable = el("div", null, "table-scroll");
+        table(
+          auditTable,
+          ["ماه", "دوره", "روش قیمت", "متغیر ناقص و علت"],
+          auditRows,
+        );
+        audit.append(auditTable);
+      } else
+        audit.append(
+          el(
+            "p",
+            "در دامنهٔ این دوره‌ها ماه ناقص کنارگذاشته‌شده‌ای وجود ندارد.",
+          ),
+        );
+      $("report-relations").append(audit);
     }
   } catch (e) {
     error(e.message);

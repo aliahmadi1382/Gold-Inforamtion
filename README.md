@@ -1,6 +1,8 @@
 # Gold Market Intelligence
 
-**آخرین تحویل: ۰٫۱۶٫۰.** گزارش آفلاین `operations-health` وضعیت و شکست متوالی دریافت‌ها، اجرای ناتمام، خطای امن refresh و راهنمای تلاش مجدد را نشان می‌دهد. سهمیهٔ اندازه‌گیری‌نشده صریح است و runtime ساخت همین گزارش ثبت می‌شود. [روش سلامت عملیات](docs/source-methodology/operations-health.fa.md) و [فصل هفدهم](docs/education/17-operations-health.fa.md) راهنما هستند.
+**آخرین تحویل: ۰٫۱۷٫۰ — رابط گرافیکی لوکال.** روی `Start-Local.cmd` در ریشهٔ پروژه دوبار کلیک کنید یا `uv run gold --store local/market local-ui` را اجرا و `http://127.0.0.1:8765` را باز کنید. پنل نمای کلی، نمودار و CSV، گزارش‌ها و مقایسه‌ها، سلامت عملیات و مسیر فازها دارد. [راهنمای رابط](docs/source-methodology/local-workspace.fa.md) و [فصل هجدهم](docs/education/18-local-workspace.fa.md) راهنما هستند. [فازبندی جاری](docs/phases.fa.md) و پنل از یک مرجع مشترک ساخته می‌شوند؛ تحویل‌های قبلی زیر حفظ شده‌اند.
+
+**قابلیت ۰٫۱۶ حفظ شده است:** گزارش آفلاین `operations-health` وضعیت و شکست متوالی دریافت‌ها، اجرای ناتمام، خطای امن refresh و راهنمای تلاش مجدد را نشان می‌دهد. سهمیهٔ اندازه‌گیری‌نشده صریح است و runtime ساخت همین گزارش ثبت می‌شود. [روش سلامت عملیات](docs/source-methodology/operations-health.fa.md) و [فصل هفدهم](docs/education/17-operations-health.fa.md) راهنما هستند.
 
 **قابلیت ۰٫۱۵ حفظ شده است:** پشتیبان سازگار SQLite/raw/runs، بررسی کامل بسته و بازیابی در مقصد تازه؛ نویسنده‌های پروژه و backup قفل مشترک دارند. [روش بازیابی](docs/source-methodology/store-recovery.fa.md) و [فصل شانزدهم](docs/education/16-store-recovery.fa.md) دامنه و دستورها را توضیح می‌دهند. گزارش‌ها و کلید جدا نگهداری می‌شوند.
 

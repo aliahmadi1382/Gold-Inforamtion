@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Delivery": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "partial",
+            "in_progress",
+            "blocked",
+            "not_started"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "title",
+        "status"
+      ],
+      "title": "Delivery",
+      "type": "object"
+    },
+    "Phase": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "partial",
+            "in_progress",
+            "blocked",
+            "not_started"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "releases": {
+          "minLength": 1,
+          "title": "Releases",
+          "type": "string"
+        },
+        "criterion": {
+          "minLength": 1,
+          "title": "Criterion",
+          "type": "string"
+        },
+        "delivered": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Delivered",
+          "type": "array"
+        },
+        "remaining": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Remaining",
+          "type": "array"
+        },
+        "deliveries": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Delivery"
+          },
+          "title": "Deliveries",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "status",
+        "releases",
+        "criterion",
+        "delivered",
+        "remaining"
+      ],
+      "title": "Phase",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "updated_at": {
+      "minLength": 1,
+      "title": "Updated At",
+      "type": "string"
+    },
+    "current_phase": {
+      "minLength": 1,
+      "title": "Current Phase",
+      "type": "string"
+    },
+    "current_delivery": {
+      "minLength": 1,
+      "title": "Current Delivery",
+      "type": "string"
+    },
+    "next_step": {
+      "minLength": 1,
+      "title": "Next Step",
+      "type": "string"
+    },
+    "phases": {
+      "items": {
+        "$ref": "#/$defs/Phase"
+      },
+      "title": "Phases",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "updated_at",
+    "current_phase",
+    "current_delivery",
+    "next_step",
+    "phases"
+  ],
+  "title": "ProjectRoadmap",
+  "type": "object"
+}

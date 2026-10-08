@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>پژوهش طلا — فضای کار محلی</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script defer src="/markdown.js"></script>
+    <script defer src="/app.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">G</span>
+        <div>پژوهش طلا<small>فضای کار محلی</small></div>
+      </div>
+      <nav aria-label="بخش‌های پنل">
+        <button data-view="overview" class="active">
+          ◈ <span>نمای کلی</span></button
+        ><button data-view="explore">⌁ <span>کاوش داده</span></button
+        ><button data-view="reports">▤ <span>گزارش پژوهش</span></button
+        ><button data-view="operations">◷ <span>سلامت عملیات</span></button
+        ><button data-view="roadmap">◉ <span>مسیر پروژه</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="local-dot"></span> فقط روی این دستگاه<small id="version"
+          >در حال اتصال…</small
+        >
+      </div>
+    </aside>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">GOLD MARKET INTELLIGENCE</p>
+          <h1 id="view-title">نمای کلی پژوهش</h1>
+        </div>
+        <div class="header-status">
+          <span class="pill neutral">نمای محلی · فقط خواندن</span
+          ><small id="snapshot-time"></small>
+        </div>
+      </header>
+      <div id="error" class="notice danger" role="alert" hidden></div>
+      <div id="loading" class="loading">در حال بارگذاری شواهد محلی…</div>
+      <section id="overview" class="view" hidden>
+        <div id="overview-cards" class="kpis"></div>
+        <div id="overview-alert" class="notice"></div>
+        <div class="two-column">
+          <article class="panel">
+            <div class="panel-heading">
+              <h2>تاریخچهٔ قیمت مرجع طلا</h2>
+              <button id="open-gold" class="text-button">کاوش نمودار ←</button>
+            </div>
+            <p class="muted">
+              قیمت تاریخ‌دار منبع؛ کندل OHLC و قیمت زنده نیست.
+            </p>
+            <div id="overview-chart"></div>
+          </article>
+          <article class="panel">
+            <h2>ادامهٔ مسیر</h2>
+            <div id="current-phase"></div>
+            <button class="secondary" data-jump="roadmap">
+              دیدن فازها و معیار پایان
+            </button>
+          </article>
+        </div>
+        <article class="panel">
+          <h2>منابع و پوشش ذخیره‌شده</h2>
+          <div id="source-cards" class="source-grid"></div>
+        </article>
+      </section>
+      <section id="explore" class="view" hidden>
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>تاریخچه و منشأ داده</h2>
+            <button id="export-series" class="secondary">
+              دریافت CSV همین بازه
+            </button>
+          </div>
+          <div class="controls">
+            <label
+              >نوع داده<select id="kind-filter">
+                <option value="all">همهٔ انواع</option>
+                <option value="price_close">قیمت مرجع روزانه</option>
+                <option value="observation">شاخص‌ها و قیمت ماهانه</option>
+                <option value="positioning">موقعیت‌های COT</option>
+              </select></label
+            ><label
+              >منبع<select id="source-filter">
+                <option value="all">همهٔ منابع</option>
+              </select></label
+            ><label class="wide">سری<select id="series-select"></select></label
+            ><label>از تاریخ<input type="date" id="date-start" /></label
+            ><label>تا تاریخ<input type="date" id="date-end" /></label
+            ><button id="apply-range" class="primary">نمایش بازه</button
+            ><button id="all-range" class="secondary">کل تاریخچه</button>
+          </div>
+          <div id="series-meta" class="metadata"></div>
+          <div id="series-chart"></div>
+          <div id="point-detail" class="notice neutral" hidden></div>
+          <details>
+            <summary>مشاهدهٔ رکوردهای همین بازه</summary>
+            <div id="series-records" class="table-wrap"></div>
+          </details>
+        </article>
+      </section>
+      <section id="reports" class="view" hidden>
+        <article class="panel">
+          <div class="controls">
+            <label class="wide"
+              >بستهٔ پژوهش تأییدشده<select id="report-select"></select></label
+            ><button id="download-report" class="secondary">
+              دریافت JSON گزارش
+            </button>
+          </div>
+          <div id="report-meta" class="metadata"></div>
+          <div id="report-sections" class="section-grid"></div>
+          <div id="report-relations"></div>
+          <div class="panel-heading">
+            <h2>متن گزارش فارسی</h2>
+            <span class="muted">همان گزارش ذخیره‌شده؛ بدون بازنویسی تحلیل</span>
+          </div>
+          <div id="report-text" class="report-text"></div>
+        </article>
+      </section>
+      <section id="operations" class="view" hidden>
+        <div id="operations-cards" class="kpis"></div>
+        <div id="health-alert" class="notice"></div>
+        <article class="panel">
+          <div class="panel-heading">
+            <h2>سابقهٔ دریافت‌ها</h2>
+            <label
+              >وضعیت<select id="run-filter">
+                <option value="all">همه</option>
+                <option value="failed">ناموفق</option>
+                <option value="running">ناتمام</option>
+                <option value="succeeded">موفق</option>
+              </select></label
+            >
+          </div>
+          <div id="run-table" class="table-wrap"></div>
+        </article>
+        <article class="panel">
+          <h2>دامنهٔ عملیات</h2>
+          <p>
+            دریافت، تلاش مجدد و پشتیبان‌گیری از داخل این نسخهٔ پنل اجرا
+            نمی‌شوند. پنل یک snapshot هنگام شروع سرویس است؛ برای دیدن دادهٔ تازه
+            سرویس را دوباره اجرا کنید. سند اجرای ناتمام خودکار حذف یا شکست‌خورده
+            اعلام نمی‌شود.
+          </p>
+          <p id="runtime-note" class="muted"></p>
+        </article>
+      </section>
+      <section id="roadmap" class="view" hidden>
+        <div id="roadmap-notice" class="notice"></div>
+        <div id="phase-list" class="phase-list"></div>
+      </section>
+      <footer>
+        نمایش نسخهٔ آخر هر مشاهده تا زمان شروع پنل · سابقهٔ نسخه‌ها محفوظ است ·
+        پژوهش توصیفی؛ قواعد تصمیم و معامله فعال نیستند
+      </footer>
+    </main>
+  </body>
+</html>

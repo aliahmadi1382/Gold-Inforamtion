@@ -17,6 +17,7 @@ from .comparison import compare_monthly
 from .credentials import credential_environment
 from .demo import demo
 from .ingestion import import_cftc, import_prices, import_records, ingest_fred, timestamp
+from .local_ui import serve_local
 from .macro import MacroContext, MacroPlan, fetch_core, load_plan, macro_context
 from .models import RECORD_TYPES, HistoricalEvent, Provenance
 from .monthly_research import (
@@ -28,6 +29,7 @@ from .monthly_research import (
 )
 from .operations_health import OperationsHealth, build_operations_health, write_operations_health
 from .positioning import PositioningContext, positioning_context, write_positioning
+from .project_roadmap import ProjectRoadmap
 from .quality import QualityPolicy, QualityReport, assess, load_policy
 from .refresh import RefreshPolicy, RefreshRun, refresh_and_report
 from .refresh_review import (
@@ -92,6 +94,10 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    c = sub.add_parser("local-ui", help="read-only graphical workspace on loopback")
+    c.add_argument("--reports", type=Path, default=Path("local/reports"))
+    c.add_argument("--roadmap", type=Path, default=Path("config/project_roadmap.json"))
+    c.add_argument("--port", type=int, default=8765)
     c = sub.add_parser("operations-health", help="offline run health; quota remains unmeasured")
     c.add_argument("--refresh-manifest", type=Path)
     c.add_argument("--allow-relocated-refresh", action="store_true")
@@ -269,6 +275,8 @@ def parser() -> argparse.ArgumentParser:
 
 
 def run(args) -> dict:
+    if args.command == "local-ui":
+        return serve_local(args.store, args.reports, args.roadmap, args.port)
     if args.command == "operations-health":
         if args.output_dir.resolve().is_relative_to(args.store.resolve()):
             raise ValueError("health output must be outside the store")
@@ -360,6 +368,7 @@ def run(args) -> dict:
             "backup_manifest": BackupManifest,
             "restore_receipt": RestoreReceipt,
             "operations_health": OperationsHealth,
+            "project_roadmap": ProjectRoadmap,
         }
         for name, model in models.items():
             schema = {

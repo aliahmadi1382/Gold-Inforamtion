@@ -1,5 +1,11 @@
 # Release validation
 
+## Release 0.17: local graphical workspace and one phase source
+
+Local suite: **592 passed, one host-permission symlink skip**, Ruff lint/format, 15-source registry and wheel/sdist build pass. Thirty-seven new offline cases cover read-only/non-initializing snapshots, credential/exception exclusion, null revisions, exact source/unit/dimension/vintage identities, future availability exclusion, date/export populations, corrupt normalized data, writer exclusion, verified research/comparison and corrupt bundle exclusion, loopback static/API headers, Host/Origin checks, traversal/arbitrary file refusal, unavailable IDs, POST refusal, CLI registry isolation, false phase completion and generated-document reconciliation, and exact owned-process identity before launcher stop/reuse. The project-roadmap contract brings the schema count to 40. Bundled JavaScript passes Node syntax checks and web assets are formatted with Prettier 3.6.2. Remote CI is checked on the pushed commit.
+
+Real evidence reconciles 88,707 SQLite rows, 79 raw blobs, 65 acquisition manifests, 65 independent series, eight verified research bundles and six verified comparisons. The September 2026 managed-money COT chart/API and browser-exported CSV exactly match five independently selected SQL observations and `long-short` values/IDs. Browser review covers all five views, filter/range/CSV interactions, historical report formatting, separated monthly methods/sample insufficiency, operation failure actions, phase criteria and desktop/narrow layouts; console errors are absent. Artifacts stay in `local/integration-v017/`. The GUI does not claim live market freshness or full raw-hash auditing.
+
 ## Release 0.16: offline operational health
 
 Local validation: **555 passed, one host-permission symlink skip** (556 cases total), Ruff lint/format, 15-source registry validation, publication boundary, package build and real snapshot JSON Schema validation pass. The final linkage guard additionally passes all 30 operational-health cases; remote CI is checked on the pushed commit.

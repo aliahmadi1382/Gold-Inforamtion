@@ -2,6 +2,7 @@
 
 | Milestone | Completion evidence | External dependency |
 | --- | --- | --- |
+| 0.17 Local graphical workspace | Loopback read-only panel: real history charts, scoped CSV, verified report/comparison, health and eight explicit project phases from one shared source | Delivered UI; phase 5 remains open for multi-source analysis; no fresh acquisition, scheduler or daily-backtest gate clearance |
 | 0.16 Operational health | Offline source/series run status, failure streaks, unfinished traces, explicitly linked refresh error codes, bounded request budgets and current snapshot runtime | Provider quota and historical runtime remain unmeasured; no automatic workflow retry |
 | 0.1 Research foundation | Offline demo, schema/lineage/as-of tests, source audit, complete ten-layer specification | Delivered code; no market-data completeness claim |
 | 0.2 Acquisition trace and quality | Per-run manifests, stream inventories, revision/time/integrity checks, scoped credentials, Persian education and CI | Delivered software; tested with offline fixtures and synthetic data |

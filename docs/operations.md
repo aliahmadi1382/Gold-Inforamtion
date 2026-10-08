@@ -1,5 +1,9 @@
 # Operating guide
 
+## Local graphical workspace (0.17)
+
+Run `uv run gold --store local/market local-ui` and open `http://127.0.0.1:8765`; Ctrl+C stops this foreground server. On Windows, `Start-Local.cmd` starts/reuses the project background process and opens the browser, `Restart-Local.cmd` rebuilds its data snapshot and `Stop-Local.cmd` stops only the matching owned process. Python/uv, the local store and report folders must already be present. No PowerShell execution-policy change or scheduled startup is required. Browser reload refreshes presentation, not the data snapshot. See [local workspace](source-methodology/local-workspace.fa.md).
+
 Run commands from the checkout root; registry/config paths are relative to the current directory. Python 3.11+ is required. The lock file pins tested dependencies. `uv sync --frozen` creates the environment, and `uv run gold --help` lists commands. For a pip-only runtime install, use `python -m pip install .`; development verification uses the locked uv environment.
 
 ## Offline verification

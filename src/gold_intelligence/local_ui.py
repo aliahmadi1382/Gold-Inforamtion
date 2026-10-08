@@ -155,6 +155,9 @@ class Workspace:
                 run = AcquisitionRun.model_validate_json(path.read_bytes())
                 if path.stem != run.run_id:
                     raise ValueError("run filename differs from its ID")
+                from .transport_evidence import load_transport
+
+                transport = load_transport(self.root, run.run_id)
                 runs.append(
                     dict(
                         id=run.run_id,
@@ -165,6 +168,7 @@ class Workspace:
                         inserted=run.inserted_records,
                         records=len(run.record_ids),
                         raw=len(run.raw_sha256),
+                        transport=transport.model_dump(mode="json") if transport else None,
                     )
                 )
             for path in (self.root / "raw").iterdir():
@@ -202,6 +206,9 @@ class Workspace:
                         str(path.parent.relative_to(self.report_root)).encode()
                     ).hexdigest()[:24]
                     # Only serve verified research JSON; no arbitrary local-file endpoint.
+                    from .runtime_evidence import load_runtime
+
+                    runtime = load_runtime(path.parent, report, content)
                     self.reports[key] = dict(
                         id=key,
                         report=json.loads(content),
@@ -212,6 +219,7 @@ class Workspace:
                         fingerprint=report.fingerprint,
                         status=report.status,
                         software_version=report.software_version,
+                        runtime=runtime.model_dump(mode="json") if runtime else None,
                     )
                 except (ValueError, OSError, KeyError):
                     self.report_errors += 1

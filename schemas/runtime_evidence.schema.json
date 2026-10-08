@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "const": "bundle_writer",
+      "default": "bundle_writer",
+      "title": "Scope",
+      "type": "string"
+    },
+    "captured_at": {
+      "format": "date-time",
+      "title": "Captured At",
+      "type": "string"
+    },
+    "application_version": {
+      "title": "Application Version",
+      "type": "string"
+    },
+    "python_version": {
+      "title": "Python Version",
+      "type": "string"
+    },
+    "python_implementation": {
+      "title": "Python Implementation",
+      "type": "string"
+    },
+    "operating_system": {
+      "title": "Operating System",
+      "type": "string"
+    },
+    "machine": {
+      "title": "Machine",
+      "type": "string"
+    },
+    "dependencies": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Dependencies",
+      "type": "object"
+    },
+    "report_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Report Sha256",
+      "type": "string"
+    },
+    "report_fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Report Fingerprint",
+      "type": "string"
+    }
+  },
+  "required": [
+    "captured_at",
+    "application_version",
+    "python_version",
+    "python_implementation",
+    "operating_system",
+    "machine",
+    "dependencies",
+    "report_sha256",
+    "report_fingerprint"
+  ],
+  "title": "RuntimeEvidence",
+  "type": "object"
+}

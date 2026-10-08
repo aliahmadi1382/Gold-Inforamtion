@@ -30,6 +30,7 @@ from .quality import QualityPolicy, QualityReport, assess
 from .release_calendar import CalendarContext, calendar_context
 from .release_values import ReleaseValueReport, release_value_report, render_release_values
 from .revision_ledger import RevisionLedger, RevisionPlan, render_revision_ledger, revision_ledger
+from .runtime_evidence import load_runtime, write_runtime
 from .storage import canonical
 
 PARTS_V1 = ("quality", "macro", "calendar", "monthly", "releases", "revisions")
@@ -716,6 +717,7 @@ def write_research_report(report, output_dir):
     (staging / "manifest.json").write_bytes(
         (manifest.model_dump_json(indent=2) + "\n").encode("utf-8")
     )
+    write_runtime(staging, report)
     verify_research_bundle(staging)
     staging.rename(destination)
     return destination
@@ -761,14 +763,17 @@ def load_verified_report(directory):
             mode="json"
         ):
             raise ValueError("report detail differs from its embedded component")
+    load_runtime(directory, report, contents["research-report.json"])
     return report, manifest, contents["research-report.json"]
 
 
 def verify_research_bundle(directory):
-    report, manifest, _ = load_verified_report(directory)
+    report, manifest, content = load_verified_report(directory)
+    runtime = load_runtime(directory, report, content)
     return {
         "status": "verified",
         "files": len(manifest.files),
         "fingerprint": report.fingerprint,
         "as_of": report.as_of.isoformat(),
+        "runtime_evidence": "verified_bundle_writer" if runtime else "not_recorded",
     }

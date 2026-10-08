@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "runtime_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Runtime Sha256",
+      "type": "string"
+    },
+    "runtime_bytes": {
+      "minimum": 0,
+      "title": "Runtime Bytes",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "runtime_sha256",
+    "runtime_bytes"
+  ],
+  "title": "RuntimeManifest",
+  "type": "object"
+}

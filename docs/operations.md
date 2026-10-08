@@ -1,5 +1,9 @@
 # Operating guide
 
+## Runtime and HTTP evidence (0.18)
+
+New research bundles include `runtime.json` and `runtime-manifest.json`; `verify-report` checks both when present. The scope is the bundle writer, not an independently proven remote computation environment. New acquisitions retain sanitized attempt evidence in `store/transport/<run_id>.json`; existing history remains unknown. Quota is not measured. Preserve `transport/` separately alongside core backups, and keep complete report directories with both runtime sidecars. Restart the local server after acquisition to reload its snapshot. See [method and limitations](source-methodology/runtime-transport.fa.md).
+
 ## Local graphical workspace (0.17)
 
 Run `uv run gold --store local/market local-ui` and open `http://127.0.0.1:8765`; Ctrl+C stops this foreground server. On Windows, `Start-Local.cmd` starts/reuses the project background process and opens the browser, `Restart-Local.cmd` rebuilds its data snapshot and `Stop-Local.cmd` stops only the matching owned process. Python/uv, the local store and report folders must already be present. No PowerShell execution-policy change or scheduled startup is required. Browser reload refreshes presentation, not the data snapshot. See [local workspace](source-methodology/local-workspace.fa.md).

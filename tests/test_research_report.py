@@ -33,6 +33,48 @@ from gold_intelligence.storage import Store
 ASOF = datetime(2024, 4, 16, tzinfo=UTC)
 
 
+@pytest.mark.parametrize("damage", ["bytes", "missing", "binding"])
+def test_runtime_receipt_is_checked(store, registry, settings, tmp_path, damage):
+    from gold_intelligence.runtime_evidence import RuntimeManifest, load_runtime
+
+    report = build_research_report(store, registry, settings, ASOF)
+    directory = write_research_report(report, tmp_path)
+    content = (directory / "research-report.json").read_bytes()
+    runtime = load_runtime(directory, report, content)
+    assert runtime.scope == "bundle_writer"
+    assert runtime.dependencies["pydantic"]
+    assert report.fingerprint == runtime.report_fingerprint
+    path = directory / "runtime.json"
+    if damage == "bytes":
+        path.write_bytes(path.read_bytes() + b" ")
+    elif damage == "missing":
+        path.unlink()
+    else:
+        data = json.loads(path.read_bytes())
+        data["report_sha256"] = "0" * 64
+        encoded = json.dumps(data).encode()
+        path.write_bytes(encoded)
+        manifest = RuntimeManifest(
+            runtime_sha256=hashlib.sha256(encoded).hexdigest(), runtime_bytes=len(encoded)
+        )
+        (directory / "runtime-manifest.json").write_text(manifest.model_dump_json())
+    with pytest.raises(ValueError):
+        verify_research_bundle(directory)
+
+
+def test_legacy_bundle_without_runtime_still_verifies(store, registry, settings, tmp_path):
+    from gold_intelligence.runtime_evidence import load_runtime
+
+    report = build_research_report(store, registry, settings, ASOF)
+    directory = write_research_report(report, tmp_path)
+    (directory / "runtime.json").unlink()
+    (directory / "runtime-manifest.json").unlink()
+    assert verify_research_bundle(directory)["fingerprint"] == report.fingerprint
+    assert (
+        load_runtime(directory, report, (directory / "research-report.json").read_bytes()) is None
+    )
+
+
 @pytest.fixture
 def settings():
     return ReportSettings(

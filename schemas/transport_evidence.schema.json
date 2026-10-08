@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "HttpAttempt": {
+      "additionalProperties": false,
+      "properties": {
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "attempt": {
+          "maximum": 3,
+          "minimum": 1,
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "outcome": {
+          "enum": [
+            "success",
+            "http_error",
+            "connection_error",
+            "response_too_large"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "status_code": {
+          "anyOf": [
+            {
+              "maximum": 599,
+              "minimum": 100,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Status Code"
+        }
+      },
+      "required": [
+        "started_at",
+        "attempt",
+        "outcome"
+      ],
+      "title": "HttpAttempt",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^[a-f0-9]{32}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "acquisition_manifest_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Acquisition Manifest Sha256",
+      "type": "string"
+    },
+    "scope": {
+      "const": "instrumented_fetch_bytes",
+      "default": "instrumented_fetch_bytes",
+      "title": "Scope",
+      "type": "string"
+    },
+    "quota_status": {
+      "const": "not_measured",
+      "default": "not_measured",
+      "title": "Quota Status",
+      "type": "string"
+    },
+    "attempts": {
+      "items": {
+        "$ref": "#/$defs/HttpAttempt"
+      },
+      "title": "Attempts",
+      "type": "array"
+    }
+  },
+  "required": [
+    "run_id",
+    "acquisition_manifest_sha256",
+    "attempts"
+  ],
+  "title": "TransportEvidence",
+  "type": "object"
+}

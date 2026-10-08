@@ -1,5 +1,7 @@
 # Brief-to-repository coverage
 
+Release 0.18 adds bundle-writer runtime receipts, per-acquisition sanitized HTTP attempts and corresponding local UI views; legacy runtime and provider quota remain unknown. Core backup excludes transport sidecars. See [method](../source-methodology/runtime-transport.fa.md) and [education chapter 19](../education/19-runtime-network-evidence.fa.md).
+
 | Brief requirement | Concrete location | Status / dependency |
 | --- | --- | --- |
 | Original supplied text | `original-brief.md` | Preserved verbatim; claims separately audited |

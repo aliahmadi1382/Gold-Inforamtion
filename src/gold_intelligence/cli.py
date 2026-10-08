@@ -72,8 +72,10 @@ from .revision_ledger import (
     render_revision_ledger,
     revision_ledger,
 )
+from .runtime_evidence import RuntimeEvidence, RuntimeManifest
 from .snapshot import MarketSnapshot, snapshot
 from .storage import Store
+from .transport_evidence import TransportEvidence
 from .world_bank import ingest_monthly_gold
 
 
@@ -369,6 +371,9 @@ def run(args) -> dict:
             "restore_receipt": RestoreReceipt,
             "operations_health": OperationsHealth,
             "project_roadmap": ProjectRoadmap,
+            "runtime_evidence": RuntimeEvidence,
+            "runtime_manifest": RuntimeManifest,
+            "transport_evidence": TransportEvidence,
         }
         for name, model in models.items():
             schema = {

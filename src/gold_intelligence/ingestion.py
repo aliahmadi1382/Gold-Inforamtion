@@ -17,6 +17,7 @@ from . import __version__
 from .models import RECORD_TYPES, Observation, Positioning, PriceBar, Provenance, aware
 from .registry import Registry, Source, validate_record_source
 from .storage import Store
+from .transport_evidence import record_attempt, started_now
 
 
 def timestamp(value: str) -> datetime:
@@ -284,17 +285,22 @@ def fetch_bytes(url: str, attempts: int = 3) -> bytes:
     if type(attempts) is not int or not 1 <= attempts <= 3:
         raise ValueError("request attempts must be an integer from 1 to 3")
     for attempt in range(attempts):
+        started = started_now()
         try:
             request = Request(url, headers={"User-Agent": f"GoldMarketIntelligence/{__version__}"})
             with urlopen(request, timeout=30) as response:
                 content = response.read(20_000_001)
                 if len(content) > 20_000_000:
+                    record_attempt(started, attempt + 1, "response_too_large")
                     raise ValueError("provider response exceeds 20 MB limit")
+                record_attempt(started, attempt + 1, "success")
                 return content
         except HTTPError as exc:
+            record_attempt(started, attempt + 1, "http_error", exc.code)
             if exc.code not in {429, 500, 502, 503, 504} or attempt == attempts - 1:
                 raise ValueError(f"provider request failed with HTTP {exc.code}") from None
         except (URLError, TimeoutError, OSError):
+            record_attempt(started, attempt + 1, "connection_error")
             if attempt == attempts - 1:
                 raise ValueError("provider connection failed after bounded retries") from None
         time.sleep(2**attempt)

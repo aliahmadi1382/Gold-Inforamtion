@@ -60,6 +60,10 @@ const names = {
   blocked: "وابسته به پیش‌نیاز",
   not_started: "شروع نشده",
   succeeded: "موفق",
+  success: "موفق",
+  http_error: "خطای HTTP",
+  connection_error: "خطای اتصال",
+  response_too_large: "پاسخ بیش از حد مجاز",
   failed: "ناموفق",
   running: "ناتمام",
   available: "در دسترس",
@@ -651,6 +655,14 @@ async function showReport() {
       "برش اطلاعات: " + stamp(r.as_of),
       "ساخته‌شده: " + stamp(r.generated_at),
       "نسخه: " + r.software_version,
+      r.runtime
+        ? "محیط ساخت بسته: " +
+          r.runtime.python_implementation +
+          " " +
+          r.runtime.python_version +
+          " · " +
+          r.runtime.operating_system
+        : "محیط تاریخی ساخت بسته: ثبت نشده",
       "هش: " + r.fingerprint.slice(0, 16) + "…",
     ]);
     clear($("report-sections"));
@@ -766,6 +778,7 @@ function renderRuns() {
       "شروع UTC",
       "رکورد درج‌شده",
       "خطای امن",
+      "تلاش HTTP ثبت‌شده",
       "اقدام",
       "شناسهٔ اجرا",
     ],
@@ -782,6 +795,15 @@ function renderRuns() {
           fmt(r.inserted),
           h?.failure_reason ||
             (r.status === "failed" ? "علت دقیق ثبت نشده" : "—"),
+          r.transport
+            ? r.transport.attempts
+                .map(
+                  (a) =>
+                    title(a.outcome) +
+                    (a.status_code ? " " + a.status_code : ""),
+                )
+                .join("؛ ") || "۰؛ فقط مسیر fetch_bytes ثبت می‌شود"
+            : "سابقه ثبت نشده",
           h ? title(h.retry_action) : "—",
           r.id,
         ];

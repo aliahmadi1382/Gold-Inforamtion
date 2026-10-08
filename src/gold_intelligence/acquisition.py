@@ -1,5 +1,6 @@
 """Local acquisition manifests. Credentials and exception payloads are never serialized."""
 
+import hashlib
 import os
 import tempfile
 from collections.abc import Callable
@@ -13,6 +14,7 @@ from pydantic import Field, model_validator
 from . import __version__
 from .models import Contract, Hash, NonEmpty, Timestamp
 from .storage import Store
+from .transport_evidence import TransportEvidence, capture_transport
 
 SAFE_PARAMETERS = {
     "input_filename",
@@ -130,7 +132,7 @@ def _acquire_locked(store, operation, parameters, execute, *, run_id=None):
     finally:
         reservation.unlink()
     failure = None
-    with store.capture_ingestion() as evidence:
+    with store.capture_ingestion() as evidence, capture_transport() as attempts:
         try:
             inserted = execute()
             if inserted != evidence.inserted_records:
@@ -149,6 +151,12 @@ def _acquire_locked(store, operation, parameters, execute, *, run_id=None):
             }
         )
         write_manifest(path, final)
+        transport = TransportEvidence(
+            run_id=final.run_id,
+            acquisition_manifest_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+            attempts=tuple(attempts),
+        )
+        write_manifest(store.root / "transport" / f"{final.run_id}.json", transport)
     if failure:
         raise failure
     return {"inserted": final.inserted_records, "run_id": final.run_id, "manifest": str(path)}

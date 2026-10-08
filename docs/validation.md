@@ -136,3 +136,14 @@ byte hash. Wide tables scroll inside their container; the document had equal
 client and scroll widths. Private receipts and screenshots are under
 `local/phase4-robustness/` and `local/integration-v025/`. Daily research and
 forecasting remain unverified; this delivery does not complete phase 4.
+# Monthly exploration delivery (0.26.0)
+
+Thirty local UI tests passed; Ruff/format, JavaScript syntax and offline package
+build passed. Browser checks verified all four driver selections retained 228
+common-sample points, the percentage-point axes for both yield series, month
+selection and current/prior input IDs. The newer methodology retained its 12
+common months in the table and CSV while suppressing the short-sample plot.
+Every value and provenance column in both real-rate CSV exports (228 + 12 rows)
+matched the verified saved report exactly. This validates display/export against
+that report, not source truth or original historical availability. Receipts and
+the scatter screenshot are private under `local/integration-v026/`.

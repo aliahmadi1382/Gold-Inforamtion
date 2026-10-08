@@ -844,9 +844,377 @@ async function showReport() {
       $("report-relations").append(audit);
     }
     if (r.monthly_robustness) renderMonthlyRobustness(r.monthly_robustness);
+    if (r.report?.monthly) renderMonthlyScatter(r.report);
   } catch (e) {
     error(e.message);
   }
+}
+function renderMonthlyScatter(report) {
+  const study = report.monthly,
+    box = $("report-relations");
+  box.append(el("h2", "کاوش ماه‌های نمونهٔ مشترک"));
+  box.append(
+    el(
+      "p",
+      "هر نقطه یک ماه با تغییر معتبر در هر پنج سری است. طلا درصد تغییر میانگین ماهانه است؛ نرخ‌های بهره تغییر به واحد درصد هستند. روش‌های قیمت جدا می‌مانند. انتخاب نقطه با کلیک یا انتخاب ماه، مقادیر و شناسه‌های شواهد را نشان می‌دهد؛ همبستگی علیت یا پیش‌بینی نیست.",
+      "muted",
+    ),
+  );
+  const controls = el("div", null, "controls");
+  function selectControl(name, id, options) {
+    const group = el("div"),
+      label = el("label", name),
+      select = el("select");
+    select.id = id;
+    label.htmlFor = id;
+    for (const [value, text] of options) {
+      const option = el("option", text);
+      option.value = value;
+      select.append(option);
+    }
+    group.append(label, select);
+    controls.append(group);
+    return select;
+  }
+  const driver = selectControl(
+    "متغیر نمودار پراکندگی",
+    "scatter-driver",
+    ["DTWEXBGS", "DFII10", "DGS10", "CPIAUCSL"].map((s) => [s, title(s)]),
+  );
+  const method = selectControl(
+    "روش قیمت نمودار پراکندگی",
+    "scatter-method",
+    ["london_afternoon_fixing_average", "spot_daily_average"].map((s) => [
+      s,
+      title(s),
+    ]),
+  );
+  const month = selectControl("ماه برای بررسی شواهد", "scatter-month", []);
+  box.append(controls);
+  const info = el("p", null, "muted"),
+    exportButton = el("button", "دریافت CSV نمونهٔ نمودار", "secondary"),
+    plot = el("div"),
+    detail = el("div"),
+    ledger = el("details");
+  detail.setAttribute("aria-live", "polite");
+  ledger.append(el("summary", "جدول ماه‌های همین نمونه"));
+  const ledgerTable = el("div", null, "table-wrap");
+  ledger.append(ledgerTable);
+  box.append(info, exportButton, plot, detail, ledger);
+  let rows = [];
+  const series = ["WB_GOLD_MONTHLY", "DTWEXBGS", "DFII10", "DGS10", "CPIAUCSL"];
+  function inspect(selected) {
+    clear(detail);
+    if (!selected) return;
+    plot.querySelectorAll("circle[data-month]").forEach((point) => {
+      const active = point.dataset.month === selected.month;
+      point.setAttribute("r", active ? 7 : 4);
+      point.setAttribute("fill", active ? "#142c37" : "#ac7c25");
+      point.setAttribute("opacity", active ? 1 : 0.7);
+    });
+    detail.append(el("h3", "شواهد ماه " + selected.month.slice(0, 7)));
+    const previous = new Date(selected.month + "T00:00:00Z");
+    previous.setUTCMonth(previous.getUTCMonth() - 1);
+    const prior = previous.toISOString().slice(0, 10);
+    const values = el("div", null, "table-wrap");
+    table(
+      values,
+      ["متغیر", "تغییر ماهانه", "واحد تغییر", "شناسه‌های ورودی ماه جاری / قبل"],
+      series.map((s) => {
+        const current = study.levels.find(
+          (a) => a.series_id === s && a.month === selected.month,
+        );
+        const before = study.levels.find(
+          (a) => a.series_id === s && a.month === prior,
+        );
+        return [
+          title(s),
+          fmt(selected.values[s]),
+          ["DFII10", "DGS10"].includes(s) ? "واحد درصد" : "درصد",
+          fmt(current?.record_ids.length) +
+            " / " +
+            fmt(before?.record_ids.length),
+        ];
+      }),
+    );
+    detail.append(values);
+    const evidence = el("details");
+    evidence.append(el("summary", "شناسه‌های کامل شواهد این تغییرها"));
+    evidence.append(
+      el(
+        "p",
+        "شناسهٔ گزارش: " +
+          report.fingerprint +
+          " · شناسهٔ مطالعه: " +
+          study.fingerprint,
+        "muted",
+      ),
+    );
+    const ids = el("pre");
+    ids.style.whiteSpace = "pre-wrap";
+    ids.style.overflowWrap = "anywhere";
+    ids.dir = "ltr";
+    ids.textContent = JSON.stringify(
+      study.levels
+        .filter(
+          (a) =>
+            series.includes(a.series_id) &&
+            [selected.month, prior].includes(a.month),
+        )
+        .map((a) => ({
+          series_id: a.series_id,
+          month: a.month,
+          status: a.status,
+          record_ids: a.record_ids,
+        })),
+      null,
+      2,
+    );
+    evidence.append(ids);
+    detail.append(evidence);
+  }
+  function draw() {
+    rows = study.changes.filter(
+      (a) =>
+        a.method === method.value &&
+        series.every(
+          (s) => a.values[s] != null && Number.isFinite(a.values[s]),
+        ),
+    );
+    clear(plot);
+    clear(month);
+    clear(ledgerTable);
+    for (const row of rows) {
+      const option = el("option", row.month.slice(0, 7));
+      option.value = row.month;
+      month.append(option);
+    }
+    month.disabled = exportButton.disabled = !rows.length;
+    const association = study.associations.find(
+      (a) =>
+        a.method === method.value &&
+        a.series_id === driver.value &&
+        a.population === "common",
+    );
+    info.textContent =
+      "نمونهٔ مشترک: " +
+      fmt(rows.length) +
+      " ماه · Pearson: " +
+      fmt(association?.pearson) +
+      " · Spearman: " +
+      fmt(association?.spearman) +
+      " · حداقل گزارش ضریب: " +
+      fmt(study.plan.minimum_pairs) +
+      " ماه. CSV فقط همین روش و متغیر را، با دقت اصلی مقادیر، صادر می‌کند.";
+    table(
+      ledgerTable,
+      ["ماه", "تغییر میانگین طلا، درصد", study.definitions[driver.value]],
+      rows.map((a) => [
+        a.month.slice(0, 7),
+        fmt(a.values.WB_GOLD_MONTHLY),
+        fmt(a.values[driver.value]),
+      ]),
+    );
+    if (rows.length < study.plan.minimum_pairs) {
+      plot.append(
+        el(
+          "p",
+          "برای این روش نمونهٔ کافی نداریم؛ نمودار پراکندگی نمایش داده نمی‌شود. ماه‌های موجود در جدول و CSV حفظ شده‌اند.",
+          "notice neutral",
+        ),
+      );
+      inspect(rows[0]);
+      return;
+    }
+    const w = 920,
+      h = 390,
+      pad = { l: 82, r: 24, t: 24, b: 60 };
+    const xs = rows.map((a) => a.values[driver.value]),
+      ys = rows.map((a) => a.values.WB_GOLD_MONTHLY);
+    function bounds(values) {
+      let low = Math.min(0, ...values),
+        high = Math.max(0, ...values);
+      const span = high - low || 1;
+      return [low - span * 0.07, high + span * 0.07];
+    }
+    const [minX, maxX] = bounds(xs),
+      [minY, maxY] = bounds(ys);
+    const x = (v) => pad.l + ((v - minX) / (maxX - minX)) * (w - pad.l - pad.r),
+      y = (v) => h - pad.b - ((v - minY) / (maxY - minY)) * (h - pad.t - pad.b);
+    const svg = svgNode("svg", {
+      viewBox: `0 0 ${w} ${h}`,
+      role: "img",
+      "aria-label":
+        "نمودار پراکندگی تغییر میانگین طلا در برابر " +
+        study.definitions[driver.value] +
+        "؛ " +
+        title(method.value) +
+        "؛ " +
+        rows.length +
+        " ماه",
+    });
+    for (let i = 0; i < 5; i++) {
+      const xx = minX + ((maxX - minX) * i) / 4,
+        yy = minY + ((maxY - minY) * i) / 4;
+      svg.append(
+        svgNode("line", {
+          x1: pad.l,
+          x2: w - pad.r,
+          y1: y(yy),
+          y2: y(yy),
+          stroke: "#e9eef1",
+        }),
+      );
+      svg.append(
+        svgNode(
+          "text",
+          {
+            x: pad.l - 10,
+            y: y(yy) + 4,
+            "text-anchor": "end",
+            fill: "#647680",
+            "font-size": 12,
+          },
+          new Intl.NumberFormat("en", { maximumFractionDigits: 2 }).format(yy),
+        ),
+      );
+      svg.append(
+        svgNode(
+          "text",
+          {
+            x: x(xx),
+            y: h - pad.b + 24,
+            "text-anchor": "middle",
+            fill: "#647680",
+            "font-size": 12,
+          },
+          new Intl.NumberFormat("en", { maximumFractionDigits: 2 }).format(xx),
+        ),
+      );
+    }
+    svg.append(
+      svgNode("line", {
+        x1: x(0),
+        x2: x(0),
+        y1: pad.t,
+        y2: h - pad.b,
+        stroke: "#83919a",
+        "stroke-dasharray": "4 4",
+      }),
+      svgNode("line", {
+        x1: pad.l,
+        x2: w - pad.r,
+        y1: y(0),
+        y2: y(0),
+        stroke: "#83919a",
+        "stroke-dasharray": "4 4",
+      }),
+    );
+    svg.append(
+      svgNode(
+        "text",
+        { x: pad.l, y: 16, fill: "#506675", "font-size": 12 },
+        "Gold monthly average change (%)",
+      ),
+    );
+    const xUnit = ["DFII10", "DGS10"].includes(driver.value)
+      ? "percentage points"
+      : "percent";
+    svg.append(
+      svgNode(
+        "text",
+        {
+          x: w / 2,
+          y: h - 8,
+          "text-anchor": "middle",
+          fill: "#506675",
+          "font-size": 12,
+        },
+        driver.value + " change (" + xUnit + ")",
+      ),
+    );
+    for (const row of rows) {
+      const point = svgNode("circle", {
+        "data-month": row.month,
+        cx: x(row.values[driver.value]),
+        cy: y(row.values.WB_GOLD_MONTHLY),
+        r: 4,
+        fill: "#ac7c25",
+        opacity: 0.7,
+      });
+      point.append(
+        svgNode(
+          "title",
+          {},
+          row.month.slice(0, 7) +
+            " · " +
+            driver.value +
+            ": " +
+            fmt(row.values[driver.value]) +
+            " · Gold: " +
+            fmt(row.values.WB_GOLD_MONTHLY),
+        ),
+      );
+      point.addEventListener("click", () => {
+        month.value = row.month;
+        inspect(row);
+      });
+      svg.append(point);
+    }
+    const shell = el("div", null, "chart-shell");
+    shell.append(svg);
+    plot.append(shell);
+    plot.append(
+      el(
+        "p",
+        "محورها متناسب با همین نمونه‌اند و صفر را شامل می‌شوند؛ نقطه‌ها به هم وصل نشده‌اند. برای بررسی با صفحه‌کلید از انتخاب ماه و جدول استفاده کنید.",
+        "chart-note",
+      ),
+    );
+    inspect(rows[0]);
+  }
+  month.onchange = () => inspect(rows.find((a) => a.month === month.value));
+  driver.onchange = method.onchange = draw;
+  exportButton.onclick = () => {
+    const header = [
+      "report_fingerprint",
+      "monthly_fingerprint",
+      "as_of",
+      "method",
+      "month",
+      "gold_change_percent",
+      "driver",
+      "driver_change",
+      "driver_change_unit",
+    ];
+    const unit = ["DFII10", "DGS10"].includes(driver.value)
+      ? "percentage_points"
+      : "percent";
+    const csv = [
+      header,
+      ...rows.map((a) => [
+        report.fingerprint,
+        study.fingerprint,
+        report.as_of,
+        a.method,
+        a.month,
+        a.values.WB_GOLD_MONTHLY,
+        driver.value,
+        a.values[driver.value],
+        unit,
+      ]),
+    ]
+      .map((a) =>
+        a.map((v) => '"' + String(v).replaceAll('"', '""') + '"').join(","),
+      )
+      .join("\r\n");
+    download(
+      "monthly-sample-" + driver.value + "-" + method.value + ".csv",
+      csv,
+      "text/csv;charset=utf-8",
+    );
+  };
+  draw();
 }
 function renderMonthlyRobustness(data) {
   const box = $("report-relations");

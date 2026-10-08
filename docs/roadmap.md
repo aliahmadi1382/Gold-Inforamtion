@@ -1,5 +1,7 @@
 # Roadmap and release gates
 
+Release 0.22 closes phase 5 against its documented panel/evidence criterion. Computation receipts bind new local calculations; imported and historical environments remain explicitly unrecorded. Published quota policy is reviewed, while actual account consumption remains unmeasured. Phase 3 is active again for price/release gates. See [acceptance scope](source-methodology/phase5-acceptance.fa.md).
+
 Release 0.19 delivers deterministic multi-source evidence synthesis with revision/method distinctions, inspectable JSON pointers, qualitative uncertainty, legacy input support and self-contained recomputation. Phase 5 retains operational evidence preservation work; the next increment is a unified backup of new sidecars, followed by the daily price/release gates. See [method](source-methodology/evidence-synthesis.fa.md).
 
 Release 0.18 completes bundle-writer runtime receipts, sanitized HTTP-attempt sidecars and local UI evidence, with a successful ten-step manual refresh on 2026-10-08. Phase 5 remains open for source-backed synthesis of conflicts and uncertainty. Quota measurement, independently bound remote computation runtime and unified evidence backup remain open. See [method](source-methodology/runtime-transport.fa.md).

@@ -1,5 +1,8 @@
 # Gold Market Intelligence
 
+**آخرین تحویل: ۰٫۲۲٫۰ — پذیرش فاز ۵ پنل پژوهش.** محیط خود محاسبهٔ جدید ثبت و شواهد حدود سهمیه در پنل نمایش داده شد. مصرف واقعی سهمیه و محیط تاریخیِ بدون سند نامعلوم می‌مانند. فاز ۳ برای دروازهٔ قیمت و انتشار فعال است؛ آمادگی روزانه false. [معیارهای پذیرش](docs/source-methodology/phase5-acceptance.fa.md) و [آموزش](docs/education/24-phase5-acceptance.fa.md).
+
+
 **آخرین تحویل: ۰٫۲۱٫۰ — شروط مستند پژوهش روزانه.** بخش جدید گزارش در پنل و CLI `daily-readiness` پنج شرط، شاهد موجود و مدرک لازم را نشان می‌دهند. پژوهش روزانه هنوز آماده نیست. [روش](docs/source-methodology/daily-readiness.fa.md)، [فصل بیست‌ودوم](docs/education/22-daily-readiness.fa.md) و [مسیر جاری](docs/phases.fa.md).
 
 **قابلیت ۰٫۲۰ حفظ شده است: — بازیابی یکپارچهٔ شواهد شبکه.** پشتیبان نسخهٔ ۲، transport را همراه پایگاه، خام و اسناد دریافت حفظ و ارتباط آن‌ها را بررسی می‌کند؛ بسته‌های نسخهٔ ۱ قابل بررسی و بازیابی‌اند. [روش](docs/source-methodology/transport-recovery.fa.md)، [فصل بیست‌ویکم](docs/education/21-transport-recovery.fa.md) و [مسیر جاری](docs/phases.fa.md).

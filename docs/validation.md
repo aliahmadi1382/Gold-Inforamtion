@@ -1,4 +1,11 @@
-# Release validation
+# Validation record
+
+## Release 0.22: phase-5 acceptance and computation receipts
+
+Local suite: **651 passed, one host-permission symlink skip**. Five new cases reject damaged, incomplete, rehashed wrongly bound or invalid-clock computation receipts and ensure imported JSON does not inherit the writer computation environment. Existing report equality remains about research content, excluding optional execution receipts. The roadmap negative test now uses an inactive phase independent of the active phase. Lint/format, JavaScript syntax, Prettier and wheel/sdist build pass. One independent computation schema brings the total to 49; previous schemas are unchanged.
+
+Real report ac69e7b10344bcffe885af5aeb327c8cc06a45b9804e31c5c076e2aa3d3bda46 verifies all 13 report artifacts, bundle-writer runtime and the new local computation receipt. UI API and browser verify version 0.22, new computation evidence, legacy unknown environments, explicit quota limits/unknown account consumption, phase-5 completion and active phase 3. Daily readiness remains false. Fresh verified backup contains 95,513 versions, 102 raw blobs, 82 acquisition manifests (75 successful, seven failed, none running) and 17 transport documents. No acquisition ran in this release; two failed local import attempts from the preceding evidence update remain preserved. Receipts/screenshot are local in local/integration-v022/. See [acceptance scope](source-methodology/phase5-acceptance.fa.md).
+
 
 ## Release 0.21: report-bound daily readiness diagnostics
 

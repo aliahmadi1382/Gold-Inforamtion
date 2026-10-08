@@ -208,9 +208,10 @@ class Workspace:
                         str(path.parent.relative_to(self.report_root)).encode()
                     ).hexdigest()[:24]
                     # Only serve verified research JSON; no arbitrary local-file endpoint.
-                    from .runtime_evidence import load_runtime
+                    from .runtime_evidence import load_computation, load_runtime
 
                     runtime = load_runtime(path.parent, report, content)
+                    computation = load_computation(path.parent, report, content)
                     self.reports[key] = dict(
                         id=key,
                         report=json.loads(content),
@@ -222,6 +223,7 @@ class Workspace:
                         status=report.status,
                         software_version=report.software_version,
                         runtime=runtime.model_dump(mode="json") if runtime else None,
+                        computation=computation.model_dump(mode="json") if computation else None,
                         daily_readiness=build_daily_readiness(content).model_dump(mode="json"),
                         synthesis=build_synthesis(content, generated_at=generated).model_dump(
                             mode="json"

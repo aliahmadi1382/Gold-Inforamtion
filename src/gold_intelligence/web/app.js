@@ -662,8 +662,20 @@ async function showReport() {
       "برش اطلاعات: " + stamp(r.as_of),
       "ساخته‌شده: " + stamp(r.generated_at),
       "نسخه: " + r.software_version,
+      r.computation
+        ? "محاسبه: Python " +
+          r.computation.python_version +
+          " · " +
+          r.computation.operating_system +
+          " · " +
+          stamp(r.computation.started_at) +
+          " تا " +
+          stamp(r.computation.finished_at)
+        : "محیط محاسبهٔ خارجی یا تاریخی: ثبت نشده",
       r.runtime
-        ? "محیط ساخت بسته: " +
+        ? (r.computation
+            ? "محیط محاسبه ثبت شده؛ محیط ساخت بسته: "
+            : "محیط محاسبه ثبت نشده؛ محیط ساخت بسته: ") +
           r.runtime.python_implementation +
           " " +
           r.runtime.python_version +

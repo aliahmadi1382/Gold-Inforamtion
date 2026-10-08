@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Literal
 from uuid import uuid4
 
-from pydantic import Field, model_validator
+from pydantic import Field, PrivateAttr, model_validator
 
 from . import __version__
 from .brief import ISSUES, NAMES, STATUSES, UNITS, cell
@@ -204,6 +204,14 @@ def fingerprint(payload):
 
 
 class ResearchReportV1(Contract):
+    _computation: dict | None = PrivateAttr(default=None)
+
+    def __eq__(self, other):
+        # Execution receipts are optional sidecars, not research content.
+        if not isinstance(other, ResearchReportV1):
+            return NotImplemented
+        return type(self) is type(other) and self.__dict__ == other.__dict__
+
     schema_version: Literal["1.0.0"] = "1.0.0"
     software_version: str
     generated_at: Timestamp
@@ -312,6 +320,9 @@ def parse_research_report(payload):
 
 
 def build_research_report(store, registry, settings, as_of):
+    from .runtime_evidence import computation_start
+
+    trace = computation_start()
     as_of = aware(as_of).astimezone(UTC)
     if store.db.in_transaction:
         raise ValueError("start the report outside an existing database transaction")
@@ -366,7 +377,11 @@ def build_research_report(store, registry, settings, as_of):
             datetime.fromisoformat(payload["generated_at"]).isoformat().replace("+00:00", "Z")
         )
         payload["as_of"] = as_of.isoformat().replace("+00:00", "Z")
-        return ResearchReport.model_validate({**payload, "fingerprint": fingerprint(payload)})
+        report = ResearchReport.model_validate({**payload, "fingerprint": fingerprint(payload)})
+        report._computation = dict(
+            **trace, finished_at=datetime.now(UTC), report_fingerprint=report.fingerprint
+        )
+        return report
     finally:
         store.db.rollback()
 
@@ -668,6 +683,9 @@ class ReportManifest(ReportManifestV1):
 
 
 def write_research_report(report, output_dir):
+    from .runtime_evidence import write_computation
+
+    trace = report._computation
     # Validate again in case a nested dictionary was edited after model creation.
     report = parse_research_report(report.model_dump(mode="json"))
     outputs = {
@@ -718,6 +736,7 @@ def write_research_report(report, output_dir):
         (manifest.model_dump_json(indent=2) + "\n").encode("utf-8")
     )
     write_runtime(staging, report)
+    write_computation(staging, report, trace)
     verify_research_bundle(staging)
     staging.rename(destination)
     return destination
@@ -764,10 +783,15 @@ def load_verified_report(directory):
         ):
             raise ValueError("report detail differs from its embedded component")
     load_runtime(directory, report, contents["research-report.json"])
+    from .runtime_evidence import load_computation
+
+    load_computation(directory, report, contents["research-report.json"])
     return report, manifest, contents["research-report.json"]
 
 
 def verify_research_bundle(directory):
+    from .runtime_evidence import load_computation
+
     report, manifest, content = load_verified_report(directory)
     runtime = load_runtime(directory, report, content)
     return {
@@ -776,4 +800,7 @@ def verify_research_bundle(directory):
         "fingerprint": report.fingerprint,
         "as_of": report.as_of.isoformat(),
         "runtime_evidence": "verified_bundle_writer" if runtime else "not_recorded",
+        "computation_evidence": "verified_local_computation"
+        if load_computation(directory, report, content)
+        else "not_recorded",
     }

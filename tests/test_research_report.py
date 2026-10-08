@@ -33,6 +33,49 @@ from gold_intelligence.storage import Store
 ASOF = datetime(2024, 4, 16, tzinfo=UTC)
 
 
+@pytest.mark.parametrize("damage", ["hash", "binding", "clock", "missing"])
+def test_computation_receipt_rejects_tampering(store, registry, settings, tmp_path, damage):
+    from gold_intelligence.runtime_evidence import RuntimeManifest, load_computation
+
+    report = build_research_report(store, registry, settings, ASOF)
+    directory = write_research_report(report, tmp_path)
+    content = (directory / "research-report.json").read_bytes()
+    receipt = load_computation(directory, report, content)
+    assert receipt.started_at <= report.generated_at <= receipt.finished_at
+    assert receipt.dependencies["pydantic"]
+    path = directory / "computation.json"
+    if damage == "hash":
+        path.write_bytes(path.read_bytes() + b" ")
+    elif damage == "missing":
+        path.unlink()
+    else:
+        data = json.loads(path.read_bytes())
+        if damage == "binding":
+            data["report_fingerprint"] = "0" * 64
+        else:
+            data["started_at"] = "2099-01-01T00:00:00Z"
+        content = json.dumps(data).encode()
+        path.write_bytes(content)
+        manifest = RuntimeManifest(
+            runtime_sha256=hashlib.sha256(content).hexdigest(), runtime_bytes=len(content)
+        )
+        (directory / "computation-manifest.json").write_text(manifest.model_dump_json())
+    with pytest.raises(ValueError):
+        verify_research_bundle(directory)
+
+
+def test_external_report_does_not_inherit_writer_computation(store, registry, settings, tmp_path):
+    from gold_intelligence.runtime_evidence import load_computation
+
+    original = build_research_report(store, registry, settings, ASOF)
+    imported = ResearchReport.model_validate_json(original.model_dump_json())
+    directory = write_research_report(imported, tmp_path)
+    content = (directory / "research-report.json").read_bytes()
+    assert load_computation(directory, imported, content) is None
+    assert verify_research_bundle(directory)["computation_evidence"] == "not_recorded"
+    assert original.fingerprint == imported.fingerprint
+
+
 @pytest.mark.parametrize("damage", ["bytes", "missing", "binding"])
 def test_runtime_receipt_is_checked(store, registry, settings, tmp_path, damage):
     from gold_intelligence.runtime_evidence import RuntimeManifest, load_runtime

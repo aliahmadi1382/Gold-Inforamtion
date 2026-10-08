@@ -87,7 +87,7 @@ from .revision_ledger import (
     render_revision_ledger,
     revision_ledger,
 )
-from .runtime_evidence import RuntimeEvidence, RuntimeManifest
+from .runtime_evidence import ComputationEvidence, RuntimeEvidence, RuntimeManifest
 from .snapshot import MarketSnapshot, snapshot
 from .storage import Store
 from .transport_evidence import TransportEvidence
@@ -418,6 +418,7 @@ def run(args) -> dict:
             "operations_health": OperationsHealth,
             "project_roadmap": ProjectRoadmap,
             "runtime_evidence": RuntimeEvidence,
+            "computation_evidence": ComputationEvidence,
             "runtime_manifest": RuntimeManifest,
             "transport_evidence": TransportEvidence,
             "daily_readiness": DailyReadiness,

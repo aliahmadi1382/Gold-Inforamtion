@@ -219,7 +219,7 @@ def test_roadmap_rejects_false_completion_and_ambiguous_status(change):
     elif change == "completed_with_remaining":
         data["phases"][3]["status"] = "completed"
     else:
-        data["current_phase"] = "3"
+        data["current_phase"] = "7"
     with pytest.raises(ValueError):
         ProjectRoadmap.model_validate(data)
 

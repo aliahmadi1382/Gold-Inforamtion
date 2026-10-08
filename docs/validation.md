@@ -1,5 +1,11 @@
 # Release validation
 
+## Release 0.20: transport-aware recovery
+
+Local suite: **636 passed, one host-permission symlink skip**; lint, format and wheel/sdist build pass. Ten new recovery cases cover byte-preserving transport restore, rehashed incorrect acquisition hash/run identity/timestamps, missing or extra sidecars, orphan/corrupt/invalid source transport and legacy version-1 schema/prose/restore compatibility. Two independent version-2 schemas bring the total to 47; legacy schemas are unchanged.
+
+Real offline backup and isolated restore preserve 95,504 versions, 98 raw blobs, 76 acquisition manifests (71 succeeded, five failed), and 11 transport documents. All sorted database rows and raw/run/transport bytes match; sidecar links and timestamps are validated. Local receipts are in `local/integration-v020/`. Reports, runtime and synthesis bundles, credentials, code and config remain outside core backup scope. No fresh acquisition ran, no historical transport is invented, and quota stays unmeasured.
+
 ## Release 0.19: multi-source evidence synthesis
 
 Local suite: **626 passed, one host-permission symlink skip**; lint/format and wheel/sdist build pass. Twenty-one new cases cover empty evidence, release-date vintage versus current-revision disagreements, missing periods/nulls, same/opposite/neutral signs and minimum sample, exact monthly method/sample preservation, semantic clock stability, legacy schema without invented COT, file corruption, fully rehashed forged claims, prose disagreement, duplicate/traversal manifests, corrupted input fingerprints, offline CLI without store initialization, and forged counts/direction. Existing local UI checks also bind derived synthesis to its verified input and exclude large synthesis payloads from catalog summaries. Two new independent schemas bring the total to 45; old report and comparator schemas stay unchanged.

@@ -18,6 +18,7 @@ from .acquisition import AcquisitionRun, write_manifest
 from .models import Contract, Hash, Timestamp
 from .storage import canonical, decode_record
 from .store_lock import store_lock
+from .transport_evidence import load_transport
 
 
 def file_hash(path):
@@ -74,6 +75,40 @@ class BackupManifest(Contract):
         return self
 
 
+class BackupFileV2(BackupFile):
+    path: str = Field(
+        pattern=r"^(market\.sqlite3|raw/[a-f0-9]{64}|(?:runs|transport)/[a-f0-9]{32}\.json)$"
+    )
+
+
+class BackupManifestV2(BackupManifest):
+    files: tuple[BackupFileV2, ...]
+    schema_version: Literal["2.0.0"] = "2.0.0"
+    transport_documents: int = Field(ge=0)
+    scope: Literal["core_store_with_transport_without_credentials_or_external_reports"] = (
+        "core_store_with_transport_without_credentials_or_external_reports"
+    )
+
+    @model_validator(mode="after")
+    def transport_count(self):
+        if self.transport_documents != sum(f.path.startswith("transport/") for f in self.files):
+            raise ValueError("transport inventory count mismatch")
+        return self
+
+
+def parse_backup(content):
+    import json
+
+    version = json.loads(content).get("schema_version")
+    model = {"1.0.0": BackupManifest, "2.0.0": BackupManifestV2}.get(version)
+    if model is None:
+        raise ValueError("unsupported backup schema")
+    manifest = model.model_validate_json(content)
+    if version == "1.0.0" and any(f.path.startswith("transport/") for f in manifest.files):
+        raise ValueError("legacy backup cannot contain transport documents")
+    return manifest
+
+
 class RestoreReceipt(Contract):
     schema_version: Literal["1.0.0"] = "1.0.0"
     application_version: str
@@ -86,33 +121,42 @@ class RestoreReceipt(Contract):
     acquisition_runs: int = Field(ge=0)
 
 
-def core_files(root):
+class RestoreReceiptV2(RestoreReceipt):
+    schema_version: Literal["2.0.0"] = "2.0.0"
+    transport_documents: int = Field(ge=0)
+
+
+def core_files(root, *, include_transport=False):
     root = Path(root).resolve()
     database = root / "market.sqlite3"
     if not database.is_file() or database.is_symlink():
         raise ValueError("missing database or linked database file")
     paths = [database]
-    for name in ("raw", "runs"):
+    for name in ("raw", "runs", "transport") if include_transport else ("raw", "runs"):
         directory = root / name
-        if directory.is_symlink() or (directory.exists() and not directory.is_dir()):
+        if (
+            directory.is_symlink()
+            or not directory.resolve().is_relative_to(root)
+            or (directory.exists() and not directory.is_dir())
+        ):
             raise ValueError("core directories must not be linked or non-directories")
         if name == "raw" and not directory.is_dir():
             raise ValueError("raw directory is required")
         for path in sorted(directory.iterdir()) if directory.exists() else ():
-            if path.is_symlink() or not path.is_file():
+            if path.is_symlink() or not path.resolve().is_relative_to(root) or not path.is_file():
                 raise ValueError("core evidence must be regular files")
             # Atomic manifest leftovers are not finalized acquisition documents.
-            if name == "runs" and path.suffix != ".json":
+            if name in {"runs", "transport"} and path.suffix != ".json":
                 continue
             relative = path.relative_to(root).as_posix()
-            BackupFile(path=relative, sha256="0" * 64, bytes=0)
+            BackupFileV2(path=relative, sha256="0" * 64, bytes=0)
             paths.append(path)
     return paths
 
 
-def audit_core(root):
+def audit_core(root, *, include_transport=False):
     root = Path(root).resolve()
-    paths = core_files(root)
+    paths = core_files(root, include_transport=include_transport)
     raw = {path.name for path in paths if path.parent.name == "raw"}
     for path in paths:
         if path.parent.name == "raw" and file_hash(path) != path.name:
@@ -146,7 +190,11 @@ def audit_core(root):
             if set(run.raw_sha256) - raw or set(run.record_ids) - identifiers:
                 raise ValueError("acquisition trace has missing evidence")
             states[run.status] += 1
+    transport = [path for path in paths if path.parent.name == "transport"]
+    for path in transport:
+        load_transport(root, path.stem)
     return {
+        **({"transport_documents": len(transport)} if include_transport else {}),
         "records": len(identifiers),
         "raw_blobs": len(raw),
         "acquisition_runs": sum(states.values()),
@@ -155,7 +203,7 @@ def audit_core(root):
 
 
 def render_backup(manifest):
-    return "\n".join(
+    legacy = "\n".join(
         [
             "# پشتیبان بررسی‌شدهٔ داده‌های اصلی",
             "",
@@ -175,17 +223,28 @@ def render_backup(manifest):
             "",
         ]
     )
+    if isinstance(manifest, BackupManifestV2):
+        return legacy + (
+            f"\nاسناد تلاش HTTP: {manifest.transport_documents}. ارتباط هر سند با بایت‌های "
+            "سند دریافت و بازهٔ زمانی آن بررسی شده است. نبود شاهد برای دریافت‌های قدیمی "
+            "به معنی نبود تلاش نیست؛ سهمیه همچنان اندازه‌گیری نشده است.\n"
+        )
+    return legacy
 
 
 def verify_payload(root, manifest):
-    paths = {path.relative_to(root).as_posix(): path for path in core_files(root)}
+    extended = isinstance(manifest, BackupManifestV2)
+    paths = {
+        path.relative_to(root).as_posix(): path
+        for path in core_files(root, include_transport=extended)
+    }
     if set(paths) != {item.path for item in manifest.files}:
         raise ValueError("backup inventory differs from manifest")
     for item in manifest.files:
         path = paths[item.path]
         if path.stat().st_size != item.bytes or file_hash(path) != item.sha256:
             raise ValueError("backup file hash or size mismatch")
-    result = audit_core(root)
+    result = audit_core(root, include_transport=extended)
     if any(result[name] != getattr(manifest, name) for name in result):
         raise ValueError("backup counts disagree with restored evidence")
     return result
@@ -196,7 +255,7 @@ def verify_backup(directory):
     for name in ("backup-manifest.json", "backup.fa.md"):
         if (root / name).is_symlink():
             raise ValueError("backup metadata must not be linked")
-    manifest = BackupManifest.model_validate_json((root / "backup-manifest.json").read_bytes())
+    manifest = parse_backup((root / "backup-manifest.json").read_bytes())
     result = verify_payload(root, manifest)
     if (root / "backup.fa.md").read_bytes() != render_backup(manifest).encode():
         raise ValueError("backup summary differs from manifest")
@@ -229,8 +288,8 @@ def backup_store(source_root, output_dir):
         raise ValueError("backup output must be outside the source store")
     with store_lock(source):
         # Validate before creating any backup directory; a typo must not create an empty store.
-        audit_core(source)
-        original = core_files(source)
+        audit_core(source, include_transport=True)
+        original = core_files(source, include_transport=True)
         evidence = {
             path.relative_to(source).as_posix(): file_hash(path)
             for path in original
@@ -242,6 +301,7 @@ def backup_store(source_root, output_dir):
         staging.mkdir()
         (staging / "raw").mkdir()
         (staging / "runs").mkdir()
+        (staging / "transport").mkdir()
         snapshot_database(source / "market.sqlite3", staging / "market.sqlite3")
         for path in original:
             if path.name != "market.sqlite3":
@@ -249,30 +309,32 @@ def backup_store(source_root, output_dir):
         # Detect outside-the-lock filesystem changes instead of certifying a mixed copy.
         current = {
             path.relative_to(source).as_posix(): file_hash(path)
-            for path in core_files(source)
+            for path in core_files(source, include_transport=True)
             if path.name != "market.sqlite3"
         }
         if current != evidence:
             raise ValueError("source evidence changed during backup")
-        result = audit_core(staging)
+        result = audit_core(staging, include_transport=True)
         files = tuple(
-            BackupFile(
+            BackupFileV2(
                 path=path.relative_to(staging).as_posix(),
                 sha256=file_hash(path),
                 bytes=path.stat().st_size,
             )
-            for path in core_files(staging)
+            for path in core_files(staging, include_transport=True)
         )
         data = dict(
-            schema_version="1.0.0",
+            schema_version="2.0.0",
             application_version=__version__,
             created_at=datetime.now(UTC).isoformat().replace("+00:00", "Z"),
             source_root=str(source),
             files=[item.model_dump(mode="json") for item in files],
             **result,
-            scope="core_store_without_credentials_or_external_reports",
+            scope="core_store_with_transport_without_credentials_or_external_reports",
         )
-        manifest = BackupManifest.model_validate({**data, "fingerprint": backup_fingerprint(data)})
+        manifest = BackupManifestV2.model_validate(
+            {**data, "fingerprint": backup_fingerprint(data)}
+        )
         write_manifest(staging / "backup-manifest.json", manifest)
         (staging / "backup.fa.md").write_bytes(render_backup(manifest).encode())
         verify_backup(staging)
@@ -290,7 +352,7 @@ def restore_store(backup_dir, destination):
         raise ValueError("restore destination must be separate from backup")
     checked = verify_backup(backup)
     manifest_bytes = (backup / "backup-manifest.json").read_bytes()
-    manifest = BackupManifest.model_validate_json(manifest_bytes)
+    manifest = parse_backup(manifest_bytes)
     if manifest.fingerprint != checked["fingerprint"]:
         raise ValueError("backup manifest changed after verification")
     if target.resolve().is_relative_to(Path(manifest.source_root).resolve()):
@@ -301,6 +363,8 @@ def restore_store(backup_dir, destination):
     staging.mkdir()
     (staging / "raw").mkdir()
     (staging / "runs").mkdir()
+    if isinstance(manifest, BackupManifestV2):
+        (staging / "transport").mkdir()
     for item in manifest.files:
         source = backup / item.path
         if source.is_symlink() or not source.resolve().is_relative_to(backup):
@@ -311,7 +375,13 @@ def restore_store(backup_dir, destination):
     verify_payload(staging.resolve(), manifest)
     published = target / "store"
     staging.rename(published)
-    receipt = RestoreReceipt(
+    receipt_model = RestoreReceiptV2 if isinstance(manifest, BackupManifestV2) else RestoreReceipt
+    receipt = receipt_model(
+        **(
+            {"transport_documents": manifest.transport_documents}
+            if isinstance(manifest, BackupManifestV2)
+            else {}
+        ),
         application_version=__version__,
         restored_at=datetime.now(UTC),
         backup_fingerprint=manifest.fingerprint,

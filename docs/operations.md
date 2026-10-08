@@ -354,3 +354,8 @@ CLI ingestion commands write per-run manifests under the store's `runs/` directo
 There is no automatic refresh scheduler. Monitor/retry orchestration, per-row quarantine/recovery, database migrations, calendar-specific gaps and distributed/concurrent ingestion are follow-up work. Run manifests record failures but do not provide a quarantine or rollback service. Never delete raw records solely to make a quality check pass. CI tests are offline. The live Alpha Vantage/FRED checks recorded on 2026-10-05 are separate, account-specific observations, not guarantees of future service availability.
 
 COT comparison keys include source, dataset, market, family, unit, observation date and category. Net values, evidence recaptures and observation age remain distinct. Markdown previews the newest changed COT dates first. Report schema/version and the COT source-registry hash are calculation context; source release instants remain unverified.
+
+
+## تحویل ۰٫۲۰: بازیابی شواهد شبکه
+
+پشتیبان نسخهٔ ۲ transport را همراه SQLite/raw/runs حفظ می‌کند؛ verify/restore نسخهٔ ۱ نیز پشتیبانی می‌شود. گزارش‌ها و ضمیمه‌ها خارج از دامنه‌اند. [دامنه و کنترل‌ها](source-methodology/transport-recovery.fa.md).

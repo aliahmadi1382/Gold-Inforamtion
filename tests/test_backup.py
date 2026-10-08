@@ -48,12 +48,12 @@ def test_backup_restore_preserves_records_raw_and_runs_but_excludes_keys(
     assert not (directory / "credentials.env").exists() and not (directory / "notes.json").exists()
     validate(
         manifest.model_dump(mode="json"),
-        json.loads(Path("schemas/backup_manifest.schema.json").read_bytes()),
+        json.loads(Path("schemas/backup_manifest_v2.schema.json").read_bytes()),
     )
     receipt = restore_store(directory, tmp_path / "restore")
     validate(
         receipt.model_dump(mode="json"),
-        json.loads(Path("schemas/restore_receipt.schema.json").read_bytes()),
+        json.loads(Path("schemas/restore_receipt_v2.schema.json").read_bytes()),
     )
     with Store(Path(receipt.store_root)) as restored:
         assert list(restored.entries()) == list(populated.entries())
@@ -465,3 +465,86 @@ def test_unknown_store_schema_is_not_copied(store, tmp_path, damage):
     with pytest.raises(ValueError, match="unexpected"):
         backup_store(store.root, tmp_path / "backup")
     assert not (tmp_path / "backup").exists()
+
+
+def test_transport_bytes_and_links_survive_restore(saved, tmp_path):
+    manifest, directory = saved
+    assert manifest.schema_version == "2.0.0" and manifest.transport_documents == 1
+    restored = Path(restore_store(directory, tmp_path / "extended-restore").store_root)
+    receipt = json.loads((restored.parent / "restore-receipt.json").read_bytes())
+    assert receipt["transport_documents"] == 1
+    assert backup.audit_core(restored, include_transport=True)["transport_documents"] == 1
+    for item in manifest.files:
+        if item.path.startswith("transport/"):
+            assert (directory / item.path).read_bytes() == (restored / item.path).read_bytes()
+
+
+@pytest.mark.parametrize("damage", ["manifest_hash", "run_id", "time", "missing", "extra"])
+def test_transport_corruption_rejected_even_after_rehash(saved, damage):
+    _, directory = saved
+    path = next((directory / "transport").glob("*.json"))
+    data = json.loads(path.read_bytes())
+    if damage == "manifest_hash":
+        data["acquisition_manifest_sha256"] = "a" * 64
+    elif damage == "run_id":
+        data["run_id"] = "a" * 32
+    elif damage == "time":
+        data["attempts"] = [
+            {
+                "started_at": "2000-01-01T00:00:00Z",
+                "attempt": 1,
+                "outcome": "success",
+                "status_code": None,
+            }
+        ]
+    elif damage == "missing":
+        path.unlink()
+    else:
+        (directory / "transport" / ("a" * 32 + ".json")).write_bytes(path.read_bytes())
+    if damage in {"manifest_hash", "run_id", "time"}:
+        path.write_text(json.dumps(data), encoding="utf-8")
+
+        def update(manifest):
+            item = next(f for f in manifest["files"] if f["path"] == f"transport/{path.name}")
+            item.update(sha256=file_hash(path), bytes=path.stat().st_size)
+
+        rehash_manifest(directory, update)
+    with pytest.raises((ValueError, OSError)):
+        verify_backup(directory)
+
+
+@pytest.mark.parametrize("damage", ["orphan", "corrupt", "bad_name"])
+def test_invalid_source_transport_not_published(populated, tmp_path, damage):
+    path = next((populated.root / "transport").glob("*.json"))
+    if damage == "orphan":
+        (populated.root / "runs" / path.name).unlink()
+    elif damage == "corrupt":
+        path.write_bytes(b"{}")
+    else:
+        path.rename(path.with_name("notes.json"))
+    with pytest.raises((ValueError, OSError)):
+        backup_store(populated.root, tmp_path / "invalid-backup")
+    assert not (tmp_path / "invalid-backup").exists()
+
+
+def test_legacy_backup_preserves_contract_and_restores_without_invented_transport(saved, tmp_path):
+    from gold_intelligence.backup import BackupManifest, render_backup
+
+    _, directory = saved
+    data = json.loads((directory / "backup-manifest.json").read_bytes())
+    data.pop("transport_documents")
+    data.update(schema_version="1.0.0", scope="core_store_without_credentials_or_external_reports")
+    data["files"] = [f for f in data["files"] if not f["path"].startswith("transport/")]
+    data["fingerprint"] = backup_fingerprint(data)
+    manifest = BackupManifest.model_validate(data)
+    validate(data, json.loads(Path("schemas/backup_manifest.schema.json").read_bytes()))
+    write_manifest(directory / "backup-manifest.json", manifest)
+    (directory / "backup.fa.md").write_bytes(render_backup(manifest).encode())
+    assert verify_backup(directory)["status"] == "verified"
+    receipt = restore_store(directory, tmp_path / "legacy-restore")
+    assert receipt.schema_version == "1.0.0"
+    assert not (Path(receipt.store_root) / "transport").exists()
+    validate(
+        receipt.model_dump(mode="json"),
+        json.loads(Path("schemas/restore_receipt.schema.json").read_bytes()),
+    )

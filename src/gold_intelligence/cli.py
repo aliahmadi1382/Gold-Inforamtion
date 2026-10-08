@@ -10,7 +10,15 @@ from pydantic import ValidationError
 from .acquisition import SAFE_PARAMETERS, AcquisitionRun, acquire, list_runs
 from .alpha_vantage import ingest_alpha_gold
 from .analysis import event_study
-from .backup import BackupManifest, RestoreReceipt, backup_store, restore_store, verify_backup
+from .backup import (
+    BackupManifest,
+    BackupManifestV2,
+    RestoreReceipt,
+    RestoreReceiptV2,
+    backup_store,
+    restore_store,
+    verify_backup,
+)
 from .brief import ResearchBrief, build_brief, render_persian
 from .cftc import FIRST_DATE, CotCapture, ingest_cftc_gold
 from .comparison import compare_monthly
@@ -110,7 +118,9 @@ def parser() -> argparse.ArgumentParser:
     c.add_argument("--refresh-manifest", type=Path)
     c.add_argument("--allow-relocated-refresh", action="store_true")
     c.add_argument("--output-dir", type=Path, required=True)
-    c = sub.add_parser("backup-store", help="verified SQLite/raw/acquisition snapshot without keys")
+    c = sub.add_parser(
+        "backup-store", help="verified SQLite/raw/acquisition/HTTP snapshot without keys"
+    )
     c.add_argument("--output-dir", type=Path, default=Path("local/backups"))
     c = sub.add_parser("verify-backup", help="verify backup hashes, SQLite and evidence lineage")
     c.add_argument("directory", type=Path)
@@ -322,6 +332,7 @@ def run(args) -> dict:
             "raw_blobs": manifest.raw_blobs,
             "acquisition_runs": manifest.acquisition_runs,
             "run_states": manifest.run_states,
+            "transport_documents": manifest.transport_documents,
         }
     if args.command == "verify-backup":
         return verify_backup(args.directory)
@@ -393,7 +404,9 @@ def run(args) -> dict:
             "refresh_review": RefreshReview,
             "review_manifest": ReviewManifest,
             "backup_manifest": BackupManifest,
+            "backup_manifest_v2": BackupManifestV2,
             "restore_receipt": RestoreReceipt,
+            "restore_receipt_v2": RestoreReceiptV2,
             "operations_health": OperationsHealth,
             "project_roadmap": ProjectRoadmap,
             "runtime_evidence": RuntimeEvidence,

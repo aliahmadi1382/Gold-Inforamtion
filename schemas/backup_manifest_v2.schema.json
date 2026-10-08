@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "BackupFileV2": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "pattern": "^(market\\.sqlite3|raw/[a-f0-9]{64}|(?:runs|transport)/[a-f0-9]{32}\\.json)$",
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "bytes": {
+          "minimum": 0,
+          "title": "Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "bytes"
+      ],
+      "title": "BackupFileV2",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "2.0.0",
+      "default": "2.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "application_version": {
+      "title": "Application Version",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "source_root": {
+      "title": "Source Root",
+      "type": "string"
+    },
+    "fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Fingerprint",
+      "type": "string"
+    },
+    "files": {
+      "items": {
+        "$ref": "#/$defs/BackupFileV2"
+      },
+      "title": "Files",
+      "type": "array"
+    },
+    "records": {
+      "minimum": 0,
+      "title": "Records",
+      "type": "integer"
+    },
+    "raw_blobs": {
+      "minimum": 0,
+      "title": "Raw Blobs",
+      "type": "integer"
+    },
+    "acquisition_runs": {
+      "minimum": 0,
+      "title": "Acquisition Runs",
+      "type": "integer"
+    },
+    "run_states": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "propertyNames": {
+        "enum": [
+          "running",
+          "succeeded",
+          "failed"
+        ]
+      },
+      "title": "Run States",
+      "type": "object"
+    },
+    "scope": {
+      "const": "core_store_with_transport_without_credentials_or_external_reports",
+      "default": "core_store_with_transport_without_credentials_or_external_reports",
+      "title": "Scope",
+      "type": "string"
+    },
+    "transport_documents": {
+      "minimum": 0,
+      "title": "Transport Documents",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "application_version",
+    "created_at",
+    "source_root",
+    "fingerprint",
+    "files",
+    "records",
+    "raw_blobs",
+    "acquisition_runs",
+    "run_states",
+    "transport_documents"
+  ],
+  "title": "BackupManifestV2",
+  "type": "object"
+}

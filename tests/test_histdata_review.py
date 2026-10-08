@@ -63,6 +63,11 @@ def test_current_month_not_accepted():
         review_archive(content(), STATUS, "202609", datetime(2026, 9, 30, tzinfo=UTC))
 
 
+def test_duplicate_does_not_hide_later_invalid_price():
+    with pytest.raises(ValueError, match="invalid OHLC"):
+        review(ROW + ROW + ROW.replace(";12;", ";nan;"))
+
+
 def test_cli_rejection_receipt_preserves_conflicting_raw_rows(tmp_path):
     archive, status, output = (
         tmp_path / name for name in ("sample.zip", "status.txt", "audit.json")

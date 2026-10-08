@@ -36,7 +36,7 @@ def review_archive(content: bytes, status: bytes, month: str, retrieved: datetim
             raise ValueError("status report does not match archive")
         data = archive.read(base + ".csv")
     previous, count, gaps, days = None, 0, [], {}
-    first, last = None, None
+    first, last, temporal_error = None, None, False
     for line, row in enumerate(csv.reader(io.StringIO(data.decode()), delimiter=";"), 1):
         if len(row) != 6:
             raise ValueError("unexpected minute columns")
@@ -49,7 +49,7 @@ def review_archive(content: bytes, status: bytes, month: str, retrieved: datetim
             raise ValueError("invalid source minute or month")
         instant = local.replace(tzinfo=EST_FIXED).astimezone(UTC)
         if previous is not None and instant <= previous:
-            raise ValueError("duplicate or unordered minute")
+            temporal_error = True
         o, h, low, close, volume = map(float, row[1:])
         if not all(math.isfinite(v) for v in (o, h, low, close, volume)) or not (
             0 < low <= min(o, close) <= max(o, close) <= h and volume == 0
@@ -72,6 +72,8 @@ def review_archive(content: bytes, status: bytes, month: str, retrieved: datetim
         count += 1
     if not count:
         raise ValueError("empty minute archive")
+    if temporal_error:
+        raise ValueError("duplicate or unordered minute")
     return dict(
         schema_version="1.0.0",
         source_id="histdata_candidate",

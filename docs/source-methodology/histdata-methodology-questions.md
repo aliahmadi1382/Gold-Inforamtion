@@ -10,6 +10,8 @@ Our structural review found 29,321 CSV rows, 28,947 unique minute timestamps, 37
 
 Could you provide a corrected archive or explain the meaning and deterministic resolution of these duplicate minute rows? We have not silently sorted, discarded or averaged conflicting prices.
 
+A second independently downloaded sample, August 2026, has 29,437 rows, 29,339 unique timestamps, 98 additional duplicate rows, 49 order reversals and 98 groups with different numeric values. Its archive SHA-256 is b6bdb6989098437df2df11cb2e0f16d145c138f66425b0848bd6ce575626fd77. The separate status file also matches its ZIP member. The issue therefore occurs in both sampled months, without implying that all other files are affected.
+
 Could you also confirm whether XAUUSD prices are USD per troy ounce, identify the underlying instrument/feed and historical trading-calendar documentation, and describe corrections or revision history? We understand that the file timezone is fixed EST without daylight saving adjustments and that bar prices are based on BID quotes.
 
 This is personal local research, with no request for redistribution, paid access, account creation or model training.

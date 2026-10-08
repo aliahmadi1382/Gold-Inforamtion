@@ -41,7 +41,7 @@ if __name__ == "__main__":
             labels = []
             for line, row in enumerate(csv.reader(io.StringIO(data.decode()), delimiter=";"), 1):
                 labels.append(row[0])
-                versions[row[0]].append((line, tuple(row[1:])))
+                versions[row[0]].append((line, tuple(map(float, row[1:]))))
             result.update(
                 rows=len(labels),
                 unique_minutes=len(versions),
@@ -56,6 +56,8 @@ if __name__ == "__main__":
                     if len(v) > 1
                 ],
                 csv_sha256=hashlib.sha256(data).hexdigest(),
+                row_validation="all timestamp and numeric fields checked before temporal rejection",
+                status_matches_archive=True,
             )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x", encoding="utf-8") as stream:

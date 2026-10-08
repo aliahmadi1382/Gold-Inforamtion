@@ -281,6 +281,8 @@ def import_cftc(
 
 def fetch_bytes(url: str, attempts: int = 3) -> bytes:
     """Bounded requests; never expose request URLs (which may contain credentials)."""
+    if type(attempts) is not int or not 1 <= attempts <= 3:
+        raise ValueError("request attempts must be an integer from 1 to 3")
     for attempt in range(attempts):
         try:
             request = Request(url, headers={"User-Agent": f"GoldMarketIntelligence/{__version__}"})

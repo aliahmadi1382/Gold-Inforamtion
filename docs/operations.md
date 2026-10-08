@@ -294,6 +294,10 @@ uv run gold verify-review PATH_TO_REVIEW_BUNDLE
 
 These two commands are offline and do not open the store or registry. Offline review requires an explicit baseline to compare; without it, it produces `no_baseline`. Each run publishes a new review folder, with full comparison JSON, Persian priorities, exact copied refresh/report inputs and a manifest. Verification recomputes comparison, priorities, counts and prose from copied inputs; it is not publisher authentication or proof of acquisition/network events. See [method](source-methodology/refresh-review.fa.md) and [lesson fifteen](education/15-refresh-review.fa.md).
 
+## Offline operational health (0.16)
+
+For offline operational status in 0.16, use `uv run gold --store local/market operations-health --output-dir local/operations-health/NEW-NAME`. Optionally supply `--refresh-manifest PATH`; a historical store path requires `--allow-relocated-refresh`, with acquisition state/count checks. Output must be new and outside the store. Exit 3 indicates `attention` or `no_history`; exit 0 means clear recorded operations, not market freshness. Quota is unmeasured, historical runtime unrecorded, and retry guidance does not execute requests. See [operational health](source-methodology/operations-health.fa.md).
+
 ## Core-store backup and restore (0.15)
 
 ```powershell

@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "HealthRun": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "pattern": "^[a-f0-9]{32}$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "manifest_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Manifest Sha256",
+          "type": "string"
+        },
+        "operation": {
+          "title": "Operation",
+          "type": "string"
+        },
+        "identity_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Identity Sha256",
+          "type": "string"
+        },
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Finished At"
+        },
+        "status": {
+          "enum": [
+            "running",
+            "succeeded",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "inserted_records": {
+          "minimum": 0,
+          "title": "Inserted Records",
+          "type": "integer"
+        },
+        "failure_category": {
+          "enum": [
+            "none",
+            "interrupted",
+            "storage",
+            "validation",
+            "unknown"
+          ],
+          "title": "Failure Category",
+          "type": "string"
+        },
+        "failure_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Reason"
+        },
+        "retry_action": {
+          "enum": [
+            "none",
+            "inspect_unfinished",
+            "check_quota_before_manual_retry",
+            "manual_retry_after_transport_budget",
+            "repair_before_retry",
+            "inspect_before_retry"
+          ],
+          "title": "Retry Action",
+          "type": "string"
+        },
+        "consecutive_failures": {
+          "minimum": 0,
+          "title": "Consecutive Failures",
+          "type": "integer"
+        },
+        "is_latest": {
+          "title": "Is Latest",
+          "type": "boolean"
+        },
+        "quota_status": {
+          "const": "not_measured",
+          "default": "not_measured",
+          "title": "Quota Status",
+          "type": "string"
+        },
+        "historical_runtime": {
+          "const": "not_recorded",
+          "default": "not_recorded",
+          "title": "Historical Runtime",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "manifest_sha256",
+        "operation",
+        "identity_sha256",
+        "started_at",
+        "finished_at",
+        "status",
+        "inserted_records",
+        "failure_category",
+        "retry_action",
+        "consecutive_failures",
+        "is_latest"
+      ],
+      "title": "HealthRun",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "application_version": {
+      "title": "Application Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "python_version": {
+      "title": "Python Version",
+      "type": "string"
+    },
+    "python_implementation": {
+      "title": "Python Implementation",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "no_history",
+        "attention",
+        "clear"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "runs": {
+      "items": {
+        "$ref": "#/$defs/HealthRun"
+      },
+      "title": "Runs",
+      "type": "array"
+    },
+    "refresh_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Refresh Sha256"
+    },
+    "refresh_status": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Refresh Status"
+    },
+    "refresh_store_relation": {
+      "enum": [
+        "not_supplied",
+        "same_path",
+        "relocated_explicitly"
+      ],
+      "title": "Refresh Store Relation",
+      "type": "string"
+    },
+    "request_attempt_limit": {
+      "const": 3,
+      "default": 3,
+      "title": "Request Attempt Limit",
+      "type": "integer"
+    },
+    "automatic_workflow_retries": {
+      "const": 0,
+      "default": 0,
+      "title": "Automatic Workflow Retries",
+      "type": "integer"
+    },
+    "market_freshness_assessed": {
+      "const": false,
+      "default": false,
+      "title": "Market Freshness Assessed",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "application_version",
+    "generated_at",
+    "python_version",
+    "python_implementation",
+    "status",
+    "runs",
+    "refresh_store_relation"
+  ],
+  "title": "OperationsHealth",
+  "type": "object"
+}

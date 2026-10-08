@@ -1,5 +1,7 @@
 # Architecture
 
+Release 0.16 adds `operations_health.py`: an offline, writer-coordinated snapshot of acquisition identities, latest statuses, failure streaks and unfinished traces. An explicitly supplied refresh adds safe error codes after operation/source/series/state/count checks; relocation is explicit and recorded. Quota and historical runtime remain unknown, while snapshot runtime is recorded. Request budgets accept only integers 1–3; no workflow retry or scheduler is added. See [operational health](source-methodology/operations-health.fa.md).
+
 Current operational addition (0.15): `store_lock.py` coordinates Store initialization/raw/record writes, whole acquisition traces, refresh workflows and core-store backups with one nonblocking OS lock. `backup.py` uses SQLite's online backup API, preserves all raw and acquisition JSON, validates normalized/trace lineage and restores into a new isolated container. Direct SQL or external filesystem writers remain outside this protocol. Backup/restore contracts are independent version 1; existing research/refresh contracts remain unchanged. External reports, code/config and keys are separate recovery assets. See [store recovery](source-methodology/store-recovery.fa.md).
 
 ```mermaid

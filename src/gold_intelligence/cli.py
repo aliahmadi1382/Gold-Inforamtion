@@ -26,6 +26,7 @@ from .monthly_research import (
     monthly_research,
     render_monthly_persian,
 )
+from .operations_health import OperationsHealth, build_operations_health, write_operations_health
 from .positioning import PositioningContext, positioning_context, write_positioning
 from .quality import QualityPolicy, QualityReport, assess, load_policy
 from .refresh import RefreshPolicy, RefreshRun, refresh_and_report
@@ -91,6 +92,10 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    c = sub.add_parser("operations-health", help="offline run health; quota remains unmeasured")
+    c.add_argument("--refresh-manifest", type=Path)
+    c.add_argument("--allow-relocated-refresh", action="store_true")
+    c.add_argument("--output-dir", type=Path, required=True)
     c = sub.add_parser("backup-store", help="verified SQLite/raw/acquisition snapshot without keys")
     c.add_argument("--output-dir", type=Path, default=Path("local/backups"))
     c = sub.add_parser("verify-backup", help="verify backup hashes, SQLite and evidence lineage")
@@ -264,6 +269,13 @@ def parser() -> argparse.ArgumentParser:
 
 
 def run(args) -> dict:
+    if args.command == "operations-health":
+        if args.output_dir.resolve().is_relative_to(args.store.resolve()):
+            raise ValueError("health output must be outside the store")
+        report = build_operations_health(
+            args.store, args.refresh_manifest, allow_relocated_refresh=args.allow_relocated_refresh
+        )
+        return write_operations_health(report, args.output_dir)
     if args.command == "backup-store":
         manifest, directory = backup_store(args.store, args.output_dir)
         return {
@@ -347,6 +359,7 @@ def run(args) -> dict:
             "review_manifest": ReviewManifest,
             "backup_manifest": BackupManifest,
             "restore_receipt": RestoreReceipt,
+            "operations_health": OperationsHealth,
         }
         for name, model in models.items():
             schema = {
@@ -684,6 +697,8 @@ def main(argv=None) -> int:
         with credential_environment(args.credentials_file):
             result = run(args)
         print(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False))
+        if args.command == "operations-health" and result["status"] != "clear":
+            return 3
         if args.command == "refresh-report" and (
             result["status"] != "succeeded"
             or result["review_status"] not in {"compared", "no_baseline"}

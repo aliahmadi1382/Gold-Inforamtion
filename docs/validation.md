@@ -1,5 +1,13 @@
 # Release validation
 
+## Release 0.16: offline operational health
+
+Local validation: **555 passed, one host-permission symlink skip** (556 cases total), Ruff lint/format, 15-source registry validation, publication boundary, package build and real snapshot JSON Schema validation pass. The final linkage guard additionally passes all 30 operational-health cases; remote CI is checked on the pushed commit.
+
+The suite adds 30 offline cases covering absent/empty stores, source/series identities across overlap windows, failure streak reset, unfinished runs, parameter/exception redaction, writer exclusion, corrupt and incorrectly named manifests, immutable output directories, safe retry actions, strict request budgets, bounded HTTP/connection retries, CLI isolation and exit status, explicit relocated refresh linkage, acquisition-count disagreement, HTTP 403 guidance and exact missing-FRED-credential classification. The operations-health schema brings the total to 39. Previous backup and report contracts are retained.
+
+The real transferred store supplies 65 acquisition manifests (60 succeeded, five failed). An explicitly relocated 0.13 refresh matches its acquisition states/counts, preserves the original historical path and yields `attention` with CFTC `HTTP_403` and `repair_before_retry`. Quota and historical runtime are explicitly unmeasured/unrecorded; the snapshot records its own Python runtime. No network acquisition, automatic workflow retry or scheduler was run. Local artifacts remain under `local/operations-health/`. See [method and limits](source-methodology/operations-health.fa.md).
+
 ## Release 0.15: consistent core-store recovery
 
 The suite has 526 offline cases: 486 existing and 40 new backup/coordination cases. On this Windows computer 525 pass and one real-symlink case is skipped because the host does not grant symbolic-link creation. New cases exercise committed WAL pages, whole acquisition/writer exclusion, process termination and thread-owner recovery, missing/empty stores, core-only credential exclusion, original failed/running states, record/raw/trace corruption including rehashed false data, unsupported table/view/key schemas, manifest traversal, non-overwriting isolated restore, copy/disk failures and source/manifest changes during copying. Two additional version-1 schemas bring the total to 38.

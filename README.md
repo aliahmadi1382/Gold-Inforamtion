@@ -1,6 +1,8 @@
 # Gold Market Intelligence
 
-**آخرین تحویل: ۰٫۱۵٫۰.** پشتیبان سازگار SQLite/raw/runs، بررسی کامل بسته و بازیابی در مقصد تازه اضافه شده‌اند؛ نویسنده‌های پروژه و backup قفل مشترک دارند. [روش بازیابی](docs/source-methodology/store-recovery.fa.md) و [فصل شانزدهم](docs/education/16-store-recovery.fa.md) دامنه و دستورها را توضیح می‌دهند. گزارش‌ها و کلید جدا نگهداری می‌شوند.
+**آخرین تحویل: ۰٫۱۶٫۰.** گزارش آفلاین `operations-health` وضعیت و شکست متوالی دریافت‌ها، اجرای ناتمام، خطای امن refresh و راهنمای تلاش مجدد را نشان می‌دهد. سهمیهٔ اندازه‌گیری‌نشده صریح است و runtime ساخت همین گزارش ثبت می‌شود. [روش سلامت عملیات](docs/source-methodology/operations-health.fa.md) و [فصل هفدهم](docs/education/17-operations-health.fa.md) راهنما هستند.
+
+**قابلیت ۰٫۱۵ حفظ شده است:** پشتیبان سازگار SQLite/raw/runs، بررسی کامل بسته و بازیابی در مقصد تازه؛ نویسنده‌های پروژه و backup قفل مشترک دارند. [روش بازیابی](docs/source-methodology/store-recovery.fa.md) و [فصل شانزدهم](docs/education/16-store-recovery.fa.md) دامنه و دستورها را توضیح می‌دهند. گزارش‌ها و کلید جدا نگهداری می‌شوند.
 
 **قابلیت ۰٫۱۴ در نسخهٔ جاری حفظ شده است:** خلاصهٔ فارسی و JSON تغییرات و اولویت بررسی پس از دریافت؛ مبنا، تغییر عدد/شاهد/سن/نما و شکست‌ها صریح‌اند. [روش تحویل](docs/source-methodology/refresh-review.fa.md) و [فصل پانزدهم](docs/education/15-refresh-review.fa.md) راهنما هستند. CLI مسیرهای `review` و `review_bundle` را ثبت می‌کند.
 

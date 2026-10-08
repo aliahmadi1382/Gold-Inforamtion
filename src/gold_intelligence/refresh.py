@@ -350,7 +350,11 @@ def safe_failure_reason(failure):
         return "HTTP_" + match[1]
     if message == "provider connection failed after bounded retries":
         return "CONNECTION_FAILED"
-    if message in {"set FRED_API_KEY before fetching", "set ALPHAVANTAGE_API_KEY before fetching"}:
+    if message in {
+        "set FRED_API_KEY before fetching",
+        "set FRED_API_KEY in the environment before fetching",
+        "set ALPHAVANTAGE_API_KEY before fetching",
+    }:
         return "MISSING_CREDENTIALS"
     if isinstance(failure, OSError):
         return "STORAGE_ERROR"

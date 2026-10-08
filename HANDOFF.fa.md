@@ -900,3 +900,7 @@ git diff --check
 - [COT](docs/source-methodology/cot-positioning.fa.md)، [اتصال COT](docs/source-methodology/integrated-positioning.fa.md) و [دریافت دستی ۰٫۱۳](docs/source-methodology/manual-refresh.fa.md).
 
 این سند نقطهٔ تحویل ۸ اکتبر ۲۰۲۶ است. هنگام تحویل بعدی، نسخهٔ کد، نتیجهٔ آخرین دریافت و CI، موجودی داده، مانع‌های باز، تصمیم‌های تازه و مرحلهٔ بعد با شواهد همان زمان به‌روز شوند؛ سوابق قبلی به‌عنوان تاریخچه حفظ شوند.
+
+## تکمیل شواهد در ۸ اکتبر ۲۰۲۶
+
+دو سند BLS سال ۲۰۲۶ و دو vintage روز انتشار FRED وارد شدند؛ ۹ نسخهٔ جدید و ۹۵٬۵۱۳ رکورد با منشأ تأییدشده. چهار مقدار جدید با vintage روز انتشار و دادهٔ فعلی در دقت نمایش تطبیق دارند. گزارش تأییدشده: `local/reports/recent-releases-2026/research-20261008T130917349090Z-acd0b42d`. نسخهٔ کد ۰٫۲۱ باقی است؛ آمادگی روزانه و اولین انتشار همچنان تأیید نشده. شرح: `docs/education/23-recent-release-evidence.fa.md`.

@@ -10,6 +10,10 @@ const names = {
   unavailable: "نامعلوم",
   london_afternoon_fixing_average: "تثبیت عصر لندن؛ تا مه ۲۰۲۵",
   spot_daily_average: "میانگین نقدی؛ پس از مرز ژوئن ۲۰۲۵",
+  monthly_research: "پژوهش ماهانهٔ همین گزارش",
+  pearson: "ضریب Pearson",
+  spearman: "ضریب Spearman",
+  constant: "سری ثابت؛ ضریب تعریف‌نشده",
   estimated: "ضریب قابل گزارش",
   too_short: "کمتر از حداقل نمونه",
   currency_per_troy_ounce: "دلار/اونس تروا",
@@ -225,7 +229,14 @@ function svgNode(tag, attrs = {}, text) {
   if (text != null) n.textContent = text;
   return n;
 }
-function chart(container, points, identity, compact = false, inspect = null) {
+function chart(
+  container,
+  points,
+  identity,
+  compact = false,
+  inspect = null,
+  domain = null,
+) {
   clear(container);
   const values = points.filter(
     (p) => p.value != null && Number.isFinite(p.value),
@@ -247,6 +258,7 @@ function chart(container, points, identity, compact = false, inspect = null) {
   let span = max - min || Math.max(Math.abs(max) * 0.1, 1);
   min -= span * 0.06;
   max += span * 0.06;
+  if (domain) [min, max] = domain;
   const x = (t) =>
       pad.l + ((t - minT) / (maxT - minT || 1)) * (w - pad.l - pad.r),
     y = (v) => h - pad.b - ((v - min) / (max - min)) * (h - pad.t - pad.b);
@@ -422,7 +434,7 @@ function chart(container, points, identity, compact = false, inspect = null) {
   container.append(
     el(
       "p",
-      `${fmt(points.length)} مشاهده · ${fmt(points.filter((p) => p.value == null).length)} مقدار ناموجود · ${unitLabel(identity)} · محور عمودی متناسب با بازه؛ null و شکاف‌های بزرگ به هم وصل نمی‌شوند.`,
+      `${fmt(points.length)} ${domain ? "پنجره" : "مشاهده"} · ${fmt(points.filter((p) => p.value == null).length)} مقدار ناموجود · ${unitLabel(identity)} · ${domain ? "محور عمودی ثابت −۱ تا +۱" : "محور عمودی متناسب با بازه"}؛ null و شکاف‌های بزرگ به هم وصل نمی‌شوند.`,
       "chart-note",
     ),
   );
@@ -764,7 +776,7 @@ async function showReport() {
           "muted",
         ),
       );
-      const node = el("div", null, "table-scroll");
+      const node = el("div", null, "table-wrap");
       table(
         node,
         [
@@ -815,7 +827,7 @@ async function showReport() {
         ]),
       );
       if (auditRows.length) {
-        const auditTable = el("div", null, "table-scroll");
+        const auditTable = el("div", null, "table-wrap");
         table(
           auditTable,
           ["ماه", "دوره", "روش قیمت", "متغیر ناقص و علت"],
@@ -831,9 +843,196 @@ async function showReport() {
         );
       $("report-relations").append(audit);
     }
+    if (r.monthly_robustness) renderMonthlyRobustness(r.monthly_robustness);
   } catch (e) {
     error(e.message);
   }
+}
+function renderMonthlyRobustness(data) {
+  const box = $("report-relations");
+  box.append(el("h2", "استحکام تحلیل ماهانه"));
+  box.append(
+    el(
+      "p",
+      "داده‌های اصلاح‌شدهٔ موجود؛ تحلیل توصیفی، بدون آزمون پیش‌بینی. روش‌های قیمت جدا هستند.",
+      "muted",
+    ),
+  );
+  const exportButton = el(
+    "button",
+    "دریافت JSON استحکام و نمونه‌ها",
+    "secondary",
+  );
+  exportButton.onclick = () =>
+    download(
+      "monthly-robustness-" + data.report_fingerprint.slice(0, 8) + ".json",
+      JSON.stringify(data, null, 2),
+      "application/json",
+    );
+  box.append(exportButton);
+  const populations = el("details");
+  populations.append(el("summary", "مقایسهٔ نمونهٔ مشترک و دوتایی"));
+  populations.append(
+    el(
+      "p",
+      "نمونهٔ دوتایی فقط طلا و همان متغیر را لازم دارد؛ نمونهٔ مشترک هر پنج سری را. اختلاف ضریب، اثر خالص حذف ماه یا رابطهٔ علّی نیست.",
+      "muted",
+    ),
+  );
+  const popTable = el("div", null, "table-wrap");
+  table(
+    popTable,
+    [
+      "روش",
+      "متغیر",
+      "n مشترک / دوتایی",
+      "Pearson مشترک / دوتایی",
+      "Spearman مشترک / دوتایی",
+      "ماه‌های اضافهٔ دوتایی",
+    ],
+    data.sample_comparisons.map((a) => [
+      title(a.method),
+      title(a.series_id),
+      fmt(a.common_n) + " / " + fmt(a.pairwise_n),
+      fmt(a.common_pearson) + " / " + fmt(a.pairwise_pearson),
+      fmt(a.common_spearman) + " / " + fmt(a.pairwise_spearman),
+      a.additional_pairwise_months.map((m) => m.slice(0, 7)).join("، ") ||
+        "ندارد",
+    ]),
+  );
+  populations.append(popTable);
+  box.append(populations);
+  const influence = el("details");
+  influence.append(el("summary", "حساسیت به کنارگذاشتن یک ماه"));
+  influence.append(
+    el(
+      "p",
+      "هر بار تنها یک ماه از نمونهٔ مشترک کنار گذاشته و ضریب دوباره محاسبه می‌شود؛ حداقل نمونه بعد از حذف نیز رعایت می‌شود. بازهٔ کمینه/بیشینه، فاصلهٔ اطمینان نیست. ماه با بیشترین تغییر، خطا یا علت بازار محسوب نمی‌شود.",
+      "muted",
+    ),
+  );
+  const infTable = el("div", null, "table-wrap");
+  table(
+    infTable,
+    [
+      "روش",
+      "متغیر",
+      "n مبنا",
+      "Pearson مبنا",
+      "کمینه / بیشینه پس از حذف",
+      "بیشترین تغییر مطلق",
+      "ماه مربوط",
+      "حذف‌های تعریف‌نشده",
+      "وضعیت",
+    ],
+    data.influence.map((a) => [
+      title(a.method),
+      title(a.series_id),
+      fmt(a.n),
+      fmt(a.baseline_pearson),
+      fmt(a.pearson_min) + " / " + fmt(a.pearson_max),
+      fmt(a.largest_absolute_change),
+      a.largest_change_month?.slice(0, 7) || "ناموجود",
+      fmt(a.undefined_removals),
+      title(a.status),
+    ]),
+  );
+  influence.append(infTable);
+  box.append(influence);
+  box.append(el("h3", "روند ضرایب در پنجره‌های متحرک"));
+  box.append(
+    el(
+      "p",
+      "پنجرهٔ کامل " +
+        fmt(data.rolling_months) +
+        "ماهه و نمونهٔ مشترک؛ محور ثابت −۱ تا +۱. تاریخ نمودار، پایان پنجره است. پنجره‌های ناقص یا عبورکننده از تغییر روش خالی می‌مانند. پنجره‌های هم‌پوشان مستقل نیستند.",
+      "muted",
+    ),
+  );
+  const controls = el("div", null, "controls");
+  const driverLabel = el("label", "متغیر نمودار"),
+    driver = el("select");
+  driver.id = "robustness-driver";
+  driverLabel.htmlFor = driver.id;
+  for (const s of ["DTWEXBGS", "DFII10", "DGS10", "CPIAUCSL"]) {
+    const o = el("option", title(s));
+    o.value = s;
+    driver.append(o);
+  }
+  const metricLabel = el("label", "نوع ضریب"),
+    metric = el("select");
+  metric.id = "robustness-metric";
+  metricLabel.htmlFor = metric.id;
+  for (const s of ["pearson", "spearman"]) {
+    const o = el("option", s === "pearson" ? "Pearson" : "Spearman");
+    o.value = s;
+    metric.append(o);
+  }
+  const driverGroup = el("div"),
+    metricGroup = el("div");
+  driverGroup.append(driverLabel, driver);
+  metricGroup.append(metricLabel, metric);
+  controls.append(driverGroup, metricGroup);
+  box.append(controls);
+  const plots = el("div");
+  box.append(plots);
+  function draw() {
+    clear(plots);
+    for (const method of [
+      "london_afternoon_fixing_average",
+      "spot_daily_average",
+    ]) {
+      const selected = data.rolling.filter(
+        (a) => a.series_id === driver.value && a.method === method,
+      );
+      plots.append(el("h4", title(method)));
+      const points = selected.map((a) => ({
+        value: a[metric.value],
+        observed_at: a.last_month + "T00:00:00Z",
+        date: a.first_month.slice(0, 7) + " تا " + a.last_month.slice(0, 7),
+      }));
+      const graph = el("div");
+      plots.append(graph);
+      chart(
+        graph,
+        points,
+        {
+          kind: "monthly_association",
+          series: driver.value,
+          source: "monthly_research",
+          unit: metric.value,
+        },
+        true,
+        null,
+        [-1, 1],
+      );
+    }
+    const all = data.rolling.filter((a) => a.series_id === driver.value);
+    const ledger = el("details");
+    ledger.append(el("summary", "جدول تمام پنجره‌ها و موارد ناموجود"));
+    const ledgerTable = el("div", null, "table-wrap");
+    const why = {
+      methodology_break: "عبور از تغییر روش",
+      noncontiguous: "ماه‌های ناپیوسته",
+      missing_common_changes: "تغییر ماهانهٔ ناقص در نمونهٔ مشترک",
+    };
+    table(
+      ledgerTable,
+      ["آغاز", "پایان", "روش", "Pearson", "Spearman", "وضعیت / علت"],
+      all.map((a) => [
+        a.first_month.slice(0, 7),
+        a.last_month.slice(0, 7),
+        title(a.method),
+        fmt(a.pearson),
+        fmt(a.spearman),
+        a.reasons.map((s) => why[s] || s).join("؛ ") || title(a.status),
+      ]),
+    );
+    ledger.append(ledgerTable);
+    plots.append(ledger);
+  }
+  driver.onchange = metric.onchange = draw;
+  draw();
 }
 function renderDailyReadiness() {
   const box = $("daily-readiness");

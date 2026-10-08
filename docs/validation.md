@@ -118,3 +118,21 @@ All eight existing local bundles (four schema-1 research reports and four compar
 Release 0.13 adds 49 offline cases for independent refresh outcomes, acquisition-ID reservation, linked success/failure traces, missing trace rejection, checkpoint ordering, interruption, process-level locking and recovery, history bootstrap, long-gap overlap, vintage/future/unit/dimension exclusions, monthly/quarterly/weekly boundary alignment, unchanged period freshness after recapture, null preservation, known World Bank eras versus incompatible streams, safe error codes, report/build/write/verification failure, prior-output preservation, raw corruption, CLI partial exits and invalid saved state. Thirty-four generated schemas match runtime models. The workflow uses existing dependencies.
 
 The final live refresh has nine successful acquisitions and a CFTC HTTP 403 failure; it correctly exits 3 with overall `partial`, even though the verified research bundle is `with_limits` and all existing inputs meet age policy. Local inspection reconciles all 6,695 newly inserted versions to raw JSON rows or workbook cells, validates seventeen related raw hashes and all ten acquisition traces, verifies thirteen research artifacts and audits 88,707 stored versions. COT remains the previously retrieved capture, with its original clock. The earlier live trial exposed month-start labels preceding mid-month request bounds; aligning the request boundary fixed both monthly FRED acquisitions while retaining strict adapter validation. Source accessibility, full historical revisions and market truth remain outside certification. See [workflow evidence](source-methodology/manual-refresh.fa.md).
+# Monthly robustness delivery (0.25.0)
+
+Local validation: 686 tests passed, one Windows symlink test skipped. Ruff checks,
+Python formatting, JavaScript syntax and the offline wheel/source build passed.
+The real verified 0.24.0 bundle was used without rewriting its artifacts.
+An independent local check used `statistics.correlation` and separate average-tie
+rank calculations over the saved monthly changes: all 912 single-month removals
+and 248 valid rolling coefficients matched to 1e-12. It also checked null windows
+against the stored rolling population; 756 candidate rows include missing windows.
+This checks derived arithmetic, not upstream truth or historical availability.
+
+Browser checks covered the shared/pairwise table, real-rate/Spearman selector
+transition, fixed -1/+1 axis, separated methods and missing-window gaps. Exported
+JSON matched the offline diagnostic exactly after excluding the CLI-only source
+byte hash. Wide tables scroll inside their container; the document had equal
+client and scroll widths. Private receipts and screenshots are under
+`local/phase4-robustness/` and `local/integration-v025/`. Daily research and
+forecasting remain unverified; this delivery does not complete phase 4.

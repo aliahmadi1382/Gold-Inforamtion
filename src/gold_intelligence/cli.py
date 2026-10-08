@@ -23,6 +23,7 @@ from .brief import ResearchBrief, build_brief, render_persian
 from .cftc import FIRST_DATE, CotCapture, ingest_cftc_gold
 from .comparison import compare_monthly
 from .credentials import credential_environment
+from .daily_readiness import DailyReadiness, build_daily_readiness
 from .demo import demo
 from .evidence_synthesis import (
     EvidenceSynthesis,
@@ -104,6 +105,8 @@ def parser() -> argparse.ArgumentParser:
     )
     sub = p.add_subparsers(dest="command", required=True)
     sub.add_parser("validate-registry")
+    c = sub.add_parser("daily-readiness", help="offline report-bound daily research requirements")
+    c.add_argument("directory", type=Path)
     d = sub.add_parser("demo", help="generate fictional prices and a research snapshot offline")
     d.add_argument("--output", type=Path, default=Path("local/demo"))
     s = sub.add_parser("schemas")
@@ -302,6 +305,11 @@ def parser() -> argparse.ArgumentParser:
 def run(args) -> dict:
     if args.command == "verify-synthesis":
         return verify_synthesis(args.directory)
+    if args.command == "daily-readiness":
+        from .research_report import load_verified_report
+
+        _, _, content = load_verified_report(args.directory)
+        return build_daily_readiness(content).model_dump(mode="json")
     if args.command == "synthesize-report":
         synthesis, directory = write_synthesis(args.directory, args.output_dir)
         return dict(
@@ -412,6 +420,7 @@ def run(args) -> dict:
             "runtime_evidence": RuntimeEvidence,
             "runtime_manifest": RuntimeManifest,
             "transport_evidence": TransportEvidence,
+            "daily_readiness": DailyReadiness,
             "evidence_synthesis": EvidenceSynthesis,
             "synthesis_manifest": SynthesisManifest,
         }

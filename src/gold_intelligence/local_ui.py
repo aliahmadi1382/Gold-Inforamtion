@@ -15,6 +15,7 @@ from uuid import uuid4
 
 from . import __version__
 from .acquisition import AcquisitionRun
+from .daily_readiness import build_daily_readiness
 from .evidence_synthesis import build_synthesis
 from .operations_health import build_operations_health
 from .project_roadmap import load_project_roadmap
@@ -221,6 +222,7 @@ class Workspace:
                         status=report.status,
                         software_version=report.software_version,
                         runtime=runtime.model_dump(mode="json") if runtime else None,
+                        daily_readiness=build_daily_readiness(content).model_dump(mode="json"),
                         synthesis=build_synthesis(content, generated_at=generated).model_dump(
                             mode="json"
                         ),
@@ -303,7 +305,7 @@ class Workspace:
                     {
                         key: value
                         for key, value in report.items()
-                        if key not in {"report", "text", "synthesis"}
+                        if key not in {"report", "text", "synthesis", "daily_readiness"}
                     }
                     for report in self.reports.values()
                 ],

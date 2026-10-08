@@ -1,6 +1,8 @@
 # Gold Market Intelligence
 
-**آخرین تحویل: ۰٫۲۰٫۰ — بازیابی یکپارچهٔ شواهد شبکه.** پشتیبان نسخهٔ ۲، transport را همراه پایگاه، خام و اسناد دریافت حفظ و ارتباط آن‌ها را بررسی می‌کند؛ بسته‌های نسخهٔ ۱ قابل بررسی و بازیابی‌اند. [روش](docs/source-methodology/transport-recovery.fa.md)، [فصل بیست‌ویکم](docs/education/21-transport-recovery.fa.md) و [مسیر جاری](docs/phases.fa.md).
+**آخرین تحویل: ۰٫۲۱٫۰ — شروط مستند پژوهش روزانه.** بخش جدید گزارش در پنل و CLI `daily-readiness` پنج شرط، شاهد موجود و مدرک لازم را نشان می‌دهند. پژوهش روزانه هنوز آماده نیست. [روش](docs/source-methodology/daily-readiness.fa.md)، [فصل بیست‌ودوم](docs/education/22-daily-readiness.fa.md) و [مسیر جاری](docs/phases.fa.md).
+
+**قابلیت ۰٫۲۰ حفظ شده است: — بازیابی یکپارچهٔ شواهد شبکه.** پشتیبان نسخهٔ ۲، transport را همراه پایگاه، خام و اسناد دریافت حفظ و ارتباط آن‌ها را بررسی می‌کند؛ بسته‌های نسخهٔ ۱ قابل بررسی و بازیابی‌اند. [روش](docs/source-methodology/transport-recovery.fa.md)، [فصل بیست‌ویکم](docs/education/21-transport-recovery.fa.md) و [مسیر جاری](docs/phases.fa.md).
 
 **قابلیت ۰٫۱۹ حفظ شده است: — جمع‌بندی شواهد چندمنبعی.** بخش گزارش پنل، اختلاف نسخهٔ هم‌تاریخ، اصلاحیهٔ جاری، اختلاف روش و محدودیت مقایسه را با شاهد قابل بازکردن نشان می‌دهد. CLI `synthesize-report` بستهٔ مستقل می‌سازد و `verify-synthesis` همهٔ یافته‌ها و متن را بازحساب می‌کند. [روش](docs/source-methodology/evidence-synthesis.fa.md)، [فصل بیستم](docs/education/20-evidence-synthesis.fa.md) و [فازبندی جاری](docs/phases.fa.md) به‌روز هستند؛ جهت بازار یا احتمال اطمینان تولید نمی‌شود.
 

@@ -71,3 +71,8 @@ Schema dispatch happens before model validation: legacy report/settings/manifest
 ## تحویل ۰٫۲۰: بازیابی شواهد شبکه
 
 پشتیبان نسخهٔ ۲ transport را همراه SQLite/raw/runs حفظ می‌کند؛ verify/restore نسخهٔ ۱ نیز پشتیبانی می‌شود. گزارش‌ها و ضمیمه‌ها خارج از دامنه‌اند. [دامنه و کنترل‌ها](source-methodology/transport-recovery.fa.md).
+
+
+## تحویل ۰٫۲۱: شروط پژوهش روزانه
+
+CLI `daily-readiness PATH_TO_REPORT` و پنل از بایت‌های گزارش بررسی‌شده پنج شرط و مدرک لازم را استخراج می‌کنند. خروجی تشخیصی است؛ داده/گزارش اصلی تغییر نمی‌کند و آمادگی تأیید نمی‌شود. [روش](source-methodology/daily-readiness.fa.md).

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "DailyRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "enum": [
+            "price_unit",
+            "session_clock",
+            "calendar",
+            "first_release",
+            "temporal_validation"
+          ],
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "needs_evidence",
+            "not_assessed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "facts": {
+          "additionalProperties": true,
+          "title": "Facts",
+          "type": "object"
+        },
+        "pointers": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Pointers",
+          "type": "array"
+        },
+        "required_evidence": {
+          "minLength": 1,
+          "title": "Required Evidence",
+          "type": "string"
+        },
+        "limitation": {
+          "minLength": 1,
+          "title": "Limitation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "status",
+        "facts",
+        "pointers",
+        "required_evidence",
+        "limitation"
+      ],
+      "title": "DailyRequirement",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "report_fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Report Fingerprint",
+      "type": "string"
+    },
+    "input_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Input Sha256",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "status": {
+      "const": "blocked",
+      "default": "blocked",
+      "title": "Status",
+      "type": "string"
+    },
+    "daily_backtest_ready": {
+      "const": false,
+      "default": false,
+      "title": "Daily Backtest Ready",
+      "type": "boolean"
+    },
+    "requirements": {
+      "items": {
+        "$ref": "#/$defs/DailyRequirement"
+      },
+      "title": "Requirements",
+      "type": "array"
+    },
+    "scope": {
+      "const": "saved_report_diagnostics_not_methodology_certification",
+      "default": "saved_report_diagnostics_not_methodology_certification",
+      "title": "Scope",
+      "type": "string"
+    }
+  },
+  "required": [
+    "report_fingerprint",
+    "input_sha256",
+    "as_of",
+    "requirements"
+  ],
+  "title": "DailyReadiness",
+  "type": "object"
+}

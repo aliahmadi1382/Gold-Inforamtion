@@ -1,5 +1,11 @@
 # Release validation
 
+## Release 0.21: report-bound daily readiness diagnostics
+
+Local suite: **646 passed, one host-permission symlink skip**. Ten new cases cover empty evidence, exact date/weekend counts and stream pointers, unrelated warning scope, forged readiness/promoted status, missing/duplicate requirements, corrupted input claims, offline verified-bundle CLI without store/registry, and legacy report cutoff binding. One independent schema brings the total to 48; report schemas remain unchanged.
+
+CLI and UI diagnostics match exactly on the current real report: 5,418 date-only prices, 1,412 weekend labels, five requirements and readiness false. All pointers resolve into the same input, catalog summaries exclude large payloads, and data remains 95,504 versions. Public GOLD_SILVER_HISTORY documentation review did not resolve session/timezone/weekend methodology in that section. No acquisition or support message ran. Receipts/screenshots remain in `local/integration-v021/`.
+
 ## Release 0.20: transport-aware recovery
 
 Local suite: **636 passed, one host-permission symlink skip**; lint, format and wheel/sdist build pass. Ten new recovery cases cover byte-preserving transport restore, rehashed incorrect acquisition hash/run identity/timestamps, missing or extra sidecars, orphan/corrupt/invalid source transport and legacy version-1 schema/prose/restore compatibility. Two independent version-2 schemas bring the total to 47; legacy schemas are unchanged.

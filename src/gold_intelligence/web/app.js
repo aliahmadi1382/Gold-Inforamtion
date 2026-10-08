@@ -642,6 +642,7 @@ async function showReport() {
   $("download-report").disabled = true;
   $("download-synthesis").disabled = true;
   clear($("synthesis-findings"));
+  clear($("daily-readiness"));
   $("synthesis-note").textContent = "";
   const key = $("report-select").value;
   if (!key) {
@@ -654,6 +655,7 @@ async function showReport() {
     selectedReport = r;
     $("download-synthesis").disabled = false;
     renderSynthesis();
+    renderDailyReadiness();
     $("download-report").disabled = false;
     meta($("report-meta"), [
       "وضعیت: " + title(r.status),
@@ -735,6 +737,40 @@ async function showReport() {
     error(e.message);
   }
 }
+function renderDailyReadiness() {
+  const box = $("daily-readiness");
+  clear(box);
+  const readiness = selectedReport?.daily_readiness;
+  if (!readiness) return;
+  box.append(
+    el(
+      "p",
+      "پژوهش روزانه آماده نیست؛ رفع هشدار به‌تنهایی مجوز بک‌تست نمی‌دهد.",
+      "notice neutral",
+    ),
+  );
+  for (const check of readiness.requirements) {
+    const item = el("details", null, "synthesis-finding");
+    item.append(
+      el(
+        "summary",
+        check.title +
+          " — " +
+          (check.status === "needs_evidence"
+            ? "شاهد لازم است"
+            : "تأیید نشده است"),
+      ),
+    );
+    item.append(el("p", "مدرک لازم: " + check.required_evidence));
+    item.append(el("p", check.limitation));
+    item.append(
+      el("p", "شاهد در JSON گزارش: " + check.pointers.join("، "), "muted"),
+    );
+    item.append(el("pre", JSON.stringify(check.facts, null, 2)));
+    box.append(item);
+  }
+}
+
 function synthesisFindings(synthesis, filter) {
   const conflicts = ["vintage_disagreement", "method_disagreement"];
   const agreements = ["matches_display", "method_concordance"];

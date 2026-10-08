@@ -662,6 +662,7 @@ async function showReport() {
   $("download-synthesis").disabled = true;
   clear($("synthesis-findings"));
   clear($("daily-readiness"));
+  clear($("event-study-plan"));
   $("synthesis-note").textContent = "";
   const key = $("report-select").value;
   if (!key) {
@@ -675,6 +676,7 @@ async function showReport() {
     $("download-synthesis").disabled = false;
     renderSynthesis();
     renderDailyReadiness();
+    renderEventStudyPlan(r.event_study_plan);
     $("download-report").disabled = false;
     meta($("report-meta"), [
       "وضعیت: " + title(r.status),
@@ -848,6 +850,100 @@ async function showReport() {
   } catch (e) {
     error(e.message);
   }
+}
+function renderEventStudyPlan(plan) {
+  const box = $("event-study-plan");
+  clear(box);
+  if (!plan) return;
+  box.append(el("h2", "طرح پیشنهادی مطالعهٔ رویدادها"));
+  box.append(
+    el(
+      "p",
+      "طرح نسخه‌دار برای CPI و گزارش اشتغال؛ مطالعه اجرا نشده و پژوهش روزانه آماده نیست. این پیش‌نویس، ثبت پیشاپیش یا آزمون پیش‌بینی محسوب نمی‌شود.",
+      "notice neutral",
+    ),
+  );
+  const exportButton = el("button", "دریافت JSON طرح مطالعه", "secondary");
+  exportButton.onclick = () =>
+    download(
+      "event-study-plan-" + plan.report_fingerprint.slice(0, 8) + ".json",
+      JSON.stringify(plan, null, 2),
+      "application/json",
+    );
+  box.append(exportButton);
+  const detail = el("details");
+  detail.append(el("summary", "تعریف پاسخ قیمت و قواعد مطالعه"));
+  const definitions = el("div", null, "table-wrap");
+  table(
+    definitions,
+    ["بخش", "قاعدهٔ پیشنهادی"],
+    [
+      [
+        "پرسش",
+        "توصیف تغییر قیمت طلا پیرامون رویداد؛ بدون ادعای اثر علّی یا غافلگیری بازار",
+      ],
+      [
+        "زمان رویداد",
+        "زمان دسترسی واقعی به اولین انتشار با UTC و شاهد؛ ساعت ثابت فرض نمی‌شود",
+      ],
+      [
+        "پاسخ اصلی",
+        "۱۰۰ × (اولین قیمت بسته‌شدن جلسه پس از رویداد ÷ آخرین بسته‌شدن پیش از رویداد − ۱)",
+      ],
+      ["پاسخ فرعی", "همان مبنا تا دومین بسته‌شدن تأییدشده پس از رویداد"],
+      [
+        "قیمت و تقویم",
+        "یک جریان با روش/ابزار/واحد/مجوز روشن و تقویم تاریخی معتبر؛ بدون ادغام منابع",
+      ],
+      [
+        "رویداد هم‌پوشان",
+        "پنجرهٔ دارای رویداد دیگر از همین دو خانواده حذف و شناسه/علت ثبت می‌شود",
+      ],
+      [
+        "نمونه",
+        "حداقل " +
+          fmt(plan.protocol.minimum_eligible_events_per_family) +
+          " رویداد واجد شرایط برای هر خانواده؛ تضمین توان آماری نیست",
+      ],
+      [
+        "تفکیک زمانی پیشنهادی",
+        "توسعه: ۲۰۱۲–۲۰۱۸؛ ارزیابی جدا: ۲۰۱۹–۲۰۲۴. پس از توسعه قواعد تثبیت می‌شوند؛ نتیجه‌ای محاسبه نشده",
+      ],
+      [
+        "خروجی توصیفی",
+        "دفتر رویدادها/حذف‌ها، میانگین، میانه و چارک پاسخ؛ چارک فاصلهٔ اطمینان نیست",
+      ],
+      [
+        "پیش‌بینی",
+        "این طرح هدف/مدل پیش‌بینی تعیین نمی‌کند؛ به پروتکل جدا با ویژگی‌های قابل دسترس در زمان تصمیم نیاز دارد",
+      ],
+    ],
+  );
+  detail.append(definitions);
+  detail.append(
+    el(
+      "p",
+      "قیمت روزانه، واکنش درون‌روزی اعلان را جدا نمی‌کند. زمان جلسه، اولین انتشار و دریافت باید مستقل ثبت شوند. شناسهٔ نسخه: " +
+        plan.protocol.version +
+        " · هش طرح: " +
+        plan.protocol_sha256,
+      "muted",
+    ),
+  );
+  box.append(detail);
+  const steps = el("details");
+  steps.append(el("summary", "ترتیب اجرای کار پس از رفع پیش‌نیازها"));
+  const list = el("ol");
+  for (const step of [
+    "تأیید روش منبع، حقوق ذخیره و تقویم تاریخی جلسه‌ها",
+    "بررسی آرشیو مقدار اولین انتشار و زمان دسترسی واقعی",
+    "ساخت دفتر کاندیدها، پنجرهٔ قیمت، حذف‌ها و رویدادهای هم‌پوشان",
+    "بازبینی نمونهٔ توسعه، تثبیت نسخهٔ طرح و ارزیابی جداگانه",
+    "بازحساب مستقل زمان‌ها، پنجره‌ها و مقادیر پیش از انتشار نتیجهٔ توصیفی",
+  ])
+    list.append(el("li", step));
+  steps.append(list);
+  box.append(steps);
 }
 function renderMonthlyScatter(report) {
   const study = report.monthly,

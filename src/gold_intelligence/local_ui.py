@@ -16,6 +16,7 @@ from uuid import uuid4
 from . import __version__
 from .acquisition import AcquisitionRun
 from .daily_readiness import build_daily_readiness
+from .event_study_plan import build_event_study_plan
 from .evidence_synthesis import build_synthesis
 from .monthly_robustness import monthly_robustness
 from .monthly_stability import monthly_stability
@@ -229,6 +230,7 @@ class Workspace:
                         daily_readiness=build_daily_readiness(content).model_dump(mode="json"),
                         monthly_stability=monthly_stability(report),
                         monthly_robustness=monthly_robustness(report),
+                        event_study_plan=build_event_study_plan(content),
                         synthesis=build_synthesis(content, generated_at=generated).model_dump(
                             mode="json"
                         ),
@@ -319,6 +321,7 @@ class Workspace:
                             "daily_readiness",
                             "monthly_stability",
                             "monthly_robustness",
+                            "event_study_plan",
                         }
                     }
                     for report in self.reports.values()

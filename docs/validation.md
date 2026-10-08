@@ -147,3 +147,13 @@ Every value and provenance column in both real-rate CSV exports (228 + 12 rows)
 matched the verified saved report exactly. This validates display/export against
 that report, not source truth or original historical availability. Receipts and
 the scatter screenshot are private under `local/integration-v026/`.
+# Event-study draft delivery (0.27.0)
+
+Thirty-two targeted protocol/local UI tests passed. They cover false-readiness
+input rejection, report-byte and protocol hashes, evidence-pointer resolution,
+isolated returned plan objects and exclusion of large drafts from summary APIs.
+Ruff/format, JavaScript syntax and offline wheel/source builds passed. The browser
+displayed the draft response definitions and unexecuted status; its exported JSON
+matched the offline draft exactly and the source report SHA-256 matched its bytes.
+Private evidence is under `local/phase4-event-plan/` and `local/integration-v027/`.
+No event windows or event responses were calculated; readiness remains false.

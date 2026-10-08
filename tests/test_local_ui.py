@@ -151,6 +151,10 @@ def test_verified_research_and_comparison_and_corrupt_bundle_exclusion(
     assert robustness["monthly_fingerprint"] == report.monthly.fingerprint
     assert not robustness["forecasting_test"]
     assert all("monthly_robustness" not in row for row in ui.summary["reports"])
+    event_plan = next(iter(ui.reports.values()))["event_study_plan"]
+    assert event_plan["report_fingerprint"] == report.fingerprint
+    assert not event_plan["study_executed"] and not event_plan["daily_backtest_ready"]
+    assert all("event_study_plan" not in row for row in ui.summary["reports"])
     assert next(iter(ui.comparisons.values()))["status"] == "unchanged"
     (first / "research-report.fa.md").write_text("tampered")
     ui = workspace(store, tmp_path, reports)

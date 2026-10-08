@@ -141,6 +141,11 @@ def test_verified_research_and_comparison_and_corrupt_bundle_exclusion(
     assert derived["report_fingerprint"] == report.fingerprint
     assert derived["market_direction"] == "not_inferred"
     assert all("synthesis" not in row for row in ui.summary["reports"])
+    stability = next(iter(ui.reports.values()))["monthly_stability"]
+    assert stability["report_fingerprint"] == report.fingerprint
+    assert stability["monthly_fingerprint"] == report.monthly.fingerprint
+    assert not stability["daily_backtest_ready"]
+    assert all("monthly_stability" not in row for row in ui.summary["reports"])
     assert next(iter(ui.comparisons.values()))["status"] == "unchanged"
     (first / "research-report.fa.md").write_text("tampered")
     ui = workspace(store, tmp_path, reports)

@@ -17,6 +17,7 @@ from . import __version__
 from .acquisition import AcquisitionRun
 from .daily_readiness import build_daily_readiness
 from .evidence_synthesis import build_synthesis
+from .monthly_stability import monthly_stability
 from .operations_health import build_operations_health
 from .project_roadmap import load_project_roadmap
 from .report_comparison import verify_comparison
@@ -225,6 +226,7 @@ class Workspace:
                         runtime=runtime.model_dump(mode="json") if runtime else None,
                         computation=computation.model_dump(mode="json") if computation else None,
                         daily_readiness=build_daily_readiness(content).model_dump(mode="json"),
+                        monthly_stability=monthly_stability(report),
                         synthesis=build_synthesis(content, generated_at=generated).model_dump(
                             mode="json"
                         ),
@@ -307,7 +309,14 @@ class Workspace:
                     {
                         key: value
                         for key, value in report.items()
-                        if key not in {"report", "text", "synthesis", "daily_readiness"}
+                        if key
+                        not in {
+                            "report",
+                            "text",
+                            "synthesis",
+                            "daily_readiness",
+                            "monthly_stability",
+                        }
                     }
                     for report in self.reports.values()
                 ],

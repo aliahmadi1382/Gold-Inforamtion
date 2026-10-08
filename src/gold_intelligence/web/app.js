@@ -752,6 +752,42 @@ async function showReport() {
       }
       $("report-relations").append(grid);
     }
+    const stability = r.monthly_stability;
+    if (stability) {
+      $("report-relations").append(el("h2", "ثبات روابط در دوره‌های جدا"));
+      $("report-relations").append(
+        el(
+          "p",
+          "بازه‌های تقویمی ثابت و بدون هم‌پوشانی، نمونهٔ مشترک و روش‌های قیمت جدا؛ دورهٔ آخر ناقص است. تغییر ضریب، آزمون پیش‌بینی یا علیت نیست. حداقل نمونه: " +
+            fmt(stability.minimum_pairs) +
+            " ماه.",
+          "muted",
+        ),
+      );
+      const node = el("div", null, "table-scroll");
+      table(
+        node,
+        [
+          "دوره",
+          "روش قیمت",
+          "متغیر",
+          "ماه معتبر / حذف",
+          "Pearson",
+          "Spearman",
+          "وضعیت",
+        ],
+        stability.rows.map((a) => [
+          a.calendar_window,
+          title(a.method),
+          title(a.series_id),
+          fmt(a.n) + " / " + fmt(a.excluded_months),
+          fmt(a.pearson),
+          fmt(a.spearman),
+          title(a.status),
+        ]),
+      );
+      $("report-relations").append(node);
+    }
   } catch (e) {
     error(e.message);
   }

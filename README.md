@@ -1,6 +1,8 @@
 # Gold Market Intelligence
 
-**تحویل جاری: ۰٫۱۴٫۰.** خلاصهٔ فارسی و JSON تغییرات و اولویت بررسی پس از دریافت اضافه شده است؛ مبنا، تغییر عدد/شاهد/سن/نما و شکست‌ها صریح‌اند. [روش تحویل](docs/source-methodology/refresh-review.fa.md) و [فصل پانزدهم](docs/education/15-refresh-review.fa.md) راهنما هستند. CLI مسیرهای `review` و `review_bundle` را ثبت می‌کند.
+**آخرین تحویل: ۰٫۱۵٫۰.** پشتیبان سازگار SQLite/raw/runs، بررسی کامل بسته و بازیابی در مقصد تازه اضافه شده‌اند؛ نویسنده‌های پروژه و backup قفل مشترک دارند. [روش بازیابی](docs/source-methodology/store-recovery.fa.md) و [فصل شانزدهم](docs/education/16-store-recovery.fa.md) دامنه و دستورها را توضیح می‌دهند. گزارش‌ها و کلید جدا نگهداری می‌شوند.
+
+**قابلیت ۰٫۱۴ در نسخهٔ جاری حفظ شده است:** خلاصهٔ فارسی و JSON تغییرات و اولویت بررسی پس از دریافت؛ مبنا، تغییر عدد/شاهد/سن/نما و شکست‌ها صریح‌اند. [روش تحویل](docs/source-methodology/refresh-review.fa.md) و [فصل پانزدهم](docs/education/15-refresh-review.fa.md) راهنما هستند. CLI مسیرهای `review` و `review_bundle` را ثبت می‌کند.
 
 زیرساخت پژوهش و تحلیل بازار طلا، با منشأ قابل پیگیری برای هر مشاهده و کنترل زمان دسترسی به داده.
 این مخزن از روی [متن ارسالی](docs/specification/original-brief.md) ساخته شده است.

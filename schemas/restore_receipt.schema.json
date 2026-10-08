@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "application_version": {
+      "title": "Application Version",
+      "type": "string"
+    },
+    "restored_at": {
+      "format": "date-time",
+      "title": "Restored At",
+      "type": "string"
+    },
+    "backup_fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Backup Fingerprint",
+      "type": "string"
+    },
+    "store_root": {
+      "title": "Store Root",
+      "type": "string"
+    },
+    "status": {
+      "const": "restored_and_verified",
+      "default": "restored_and_verified",
+      "title": "Status",
+      "type": "string"
+    },
+    "records": {
+      "minimum": 0,
+      "title": "Records",
+      "type": "integer"
+    },
+    "raw_blobs": {
+      "minimum": 0,
+      "title": "Raw Blobs",
+      "type": "integer"
+    },
+    "acquisition_runs": {
+      "minimum": 0,
+      "title": "Acquisition Runs",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "application_version",
+    "restored_at",
+    "backup_fingerprint",
+    "store_root",
+    "records",
+    "raw_blobs",
+    "acquisition_runs"
+  ],
+  "title": "RestoreReceipt",
+  "type": "object"
+}

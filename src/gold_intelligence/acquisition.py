@@ -103,6 +103,11 @@ def acquire(
     *,
     run_id: str | None = None,
 ) -> dict:
+    with store.writer_lock():
+        return _acquire_locked(store, operation, parameters, execute, run_id=run_id)
+
+
+def _acquire_locked(store, operation, parameters, execute, *, run_id=None):
     run = AcquisitionRun(
         run_id=run_id if run_id is not None else uuid4().hex,
         operation=operation,

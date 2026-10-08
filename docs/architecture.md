@@ -1,5 +1,7 @@
 # Architecture
 
+Current operational addition (0.15): `store_lock.py` coordinates Store initialization/raw/record writes, whole acquisition traces, refresh workflows and core-store backups with one nonblocking OS lock. `backup.py` uses SQLite's online backup API, preserves all raw and acquisition JSON, validates normalized/trace lineage and restores into a new isolated container. Direct SQL or external filesystem writers remain outside this protocol. Backup/restore contracts are independent version 1; existing research/refresh contracts remain unchanged. External reports, code/config and keys are separate recovery assets. See [store recovery](source-methodology/store-recovery.fa.md).
+
 ```mermaid
 flowchart LR
     P[Provider / entitled local file] --> R[Raw bytes + SHA-256]

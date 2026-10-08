@@ -1,5 +1,13 @@
 # Release validation
 
+## Release 0.15: consistent core-store recovery
+
+The suite has 526 offline cases: 486 existing and 40 new backup/coordination cases. On this Windows computer 525 pass and one real-symlink case is skipped because the host does not grant symbolic-link creation. New cases exercise committed WAL pages, whole acquisition/writer exclusion, process termination and thread-owner recovery, missing/empty stores, core-only credential exclusion, original failed/running states, record/raw/trace corruption including rehashed false data, unsupported table/view/key schemas, manifest traversal, non-overwriting isolated restore, copy/disk failures and source/manifest changes during copying. Two additional version-1 schemas bring the total to 38.
+
+A real 145-file snapshot preserves 88,707 record versions, 79 raw blobs and 65 acquisition documents (60 succeeded, 5 failed). It restores into a separate store, with identical SQLite rows and verified raw lineage. Rebuilding the historical report with identical code/settings/cutoff/registry and Python 3.12.14 yields identical source/restore fingerprints. Comparing that rebuild to the old Python-3.11 report exposes 42 rolling Pearson fields differing by at most 2.22e-16. A controlled Python 3.11.16 rebuild on the restored store has zero content differences and only software-version context; the numerical method and comparator are unchanged. Exact replay therefore also requires matching runtime. Receipts are under `local/integration-v015/` and are not published.
+
+Remote CI for this commit is checked separately. This is tested local recovery, not configured off-device protection or complete operational automation. See [recovery method](source-methodology/store-recovery.fa.md). Earlier sections preserve previous release evidence.
+
 ## Release 0.14 on the destination computer
 
 Python 3.12.14 and the frozen lock recreate the copied environment. All 449 original offline cases pass on this computer. Release 0.14 adds 37 cases, for **486 passing tests**, and two versioned schemas (36 total). New cases cover exact copied inputs and priority pointers, absent/corrupt/ambiguous baselines, store isolation, future/reversed baseline cutoffs, acquisition/report/review failure separation, zero/null/boolean/view distinctions, unchanged/context-only/age/recapture/value changes, legacy schema absence, repeated publication, clock-independent fingerprints, disk failures, rehashed false priorities/prose, database-free recovery and automatic selection before the second CLI refresh.

@@ -10,6 +10,7 @@ from pydantic import ValidationError
 from .acquisition import SAFE_PARAMETERS, AcquisitionRun, acquire, list_runs
 from .alpha_vantage import ingest_alpha_gold
 from .analysis import event_study
+from .backup import BackupManifest, RestoreReceipt, backup_store, restore_store, verify_backup
 from .brief import ResearchBrief, build_brief, render_persian
 from .cftc import FIRST_DATE, CotCapture, ingest_cftc_gold
 from .comparison import compare_monthly
@@ -90,6 +91,13 @@ def parser() -> argparse.ArgumentParser:
     s.add_argument("--output", type=Path, default=Path("schemas"))
     sub.add_parser("audit")
     sub.add_parser("runs", help="list local acquisition manifests without credentials")
+    c = sub.add_parser("backup-store", help="verified SQLite/raw/acquisition snapshot without keys")
+    c.add_argument("--output-dir", type=Path, default=Path("local/backups"))
+    c = sub.add_parser("verify-backup", help="verify backup hashes, SQLite and evidence lineage")
+    c.add_argument("directory", type=Path)
+    c = sub.add_parser("restore-store", help="restore to a new isolated container; no overwrite")
+    c.add_argument("directory", type=Path)
+    c.add_argument("--destination", type=Path, required=True)
     c = sub.add_parser("fetch-cftc-gold", help="public disaggregated COMEX gold futures history")
     c.add_argument("--start", type=date.fromisoformat, default=FIRST_DATE)
     c.add_argument("--end", type=date.fromisoformat, required=True)
@@ -256,6 +264,22 @@ def parser() -> argparse.ArgumentParser:
 
 
 def run(args) -> dict:
+    if args.command == "backup-store":
+        manifest, directory = backup_store(args.store, args.output_dir)
+        return {
+            "status": "created_and_verified",
+            "bundle": str(directory),
+            "summary": str(directory / "backup.fa.md"),
+            "fingerprint": manifest.fingerprint,
+            "records": manifest.records,
+            "raw_blobs": manifest.raw_blobs,
+            "acquisition_runs": manifest.acquisition_runs,
+            "run_states": manifest.run_states,
+        }
+    if args.command == "verify-backup":
+        return verify_backup(args.directory)
+    if args.command == "restore-store":
+        return restore_store(args.directory, args.destination).model_dump(mode="json")
     if args.command == "verify-review":
         return verify_review(args.directory)
     if args.command == "review-refresh":
@@ -321,6 +345,8 @@ def run(args) -> dict:
             "refresh_run": RefreshRun,
             "refresh_review": RefreshReview,
             "review_manifest": ReviewManifest,
+            "backup_manifest": BackupManifest,
+            "restore_receipt": RestoreReceipt,
         }
         for name, model in models.items():
             schema = {

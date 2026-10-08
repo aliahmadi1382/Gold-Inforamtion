@@ -7,8 +7,10 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+from threading import get_ident
 
 from .models import RECORD_TYPES, Record, aware
+from .store_lock import store_lock
 
 
 def canonical(value: dict) -> str:
@@ -41,17 +43,42 @@ class Store:
     def __init__(self, root: Path):
         self.root = Path(root)
         self._capture = None
-        (self.root / "raw").mkdir(parents=True, exist_ok=True)
-        self.db = sqlite3.connect(self.root / "market.sqlite3")
-        self.db.execute("""CREATE TABLE IF NOT EXISTS records (
-            id TEXT PRIMARY KEY, kind TEXT NOT NULL, payload TEXT NOT NULL)""")
-        self.db.commit()
+        self._write_depth = 0
+        self._write_owner = None
+        self.root.mkdir(parents=True, exist_ok=True)
+        with self.writer_lock():
+            (self.root / "raw").mkdir(exist_ok=True)
+            self.db = sqlite3.connect(self.root / "market.sqlite3")
+            self.db.execute("""CREATE TABLE IF NOT EXISTS records (
+                id TEXT PRIMARY KEY, kind TEXT NOT NULL, payload TEXT NOT NULL)""")
+            self.db.commit()
 
     def __enter__(self):
         return self
 
     def __exit__(self, *_):
         self.db.close()
+
+    @contextmanager
+    def writer_lock(self):
+        # Nested adapter calls in one acquisition reuse the same Store-owned lock.
+        if self._write_depth:
+            if self._write_owner != get_ident():
+                raise ValueError("Store writer ownership cannot cross threads")
+            self._write_depth += 1
+            try:
+                yield
+            finally:
+                self._write_depth -= 1
+        else:
+            with store_lock(self.root):
+                self._write_depth = 1
+                self._write_owner = get_ident()
+                try:
+                    yield
+                finally:
+                    self._write_depth = 0
+                    self._write_owner = None
 
     @contextmanager
     def capture_ingestion(self):
@@ -67,6 +94,10 @@ class Store:
         return self.db.execute("SELECT id, kind, payload FROM records ORDER BY id")
 
     def put_raw(self, content: bytes) -> str:
+        with self.writer_lock():
+            return self._put_raw(content)
+
+    def _put_raw(self, content: bytes) -> str:
         digest = hashlib.sha256(content).hexdigest()
         path = self.root / "raw" / digest
         try:
@@ -80,6 +111,10 @@ class Store:
         return digest
 
     def put(self, records: list[Record]) -> int:
+        with self.writer_lock():
+            return self._put(records)
+
+    def _put(self, records: list[Record]) -> int:
         # Validate every record and its raw pointer before beginning a transaction.
         rows = []
         checked = set()

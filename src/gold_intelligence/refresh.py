@@ -582,7 +582,7 @@ def refresh_and_report(store, registry, settings, policy, output_dir):
     policy = RefreshPolicy.model_validate(policy.model_dump())
     for key in (*AUTO_KEYS, "fred"):
         registry.get(key)
-    with refresh_lock(store.root):
+    with refresh_lock(store.root), store.writer_lock():
         started = datetime.now(UTC)
         run = RefreshRun(
             application_version=__version__,

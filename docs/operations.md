@@ -277,7 +277,7 @@ The report uses the existing `--macro-plan`, `--monthly-plan`, `--revision-plan`
 
 Exit 0 means all acquisition traces succeeded, the research bundle verified, automatic inputs have current reference age under their policies, calendar evidence is usable and the research report is not partial. Research status `with_limits` can still occur. Exit 3 means `partial` (a failed source, missing/stale/unchecked freshness or partial research/calendar coverage) or `failed` (report build/write/verification failed). Preflight/configuration/lock/storage errors exit 2. BLS schedules, reviewed release-value extracts and exact-date FRED vintages are explicitly not auto-refreshed.
 
-Checkpoints are atomically replaced before and after steps. Ctrl+C records interruption where possible and stops further requests; forced termination can leave `running`, which must never be interpreted as success. There is no resume or automatic whole-workflow retry. A new invocation keeps completed data and creates a new run. An OS lock rejects another `refresh-report` on the same store and is released when the process ends; the persistent `refresh.lock` file is not itself evidence of an active process. Do not delete it or run separate acquisition commands concurrently against the same store: those commands do not participate in this lock.
+Checkpoints are atomically replaced before and after steps. Ctrl+C records interruption where possible; forced termination can leave `running`, which is not success. There is no resume or whole-workflow retry. A new invocation preserves completed data. The original `refresh.lock` remains; release 0.15 additionally shares `writer.lock` between refresh, independent acquisitions, Store writes and backup. Contending operations fail rather than wait indefinitely. Persistent lock files are not evidence of active ownership; never delete them to bypass coordination. Direct SQL and external file writers must be stopped separately.
 
 See [method and limits](source-methodology/manual-refresh.fa.md) and [Persian lesson fourteen](education/14-manual-refresh.fa.md). No scheduler or broker connection is installed.
 
@@ -293,6 +293,21 @@ uv run gold verify-review PATH_TO_REVIEW_BUNDLE
 ```
 
 These two commands are offline and do not open the store or registry. Offline review requires an explicit baseline to compare; without it, it produces `no_baseline`. Each run publishes a new review folder, with full comparison JSON, Persian priorities, exact copied refresh/report inputs and a manifest. Verification recomputes comparison, priorities, counts and prose from copied inputs; it is not publisher authentication or proof of acquisition/network events. See [method](source-methodology/refresh-review.fa.md) and [lesson fifteen](education/15-refresh-review.fa.md).
+
+## Core-store backup and restore (0.15)
+
+```powershell
+uv run gold --store local/market backup-store --output-dir local/backups
+uv run gold verify-backup PATH_TO_BACKUP
+uv run gold restore-store PATH_TO_BACKUP --destination local/restore-tests/NEW_NAME
+uv run gold --store local/restore-tests/NEW_NAME/store audit
+```
+
+These commands are offline and bypass registry/store creation on preflight. A missing source is refused, not initialized. The package contains a SQLite online snapshot including committed WAL pages, every content-hashed raw blob and acquisition JSON, a version-1 manifest and a Persian summary. Keys, auxiliary store reports, external report bundles, code/config, lock files and journal files are not copied. Preserve those reports/config separately and provision credentials through the owner's secure path.
+
+Backup holds the shared nonblocking project-writer lock and validates both source and staged copy, including all records, direct lineage, metadata/failed raw blobs and acquisition references. It publishes a fresh directory only after verification; disk or integrity failure can leave `.incomplete-backup-*` without claiming success. Running/failed historical acquisitions retain their status. A local same-disk copy is not off-device disaster recovery.
+
+Restore requires a new **container** path and publishes its verified store under `NEW_NAME/store`, with a receipt alongside it. Existing containers, even empty, and locations inside the backup or original source are refused. Failed copying can leave `.incomplete-store` in the new container; it never replaces the current store. Exit 0 requires successful verification and publication/receipt; input, lock, corruption and storage errors exit 2. Exact report reproduction needs matching interpreter as well as code, dependencies, cutoff, registry and settings. See [method](source-methodology/store-recovery.fa.md) and [lesson sixteen](education/16-store-recovery.fa.md).
 
 ## Other layers via normalized records
 

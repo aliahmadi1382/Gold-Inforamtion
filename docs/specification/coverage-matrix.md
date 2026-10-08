@@ -1,5 +1,7 @@
 # Brief-to-repository coverage
 
+Release 0.19 adds source-backed deterministic synthesis, qualitative uncertainty, version/method/non-comparability distinctions and an offline self-contained verification contract. Local report filters expose exact evidence without rewriting historical reports. Probability calibration, causal inference and daily research readiness remain outside the delivered scope. See [method](../source-methodology/evidence-synthesis.fa.md) and [chapter 20](../education/20-evidence-synthesis.fa.md).
+
 Release 0.18 adds bundle-writer runtime receipts, per-acquisition sanitized HTTP attempts and corresponding local UI views; legacy runtime and provider quota remain unknown. Core backup excludes transport sidecars. See [method](../source-methodology/runtime-transport.fa.md) and [education chapter 19](../education/19-runtime-network-evidence.fa.md).
 
 | Brief requirement | Concrete location | Status / dependency |

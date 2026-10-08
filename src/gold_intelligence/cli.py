@@ -16,6 +16,12 @@ from .cftc import FIRST_DATE, CotCapture, ingest_cftc_gold
 from .comparison import compare_monthly
 from .credentials import credential_environment
 from .demo import demo
+from .evidence_synthesis import (
+    EvidenceSynthesis,
+    SynthesisManifest,
+    verify_synthesis,
+    write_synthesis,
+)
 from .ingestion import import_cftc, import_prices, import_records, ingest_fred, timestamp
 from .local_ui import serve_local
 from .macro import MacroContext, MacroPlan, fetch_core, load_plan, macro_context
@@ -128,6 +134,13 @@ def parser() -> argparse.ArgumentParser:
     c.add_argument("directory", type=Path)
     c.add_argument("--baseline", type=Path)
     c = sub.add_parser("verify-review", help="verify and recompute a saved refresh review")
+    c.add_argument("directory", type=Path)
+    c = sub.add_parser(
+        "synthesize-report", help="offline evidence synthesis from a verified report"
+    )
+    c.add_argument("directory", type=Path)
+    c.add_argument("--output-dir", type=Path, default=Path("local/reports/synthesis"))
+    c = sub.add_parser("verify-synthesis", help="recompute a self-contained evidence synthesis")
     c.add_argument("directory", type=Path)
     for name in ("research-report", "refresh-report"):
         c = sub.add_parser(
@@ -277,6 +290,18 @@ def parser() -> argparse.ArgumentParser:
 
 
 def run(args) -> dict:
+    if args.command == "verify-synthesis":
+        return verify_synthesis(args.directory)
+    if args.command == "synthesize-report":
+        synthesis, directory = write_synthesis(args.directory, args.output_dir)
+        return dict(
+            status=synthesis.status,
+            bundle=str(directory),
+            report=str(directory / "synthesis.fa.md"),
+            fingerprint=synthesis.fingerprint,
+            outcomes=synthesis.outcome_counts,
+            daily_backtest_ready=False,
+        )
     if args.command == "local-ui":
         return serve_local(args.store, args.reports, args.roadmap, args.port)
     if args.command == "operations-health":
@@ -374,6 +399,8 @@ def run(args) -> dict:
             "runtime_evidence": RuntimeEvidence,
             "runtime_manifest": RuntimeManifest,
             "transport_evidence": TransportEvidence,
+            "evidence_synthesis": EvidenceSynthesis,
+            "synthesis_manifest": SynthesisManifest,
         }
         for name, model in models.items():
             schema = {

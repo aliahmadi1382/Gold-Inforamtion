@@ -1,5 +1,9 @@
 # Operating guide
 
+## Evidence synthesis (0.19)
+
+Run `uv run gold synthesize-report <verified-report-directory> --output-dir local/reports/synthesis`, then `uv run gold verify-synthesis <synthesis-directory>`. Both commands are offline and execute before opening a store or loading a registry. The self-contained output retains report JSON, typed findings, Persian text and an exact file manifest. In the local report view, filter findings and expand their evidence; the JSON download exports the filtered view with its provenance; use the CLI for a complete self-contained bundle. Restart the service after upgrading to load current rules. See [scope and limits](source-methodology/evidence-synthesis.fa.md).
+
 ## Runtime and HTTP evidence (0.18)
 
 New research bundles include `runtime.json` and `runtime-manifest.json`; `verify-report` checks both when present. The scope is the bundle writer, not an independently proven remote computation environment. New acquisitions retain sanitized attempt evidence in `store/transport/<run_id>.json`; existing history remains unknown. Quota is not measured. Preserve `transport/` separately alongside core backups, and keep complete report directories with both runtime sidecars. Restart the local server after acquisition to reload its snapshot. See [method and limitations](source-methodology/runtime-transport.fa.md).

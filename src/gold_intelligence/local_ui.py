@@ -15,6 +15,7 @@ from uuid import uuid4
 
 from . import __version__
 from .acquisition import AcquisitionRun
+from .evidence_synthesis import build_synthesis
 from .operations_health import build_operations_health
 from .project_roadmap import load_project_roadmap
 from .report_comparison import verify_comparison
@@ -220,6 +221,9 @@ class Workspace:
                         status=report.status,
                         software_version=report.software_version,
                         runtime=runtime.model_dump(mode="json") if runtime else None,
+                        synthesis=build_synthesis(content, generated_at=generated).model_dump(
+                            mode="json"
+                        ),
                     )
                 except (ValueError, OSError, KeyError):
                     self.report_errors += 1
@@ -296,7 +300,11 @@ class Workspace:
             series=sorted(inventory, key=lambda x: (x["identity"]["source"], x["id"])),
             reports=sorted(
                 [
-                    {key: value for key, value in report.items() if key not in {"report", "text"}}
+                    {
+                        key: value
+                        for key, value in report.items()
+                        if key not in {"report", "text", "synthesis"}
+                    }
                     for report in self.reports.values()
                 ],
                 key=lambda x: (x["as_of"], x["generated_at"], x["id"]),

@@ -137,6 +137,10 @@ def test_verified_research_and_comparison_and_corrupt_bundle_exclusion(
     compare_reports(first, second, reports / "comparisons")
     ui = workspace(store, tmp_path, reports)
     assert len(ui.reports) == 2 and len(ui.comparisons) == 1
+    derived = next(iter(ui.reports.values()))["synthesis"]
+    assert derived["report_fingerprint"] == report.fingerprint
+    assert derived["market_direction"] == "not_inferred"
+    assert all("synthesis" not in row for row in ui.summary["reports"])
     assert next(iter(ui.comparisons.values()))["status"] == "unchanged"
     (first / "research-report.fa.md").write_text("tampered")
     ui = workspace(store, tmp_path, reports)

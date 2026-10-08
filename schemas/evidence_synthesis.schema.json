@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "Finding": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "release",
+            "monthly",
+            "comparability",
+            "readiness"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "outcome": {
+          "enum": [
+            "matches_display",
+            "vintage_disagreement",
+            "revision_difference",
+            "rounding_boundary",
+            "missing_period",
+            "missing_value",
+            "method_concordance",
+            "method_disagreement",
+            "insufficient_sample",
+            "not_comparable",
+            "coverage_limited",
+            "no_evidence"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "enum": [
+              "bls",
+              "fred",
+              "world_bank_pink_sheet",
+              "alpha_vantage_gold",
+              "cftc_disaggregated"
+            ],
+            "type": "string"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "pointers": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Pointers",
+          "type": "array"
+        },
+        "facts": {
+          "additionalProperties": true,
+          "title": "Facts",
+          "type": "object"
+        },
+        "limitation": {
+          "title": "Limitation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "category",
+        "outcome",
+        "sources",
+        "pointers",
+        "facts",
+        "limitation"
+      ],
+      "title": "Finding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "rule_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Rule Version",
+      "type": "string"
+    },
+    "software_version": {
+      "title": "Software Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "input_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Input Sha256",
+      "type": "string"
+    },
+    "report_fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Report Fingerprint",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "limited",
+        "needs_review",
+        "no_evidence"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "outcome_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Outcome Counts",
+      "type": "object"
+    },
+    "fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Fingerprint",
+      "type": "string"
+    },
+    "daily_backtest_ready": {
+      "const": false,
+      "default": false,
+      "title": "Daily Backtest Ready",
+      "type": "boolean"
+    },
+    "market_direction": {
+      "const": "not_inferred",
+      "default": "not_inferred",
+      "title": "Market Direction",
+      "type": "string"
+    },
+    "confidence_probability": {
+      "default": null,
+      "title": "Confidence Probability",
+      "type": "null"
+    }
+  },
+  "required": [
+    "software_version",
+    "generated_at",
+    "as_of",
+    "input_sha256",
+    "report_fingerprint",
+    "status",
+    "findings",
+    "outcome_counts",
+    "fingerprint"
+  ],
+  "title": "EvidenceSynthesis",
+  "type": "object"
+}

@@ -114,6 +114,23 @@
           </div>
           <div id="report-meta" class="metadata"></div>
           <div id="report-sections" class="section-grid"></div>
+          <h2>جمع‌بندی شواهد چندمنبعی</h2>
+          <div id="synthesis-note" class="notice neutral"></div>
+          <div class="controls">
+            <label
+              >نوع یافته<select id="synthesis-filter">
+                <option value="all">همه</option>
+                <option value="conflicts">اختلاف نیازمند بررسی</option>
+                <option value="revisions">اختلاف اصلاحیهٔ جاری</option>
+                <option value="limits">محدودیت و شاهد ناکافی</option>
+                <option value="agreements">سازگاری محدود</option>
+              </select></label
+            >
+            <button id="download-synthesis" class="secondary" disabled>
+              دریافت JSON همین نما
+            </button>
+          </div>
+          <div id="synthesis-findings"></div>
           <div id="report-relations"></div>
           <div class="panel-heading">
             <h2>متن گزارش فارسی</h2>

@@ -640,6 +640,9 @@ function exportSeries() {
 async function showReport() {
   selectedReport = null;
   $("download-report").disabled = true;
+  $("download-synthesis").disabled = true;
+  clear($("synthesis-findings"));
+  $("synthesis-note").textContent = "";
   const key = $("report-select").value;
   if (!key) {
     $("report-text").textContent = "بستهٔ پژوهش تأییدشده موجود نیست.";
@@ -649,6 +652,8 @@ async function showReport() {
     const r = await get("/api/report?id=" + key);
     if ($("report-select").value !== key) return;
     selectedReport = r;
+    $("download-synthesis").disabled = false;
+    renderSynthesis();
     $("download-report").disabled = false;
     meta($("report-meta"), [
       "وضعیت: " + title(r.status),
@@ -728,6 +733,158 @@ async function showReport() {
     }
   } catch (e) {
     error(e.message);
+  }
+}
+function synthesisFindings(synthesis, filter) {
+  const conflicts = ["vintage_disagreement", "method_disagreement"];
+  const agreements = ["matches_display", "method_concordance"];
+  return synthesis.findings.filter(
+    (f) =>
+      filter === "all" ||
+      (filter === "conflicts" && conflicts.includes(f.outcome)) ||
+      (filter === "revisions" && f.outcome === "revision_difference") ||
+      (filter === "agreements" && agreements.includes(f.outcome)) ||
+      (filter === "limits" &&
+        ![...conflicts, ...agreements, "revision_difference"].includes(
+          f.outcome,
+        )),
+  );
+}
+function renderSynthesis() {
+  clear($("synthesis-findings"));
+  const synthesis = selectedReport?.synthesis;
+  if (!synthesis) return;
+  const outcomes = {
+    matches_display: "سازگار در دقت نمایش",
+    vintage_disagreement: "اختلاف با نسخهٔ هم‌تاریخ",
+    revision_difference: "اختلاف با نسخهٔ اصلاح‌شدهٔ جاری",
+    rounding_boundary: "مرز گردکردن؛ نامعین",
+    missing_period: "دورهٔ قابل مقایسه موجود نیست",
+    missing_value: "مقدار قابل مقایسه موجود نیست",
+    method_concordance: "جهت دو ضریب سازگار است",
+    method_disagreement: "جهت دو روش متفاوت است",
+    insufficient_sample: "شاهد آماری کافی نیست",
+    not_comparable: "تعریف یا دوره متفاوت؛ ادغام نمی‌شود",
+    coverage_limited: "پژوهش روزانه نیازمند شاهد بیشتر است",
+    no_evidence: "شاهد موجود نیست",
+  };
+  const filter = $("synthesis-filter").value;
+  const findings = synthesisFindings(synthesis, filter);
+  const counts = synthesis.outcome_counts;
+  $("synthesis-note").textContent =
+    "بازحساب از همین گزارش با قواعد نسخهٔ " +
+    synthesis.rule_version +
+    " · اختلاف نیازمند بررسی: " +
+    fmt(
+      (counts.vintage_disagreement || 0) + (counts.method_disagreement || 0),
+    ) +
+    " · اختلاف اصلاحیهٔ جاری: " +
+    fmt(counts.revision_difference || 0) +
+    " · یافته‌های این نما: " +
+    fmt(findings.length) +
+    " · تعداد یافته، شمار منابع مستقل یا احتمال اطمینان نیست؛ جهت بازار استنتاج نشده است.";
+  if (!findings.length) {
+    $("synthesis-findings").append(
+      el(
+        "p",
+        "در این گزارش برای این فیلتر یافته‌ای ثبت نشده است؛ نبود اختلاف، تأیید همهٔ داده‌ها نیست.",
+      ),
+    );
+  }
+  for (const finding of findings) {
+    const item = el("details", null, "synthesis-finding");
+    const f = finding.facts;
+    const identity =
+      finding.category === "release"
+        ? (f.metric === "cpi_all_items_sa_mom"
+            ? "تورم ماهانهٔ CPI"
+            : "نرخ بیکاری") +
+          " · " +
+          f.period +
+          " · سند " +
+          f.announced_at.slice(0, 10) +
+          " · " +
+          (f.period_role === "headline" ? "دورهٔ اصلی" : "دورهٔ قبلی") +
+          " · " +
+          (f.comparison === "release_date_vintage"
+            ? "نسخهٔ هم‌تاریخ"
+            : "نسخهٔ جاری")
+        : finding.category === "monthly"
+          ? title(f.series_id) + " · " + title(f.method) + " · n=" + fmt(f.n)
+          : finding.id === "comparability:gold"
+            ? "قیمت مرجع روزانه و میانگین ماهانه"
+            : finding.id === "comparability:periods"
+              ? "دوره‌های مرجع کلان و COT"
+              : "دروازهٔ پژوهش روزانه";
+    item.append(el("summary", identity + " — " + outcomes[finding.outcome]));
+    item.append(
+      el(
+        "p",
+        "منابع: " + (finding.sources.map(title).join("، ") || "دروازهٔ گزارش"),
+      ),
+    );
+    item.append(el("p", finding.limitation));
+    if (finding.category === "release") {
+      item.append(
+        el(
+          "p",
+          "مقدار سند: " +
+            fmt(f.document_value) +
+            " · FRED (≈): " +
+            fmt(f.compared_value) +
+            " · واحد: " +
+            title(f.unit) +
+            " · اختلاف با سند (≈): " +
+            fmt(f.difference),
+        ),
+      );
+    } else if (finding.category === "monthly") {
+      item.append(
+        el(
+          "p",
+          "Pearson (≈): " +
+            fmt(f.pearson) +
+            " · Spearman (≈): " +
+            fmt(f.spearman) +
+            " · ماه‌های نمونه: " +
+            (f.months[0] || "ناموجود") +
+            " تا " +
+            (f.months[f.months.length - 1] || "ناموجود"),
+        ),
+      );
+    } else if (finding.id === "comparability:periods") {
+      item.append(el("p", "دورهٔ COT: " + (f.cot_reference || "ناموجود")));
+      for (const reference of f.macro_references)
+        item.append(
+          el(
+            "p",
+            title(reference.series_id) +
+              ": " +
+              (reference.reference_at?.slice(0, 10) || "ناموجود") +
+              " · " +
+              title(reference.status),
+          ),
+        );
+    }
+    if (f.source_url) {
+      const sourceUrl = new URL(f.source_url);
+      if (
+        sourceUrl.protocol === "https:" &&
+        sourceUrl.hostname === "www.bls.gov" &&
+        sourceUrl.pathname.startsWith("/news.release/archives/")
+      ) {
+        const sourceLink = el("a", "مشاهدهٔ سند BLS");
+        sourceLink.href = sourceUrl.href;
+        sourceLink.target = "_blank";
+        sourceLink.rel = "noopener noreferrer";
+        item.append(sourceLink);
+      }
+    }
+    item.append(
+      el("p", "شاهد در JSON گزارش: " + finding.pointers.join("، "), "muted"),
+    );
+    item.append(el("pre", JSON.stringify(finding.facts, null, 2)));
+    $("synthesis-findings").append(item);
   }
 }
 function operations() {
@@ -925,6 +1082,29 @@ $("all-range").onclick = () => {
 };
 $("export-series").onclick = exportSeries;
 $("report-select").onchange = showReport;
+$("synthesis-filter").onchange = renderSynthesis;
+$("download-synthesis").onclick = () => {
+  if (selectedReport?.synthesis) {
+    const synthesis = selectedReport.synthesis;
+    const filter = $("synthesis-filter").value;
+    const view = {
+      export_type: "filtered_synthesis_view",
+      rule_version: synthesis.rule_version,
+      as_of: synthesis.as_of,
+      source_report_fingerprint: synthesis.report_fingerprint,
+      synthesis_fingerprint: synthesis.fingerprint,
+      input_sha256: synthesis.input_sha256,
+      filter,
+      total_findings: synthesis.findings.length,
+      findings: synthesisFindings(synthesis, filter),
+    };
+    download(
+      "gold-synthesis-" + selectedReport.id + "-" + filter + ".json",
+      JSON.stringify(view, null, 2),
+      "application/json",
+    );
+  }
+};
 $("download-report").onclick = () => {
   if (selectedReport)
     download(

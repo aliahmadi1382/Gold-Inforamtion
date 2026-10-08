@@ -1,5 +1,11 @@
 # Release validation
 
+## Release 0.19: multi-source evidence synthesis
+
+Local suite: **626 passed, one host-permission symlink skip**; lint/format and wheel/sdist build pass. Twenty-one new cases cover empty evidence, release-date vintage versus current-revision disagreements, missing periods/nulls, same/opposite/neutral signs and minimum sample, exact monthly method/sample preservation, semantic clock stability, legacy schema without invented COT, file corruption, fully rehashed forged claims, prose disagreement, duplicate/traversal manifests, corrupted input fingerprints, offline CLI without store initialization, and forged counts/direction. Existing local UI checks also bind derived synthesis to its verified input and exclude large synthesis payloads from catalog summaries. Two new independent schemas bring the total to 45; old report and comparator schemas stay unchanged.
+
+Real report evidence yields 67 findings: 39 display matches (28 historical and 11 current), 17 current-revision differences, four sign concordances, four insufficient samples, two non-comparable domains and one daily-readiness limit. No historical-vintage or method-sign disagreement is present in this scope. Input/report hashes and manifest/record counts are reconciled independently; data remains 95,504 versions with 76 acquisition manifests. No network acquisition ran. Local artifacts remain under `local/integration-v019/` and `local/reports/synthesis-v019/`; the complete suite, lint/format, package build, browser filters/detail/export and pushed CI are checked for this delivery.
+
 ## Release 0.18: runtime, transport and fresh evidence
 
 Local suite: **605 passed, one host-permission symlink skip**; lint/format, JavaScript syntax and wheel/sdist build pass. Thirteen new cases cover runtime bytes/incomplete pair/rehash with false binding, legacy bundles without runtime, HTTP 403/429/503 bounded attempt counts, secret exclusion, nested/thread context isolation, changed manifest and unsupported payload rejection, success after retry, oversized response and out-of-run timestamps. Three new version-1 evidence schemas bring the total to 43; report/comparison schemas remain unchanged. Remote CI is checked on the pushed commit.

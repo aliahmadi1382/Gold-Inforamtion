@@ -654,3 +654,14 @@ footer {
     gap: 10px;
   }
 }
+/* Source-backed findings keep exact values in expandable evidence. */
+.synthesis-finding {
+  padding: 12px 0;
+  border-bottom: 1px solid #e6e9ec;
+}
+.synthesis-finding pre {
+  direction: ltr;
+  text-align: left;
+  overflow: auto;
+  max-height: 320px;
+}

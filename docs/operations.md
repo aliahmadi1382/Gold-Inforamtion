@@ -281,6 +281,19 @@ Checkpoints are atomically replaced before and after steps. Ctrl+C records inter
 
 See [method and limits](source-methodology/manual-refresh.fa.md) and [Persian lesson fourteen](education/14-manual-refresh.fa.md). No scheduler or broker connection is installed.
 
+## Refresh review (0.14)
+
+`refresh-report --baseline PATH` selects and reads a verified prior research bundle before acquisition. Without it, the latest-cutoff completed refresh with a successful report in the same output directory and store is selected. Ambiguous, unreadable or corrupt candidates are explicit failures, without falling back. After moving a store to a different computer/path, use an explicit baseline for the first run. The current refresh is never selected as its own automatic baseline.
+
+The original refresh `status`, manifest and report remain independent. The CLI adds `review_status`, `review`, `review_bundle` and `review_failure_type`. Exit 3 also covers review failures; `no_baseline` alone is not a failure. The Persian refresh summary links to the review. Review schema 1 is separate from unchanged RefreshRun schema 1; existing readers and legacy research/comparison schemas remain supported.
+
+```sh
+uv run gold review-refresh PATH_TO_SAVED_REFRESH --baseline PATH_TO_RESEARCH_BUNDLE
+uv run gold verify-review PATH_TO_REVIEW_BUNDLE
+```
+
+These two commands are offline and do not open the store or registry. Offline review requires an explicit baseline to compare; without it, it produces `no_baseline`. Each run publishes a new review folder, with full comparison JSON, Persian priorities, exact copied refresh/report inputs and a manifest. Verification recomputes comparison, priorities, counts and prose from copied inputs; it is not publisher authentication or proof of acquisition/network events. See [method](source-methodology/refresh-review.fa.md) and [lesson fifteen](education/15-refresh-review.fa.md).
+
 ## Other layers via normalized records
 
 Prepare JSONL conforming to a runtime record contract and a directory of original raw evidence files named by SHA-256. Provider, license, layer and synthetic flags must match the registry:

@@ -28,6 +28,13 @@ from .monthly_research import (
 from .positioning import PositioningContext, positioning_context, write_positioning
 from .quality import QualityPolicy, QualityReport, assess, load_policy
 from .refresh import RefreshPolicy, RefreshRun, refresh_and_report
+from .refresh_review import (
+    RefreshReview,
+    ReviewManifest,
+    select_baseline,
+    verify_review,
+    write_refresh_review,
+)
 from .registry import Registry, export_public, load_registry
 from .release_calendar import CalendarContext, ReleaseEvidence, calendar_context, import_evidence
 from .release_values import (
@@ -96,6 +103,11 @@ def parser() -> argparse.ArgumentParser:
     c.add_argument("--output-dir", type=Path, default=Path("local/reports/comparisons"))
     c = sub.add_parser("verify-comparison", help="verify and recompute a saved comparison")
     c.add_argument("directory", type=Path)
+    c = sub.add_parser("review-refresh", help="review a saved refresh without network acquisition")
+    c.add_argument("directory", type=Path)
+    c.add_argument("--baseline", type=Path)
+    c = sub.add_parser("verify-review", help="verify and recompute a saved refresh review")
+    c.add_argument("directory", type=Path)
     for name in ("research-report", "refresh-report"):
         c = sub.add_parser(
             name,
@@ -109,6 +121,9 @@ def parser() -> argparse.ArgumentParser:
             c.add_argument("--fred-overlap-days", type=int, default=120)
             c.add_argument("--cot-overlap-days", type=int, default=90)
             c.add_argument("--full-history", action="store_true")
+            c.add_argument(
+                "--baseline", type=Path, help="explicit verified report bundle to compare"
+            )
         c.add_argument("--macro-plan", type=Path, default=Path("config/macro_core.yaml"))
         c.add_argument("--monthly-plan", type=Path, default=Path("config/monthly_research.yaml"))
         c.add_argument("--revision-plan", type=Path, default=Path("config/revision_ledger.yaml"))
@@ -241,6 +256,19 @@ def parser() -> argparse.ArgumentParser:
 
 
 def run(args) -> dict:
+    if args.command == "verify-review":
+        return verify_review(args.directory)
+    if args.command == "review-refresh":
+        # Offline recovery is explicit: no automatic scan can select this run as its own baseline.
+        baseline = select_baseline(None, args.baseline)
+        review, directory = write_refresh_review(args.directory, baseline)
+        return {
+            "status": review.status,
+            "bundle": str(directory),
+            "report": str(directory / "review.fa.md"),
+            "fingerprint": review.fingerprint,
+            "daily_backtest_ready": False,
+        }
     if args.command == "compare-reports":
         report, directory = compare_reports(args.before, args.after, args.output_dir)
         return {
@@ -291,6 +319,8 @@ def run(args) -> dict:
             "report_manifest_v1": ReportManifestV1,
             "report_comparison_v1": ReportComparisonV1,
             "refresh_run": RefreshRun,
+            "refresh_review": RefreshReview,
+            "review_manifest": ReviewManifest,
         }
         for name, model in models.items():
             schema = {
@@ -326,6 +356,7 @@ def run(args) -> dict:
                 positioning_max_age_days=args.positioning_max_age_days,
             )
             if args.command == "refresh-report":
+                baseline = select_baseline(args.output_dir, args.baseline, store.root)
                 workflow, directory = refresh_and_report(
                     store,
                     registry,
@@ -338,6 +369,26 @@ def run(args) -> dict:
                     args.output_dir,
                 )
                 bundle = directory / workflow.report.bundle if workflow.report.bundle else None
+                review_status, review_path, review_bundle, review_failure = (
+                    "failed",
+                    None,
+                    None,
+                    None,
+                )
+                try:
+                    review, review_directory = write_refresh_review(directory, baseline)
+                    review_status = review.status
+                    review_path = str(review_directory / "review.fa.md")
+                    review_bundle = str(review_directory)
+                    with (directory / "refresh.fa.md").open("a", encoding="utf-8") as stream:
+                        relative = (
+                            (review_directory / "review.fa.md").relative_to(directory).as_posix()
+                        )
+                        stream.write(f"\n[خلاصهٔ تغییرات و اولویت بررسی]({relative})\n")
+                except Exception as exc:
+                    # Completed acquisition/report state remains independently visible.
+                    review_status = "failed"
+                    review_failure = type(exc).__name__
                 return {
                     "status": workflow.status,
                     "run_id": workflow.run_id,
@@ -350,6 +401,10 @@ def run(args) -> dict:
                     "report": str(bundle / "research-report.fa.md") if bundle else None,
                     "freshness": {f.key: f.status for f in workflow.report.freshness},
                     "daily_backtest_ready": False,
+                    "review_status": review_status,
+                    "review": review_path,
+                    "review_bundle": review_bundle,
+                    "review_failure_type": review_failure,
                 }
             report = build_research_report(store, registry, settings, args.as_of)
             directory = write_research_report(report, args.output_dir)
@@ -603,7 +658,12 @@ def main(argv=None) -> int:
         with credential_environment(args.credentials_file):
             result = run(args)
         print(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False))
-        if args.command == "refresh-report" and result["status"] != "succeeded":
+        if args.command == "refresh-report" and (
+            result["status"] != "succeeded"
+            or result["review_status"] not in {"compared", "no_baseline"}
+        ):
+            return 3
+        if args.command == "review-refresh" and result["status"] not in {"compared", "no_baseline"}:
             return 3
         if args.command == "fetch-fred-core" and result["status"] != "succeeded":
             return 3

@@ -1,5 +1,13 @@
 # Release validation
 
+## Release 0.14 on the destination computer
+
+Python 3.12.14 and the frozen lock recreate the copied environment. All 449 original offline cases pass on this computer. Release 0.14 adds 37 cases, for **486 passing tests**, and two versioned schemas (36 total). New cases cover exact copied inputs and priority pointers, absent/corrupt/ambiguous baselines, store isolation, future/reversed baseline cutoffs, acquisition/report/review failure separation, zero/null/boolean/view distinctions, unchanged/context-only/age/recapture/value changes, legacy schema absence, repeated publication, clock-independent fingerprints, disk failures, rehashed false priorities/prose, database-free recovery and automatic selection before the second CLI refresh.
+
+The saved 0.13 refresh is reviewed offline against the 0.12 report; no new market data is acquired. Numeric fields include inventory/sample counts as well as economic values. CFTC HTTP 403 remains an acquisition priority even when the historical reference-age policy passes. The copied-input review recomputes comparison, counts, priorities and Persian prose. Source-backed outputs and receipts remain in `local/integration-v014/` and the original refresh directory, outside Git.
+
+This verifies software and saved evidence coherence, not publisher truth, historical first availability or profitability. Remote CI for this commit must be checked separately. See [method](source-methodology/refresh-review.fa.md). The sections below preserve earlier releases' validation evidence.
+
 Release 0.12.0 is verified locally on Windows with Python 3.11 using the locked environment. The test suite contains 400 offline cases, including parameterized cases. CI repeats the suite on Windows and Linux with Python 3.11 and 3.12; the GitHub Actions result is the authority for remote status.
 
 Verified behavior includes closed-bar validity, finite values, timezone awareness/DST, raw and normalized content hashes, atomic failed batches, exact-record idempotence, publication/retrieval cutoffs, future revision exclusion, delayed swing confirmation, mixed-stream rejection, price freshness, event-window arithmetic, restricted export, source-registry matching, FRED pagination/missing values/credential-safe errors, CFTC documented column mapping, generated-schema consistency and the repeatable synthetic demo. The source distribution and Python wheel build successfully.

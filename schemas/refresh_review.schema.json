@@ -1,0 +1,578 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "EntityChange": {
+      "additionalProperties": false,
+      "properties": {
+        "section": {
+          "enum": [
+            "quality",
+            "price",
+            "macro",
+            "calendar",
+            "monthly",
+            "releases",
+            "revisions",
+            "positioning"
+          ],
+          "title": "Section",
+          "type": "string"
+        },
+        "collection": {
+          "title": "Collection",
+          "type": "string"
+        },
+        "identity": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Identity",
+          "type": "array"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "action": {
+          "enum": [
+            "added",
+            "removed",
+            "modified"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "before_pointer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Before Pointer"
+        },
+        "after_pointer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "After Pointer"
+        },
+        "fields": {
+          "items": {
+            "$ref": "#/$defs/FieldChange"
+          },
+          "minItems": 1,
+          "title": "Fields",
+          "type": "array"
+        }
+      },
+      "required": [
+        "section",
+        "collection",
+        "identity",
+        "label",
+        "action",
+        "before_pointer",
+        "after_pointer",
+        "fields"
+      ],
+      "title": "EntityChange",
+      "type": "object"
+    },
+    "FieldChange": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "result",
+            "evidence",
+            "age"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "before_present": {
+          "title": "Before Present",
+          "type": "boolean"
+        },
+        "after_present": {
+          "title": "After Present",
+          "type": "boolean"
+        },
+        "before": {
+          "$ref": "#/$defs/JsonValue"
+        },
+        "after": {
+          "$ref": "#/$defs/JsonValue"
+        }
+      },
+      "required": [
+        "path",
+        "category",
+        "before_present",
+        "after_present",
+        "before",
+        "after"
+      ],
+      "title": "FieldChange",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "ReportComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "2.0.0",
+          "default": "2.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "comparator_version": {
+          "const": "2.0.0",
+          "default": "2.0.0",
+          "title": "Comparator Version",
+          "type": "string"
+        },
+        "software_version": {
+          "title": "Software Version",
+          "type": "string"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "fingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Fingerprint",
+          "type": "string"
+        },
+        "before": {
+          "$ref": "#/$defs/ReportReferenceV2"
+        },
+        "after": {
+          "$ref": "#/$defs/ReportReferenceV2"
+        },
+        "status": {
+          "enum": [
+            "unchanged",
+            "context_only",
+            "changed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "context_changes": {
+          "items": {
+            "$ref": "#/$defs/FieldChange"
+          },
+          "title": "Context Changes",
+          "type": "array"
+        },
+        "sections": {
+          "items": {
+            "$ref": "#/$defs/SectionComparison"
+          },
+          "title": "Sections",
+          "type": "array"
+        },
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/EntityChange"
+          },
+          "title": "Changes",
+          "type": "array"
+        },
+        "daily_backtest_ready": {
+          "const": false,
+          "default": false,
+          "title": "Daily Backtest Ready",
+          "type": "boolean"
+        },
+        "causal_attribution": {
+          "const": false,
+          "default": false,
+          "title": "Causal Attribution",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "software_version",
+        "generated_at",
+        "fingerprint",
+        "before",
+        "after",
+        "status",
+        "context_changes",
+        "sections",
+        "changes"
+      ],
+      "title": "ReportComparison",
+      "type": "object"
+    },
+    "ReportReferenceV2": {
+      "additionalProperties": false,
+      "properties": {
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "report_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Report Sha256",
+          "type": "string"
+        },
+        "fingerprint": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Fingerprint",
+          "type": "string"
+        },
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "generated_at": {
+          "format": "date-time",
+          "title": "Generated At",
+          "type": "string"
+        },
+        "software_version": {
+          "title": "Software Version",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "report_schema_version": {
+          "enum": [
+            "1.0.0",
+            "2.0.0"
+          ],
+          "title": "Report Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "location",
+        "report_sha256",
+        "fingerprint",
+        "as_of",
+        "generated_at",
+        "software_version",
+        "status",
+        "report_schema_version"
+      ],
+      "title": "ReportReferenceV2",
+      "type": "object"
+    },
+    "ReviewPriority": {
+      "additionalProperties": false,
+      "properties": {
+        "priority": {
+          "enum": [
+            1,
+            2,
+            3
+          ],
+          "title": "Priority",
+          "type": "integer"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "subject": {
+          "title": "Subject",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "input_path": {
+          "enum": [
+            "inputs/refresh-run.json",
+            "inputs/after.json",
+            "review.json"
+          ],
+          "title": "Input Path",
+          "type": "string"
+        },
+        "pointer": {
+          "pattern": "^/",
+          "title": "Pointer",
+          "type": "string"
+        }
+      },
+      "required": [
+        "priority",
+        "code",
+        "subject",
+        "message",
+        "input_path",
+        "pointer"
+      ],
+      "title": "ReviewPriority",
+      "type": "object"
+    },
+    "SectionComparison": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "enum": [
+            "quality",
+            "price",
+            "macro",
+            "calendar",
+            "monthly",
+            "releases",
+            "revisions",
+            "positioning"
+          ],
+          "title": "Key",
+          "type": "string"
+        },
+        "before_status": {
+          "title": "Before Status",
+          "type": "string"
+        },
+        "after_status": {
+          "title": "After Status",
+          "type": "string"
+        },
+        "added": {
+          "minimum": 0,
+          "title": "Added",
+          "type": "integer"
+        },
+        "removed": {
+          "minimum": 0,
+          "title": "Removed",
+          "type": "integer"
+        },
+        "modified": {
+          "minimum": 0,
+          "title": "Modified",
+          "type": "integer"
+        },
+        "unchanged": {
+          "minimum": 0,
+          "title": "Unchanged",
+          "type": "integer"
+        },
+        "evidence_ids_added": {
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Evidence Ids Added",
+          "type": "array"
+        },
+        "evidence_ids_removed": {
+          "items": {
+            "pattern": "^[a-f0-9]{64}$",
+            "type": "string"
+          },
+          "title": "Evidence Ids Removed",
+          "type": "array"
+        },
+        "comparison_basis": {
+          "enum": [
+            "both_present",
+            "not_in_before_schema",
+            "not_in_after_schema",
+            "neither_schema"
+          ],
+          "title": "Comparison Basis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "before_status",
+        "after_status",
+        "added",
+        "removed",
+        "modified",
+        "unchanged",
+        "evidence_ids_added",
+        "evidence_ids_removed",
+        "comparison_basis"
+      ],
+      "title": "SectionComparison",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "application_version": {
+      "title": "Application Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "fingerprint": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Fingerprint",
+      "type": "string"
+    },
+    "refresh_run_id": {
+      "title": "Refresh Run Id",
+      "type": "string"
+    },
+    "refresh_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Refresh Sha256",
+      "type": "string"
+    },
+    "after_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "After Sha256"
+    },
+    "before_sha256": {
+      "anyOf": [
+        {
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Before Sha256"
+    },
+    "baseline_status": {
+      "enum": [
+        "selected",
+        "missing",
+        "failed"
+      ],
+      "title": "Baseline Status",
+      "type": "string"
+    },
+    "baseline_failure_type": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Baseline Failure Type"
+    },
+    "status": {
+      "enum": [
+        "compared",
+        "no_baseline",
+        "baseline_failed",
+        "comparison_failed",
+        "report_failed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "failure_type": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Failure Type"
+    },
+    "comparison": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReportComparison"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "field_counts": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "Field Counts",
+      "type": "object"
+    },
+    "priorities": {
+      "items": {
+        "$ref": "#/$defs/ReviewPriority"
+      },
+      "title": "Priorities",
+      "type": "array"
+    },
+    "daily_backtest_ready": {
+      "const": false,
+      "default": false,
+      "title": "Daily Backtest Ready",
+      "type": "boolean"
+    },
+    "causal_attribution": {
+      "const": false,
+      "default": false,
+      "title": "Causal Attribution",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "application_version",
+    "generated_at",
+    "fingerprint",
+    "refresh_run_id",
+    "refresh_sha256",
+    "after_sha256",
+    "before_sha256",
+    "baseline_status",
+    "baseline_failure_type",
+    "status",
+    "failure_type",
+    "comparison",
+    "field_counts",
+    "priorities"
+  ],
+  "title": "RefreshReview",
+  "type": "object"
+}

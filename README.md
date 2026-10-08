@@ -58,6 +58,7 @@ uv run gold --credentials-file local/credentials.env refresh-report
 
 | سند | کاربرد |
 | --- | --- |
+| [تحویل کامل پروژه](HANDOFF.fa.md) | اهداف، تاریخچه، موجودی واقعی، معماری، راهنمای اجرا و انتقال، محدودیت‌ها و تمام فازهای باقی‌مانده |
 | [Master specification](docs/specification/master-specification.md) | نیازمندی‌های هر ده لایه، فازها و تصمیم‌های باز |
 | [Coverage matrix](docs/specification/coverage-matrix.md) | چه چیزی اجرا شده و چه چیزی به توسعه یا دسترسی نیاز دارد |
 | [Architecture](docs/architecture.md) | اجزا، مسیر داده و تفاوت با ساختار پیشنهادی اولیه |

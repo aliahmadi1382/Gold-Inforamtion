@@ -364,3 +364,5 @@ COT comparison keys include source, dataset, market, family, unit, observation d
 ## تحویل ۰٫۲۱: شروط پژوهش روزانه
 
 CLI `daily-readiness PATH_TO_REPORT` و پنل از بایت‌های گزارش بررسی‌شده پنج شرط و مدرک لازم را استخراج می‌کنند. خروجی تشخیصی است؛ داده/گزارش اصلی تغییر نمی‌کند و آمادگی تأیید نمی‌شود. [روش](source-methodology/daily-readiness.fa.md).
+
+Optional public CPI release-estimate acquisition: `uv run gold fetch-philly-cpi`. This is separate from the ten-step refresh workflow; restart the local UI after acquisition. Values retain annualized units and retrieval-bound availability. Use `scripts/inspect_philly_cpi.py` for scoped headline reconciliation; no historical time backdating or readiness promotion occurs.

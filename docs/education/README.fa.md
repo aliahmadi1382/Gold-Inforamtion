@@ -37,3 +37,5 @@
 [۲۳: اسناد انتشار تازه و نسخهٔ تاریخی](23-recent-release-evidence.fa.md)
 
 [۲۴: پایان پنل و بازبینی داده](24-phase5-acceptance.fa.md)
+
+[۲۵: مقدار اولیه و ساعت انتشار](25-initial-cpi-evidence.fa.md)

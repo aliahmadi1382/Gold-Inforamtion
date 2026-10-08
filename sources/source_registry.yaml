@@ -1,5 +1,5 @@
 schema_version: 1.0.0
-reviewed_on: '2026-10-06'
+reviewed_on: '2026-10-08'
 sources:
   - source_id: synthetic_demo
     provider: Gold Market Intelligence test generator
@@ -183,3 +183,21 @@ sources:
     coverage: Contract dependent; no licensed feed configured
     frequency: Event driven
     notes: Link to stories; retain publication and event times. No full-text corpus committed.
+
+  - source_id: philadelphia_fed_pcpi
+    provider: Federal Reserve Bank of Philadelphia / Bureau of Labor Statistics
+    url: https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/pcpi
+    layers:
+    - macro
+    access: public
+    license_status: RESTRICTED
+    license_id: Philadelphia-Fed-public-download-local-research-2026-10-08
+    terms_url: https://www.philadelphiafed.org/
+    redistribution_allowed: false
+    training_allowed: false
+    implementation: implemented
+    coverage: Release estimates for monthly CPI from the downloaded workbook; preserve missing stages
+    frequency: Monthly observations; estimated release stages from monthly vintages
+    notes: Native seasonally adjusted M/M growth at annual rate. Same upstream BLS, not independent confirmation.
+      First/Second/Third use a vintage-selection algorithm; no measured historical delivery time. Public
+      download does not establish redistribution rights.

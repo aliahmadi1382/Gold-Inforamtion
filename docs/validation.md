@@ -1,5 +1,11 @@
 # Validation record
 
+## Release 0.23: Philadelphia CPI release estimates
+
+Local suite: **658 passed, one host-permission symlink skip**. Seven adapter cases validate native annualization, missing stages, retrieval-bound availability, source unit drift, duplicate/future/invalid months, invalid values and byte-preserving workbook lineage. Lint/format, JavaScript syntax and wheel/sdist build pass; regenerated roadmap text matches its source. Schema count remains 49; acquisition operation enum gains fetch-philly-cpi, while existing operations and report schemas are preserved. Older readers cannot recognize the new operation.
+
+One public workbook acquisition adds 1,340 versions: 335 reference months and four distinct stages. First/latest each contain 333 numeric and two missing observations; second/third are entirely missing in this capture. Eight stored BLS headline CPI extracts match the monthly equivalents of the initial estimates at display precision; both share BLS upstream and no delivery-time certification follows. Raw-lineage audit passes all 96,853 records. The fresh report 5a9c280fb0aab06a75dd853fc319300f940e991e37c9f75c8538af0724cebe3b verifies with computation/writer receipts. Fresh verified backup contains 96,853 versions, 103 raw blobs, 83 run manifests and 18 transport receipts. UI displays four distinct series, annualized units, two missing periods and unverified historical availability. Live acquisition during development retained its original application_version 0.22; no manifest was rewritten. Phase 3 and both daily readiness/first-release gates remain open/false. Private evidence is in local/phase3-source-review/ and local/integration-v023/.
+
 ## Release 0.22: phase-5 acceptance and computation receipts
 
 Local suite: **651 passed, one host-permission symlink skip**. Five new cases reject damaged, incomplete, rehashed wrongly bound or invalid-clock computation receipts and ensure imported JSON does not inherit the writer computation environment. Existing report equality remains about research content, excluding optional execution receipts. The roadmap negative test now uses an inactive phase independent of the active phase. Lint/format, JavaScript syntax, Prettier and wheel/sdist build pass. One independent computation schema brings the total to 49; previous schemas are unchanged.

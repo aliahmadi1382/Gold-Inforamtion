@@ -76,3 +76,5 @@ Schema dispatch happens before model validation: legacy report/settings/manifest
 ## تحویل ۰٫۲۱: شروط پژوهش روزانه
 
 CLI `daily-readiness PATH_TO_REPORT` و پنل از بایت‌های گزارش بررسی‌شده پنج شرط و مدرک لازم را استخراج می‌کنند. خروجی تشخیصی است؛ داده/گزارش اصلی تغییر نمی‌کند و آمادگی تأیید نمی‌شود. [روش](source-methodology/daily-readiness.fa.md).
+
+Philadelphia CPI adapter retains native annualized growth and algorithmic release stages as separate scalar series. It validates workbook metadata before transactional ingestion and never substitutes these for date-vintage levels, measured release-time evidence or daily-price inputs. Manual acquisition uses the existing run/transport lifecycle; no automatic refresh step is added.

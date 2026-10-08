@@ -43,6 +43,7 @@ from .monthly_research import (
     render_monthly_persian,
 )
 from .operations_health import OperationsHealth, build_operations_health, write_operations_health
+from .philadelphia_cpi import ingest_pcpi
 from .positioning import PositioningContext, positioning_context, write_positioning
 from .project_roadmap import ProjectRoadmap
 from .quality import QualityPolicy, QualityReport, assess, load_policy
@@ -222,6 +223,7 @@ def parser() -> argparse.ArgumentParser:
     c.add_argument("--output-dir", type=Path, default=Path("local/reports"))
     sub.add_parser("fetch-alpha-gold", help="fetch daily XAUUSD close-only provider history")
     sub.add_parser("fetch-worldbank-gold", help="fetch the reviewed monthly Pink Sheet workbook")
+    sub.add_parser("fetch-philly-cpi", help="fetch native annualized CPI release estimates")
     f = sub.add_parser(
         "fetch-fred-core", help="backfill the reviewed macro set with metadata gates"
     )
@@ -640,6 +642,7 @@ def run(args) -> dict:
             "fetch-fred",
             "fetch-alpha-gold",
             "fetch-worldbank-gold",
+            "fetch-philly-cpi",
             "fetch-cftc-gold",
             "import-release-evidence",
             "import-release-values",
@@ -659,6 +662,8 @@ def run(args) -> dict:
                 parameters.update(
                     source="world_bank_pink_sheet", instrument="GOLD", timeframe="1mo"
                 )
+            if args.command == "fetch-philly-cpi":
+                parameters.update(source="philadelphia_fed_pcpi", series="PCPI")
             if args.command == "fetch-cftc-gold":
                 parameters.update(source="cftc_disaggregated", market_code="088691")
             return acquire(
@@ -701,6 +706,8 @@ def run(args) -> dict:
 
 
 def perform_ingestion(args, store, registry) -> int:
+    if args.command == "fetch-philly-cpi":
+        return ingest_pcpi(store, registry.get("philadelphia_fed_pcpi"))
     if args.command == "fetch-cftc-gold":
         return ingest_cftc_gold(store, registry.get("cftc_disaggregated"), args.start, args.end)
     if args.command == "import-release-values":

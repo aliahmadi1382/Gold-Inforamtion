@@ -409,23 +409,31 @@ def handler_for(workspace, port):
                 return
             path = urlsplit(self.path)
             try:
-                if path.path in {"/", "/app.js", "/markdown.js", "/style.css"}:
+                if path.path in {
+                    "/",
+                    "/app.js",
+                    "/markdown.js",
+                    "/style.css",
+                    "/fonts/Vazirmatn-variable.woff2",
+                }:
                     name = {
                         "/": "index.html",
                         "/app.js": "app.js",
                         "/markdown.js": "markdown.js",
                         "/style.css": "style.css",
+                        "/fonts/Vazirmatn-variable.woff2": "fonts/Vazirmatn-variable.woff2",
                     }[path.path]
                     mime = {
                         "index.html": "text/html",
                         "app.js": "text/javascript",
                         "markdown.js": "text/javascript",
                         "style.css": "text/css",
+                        "fonts/Vazirmatn-variable.woff2": "font/woff2",
                     }[name]
                     self.send_body(
                         200,
                         files("gold_intelligence").joinpath("web", name).read_bytes(),
-                        mime + "; charset=utf-8",
+                        mime + ("; charset=utf-8" if mime.startswith("text/") else ""),
                     )
                     return
                 if path.path == "/api/status":

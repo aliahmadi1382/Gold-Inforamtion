@@ -1,4 +1,12 @@
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 :root {
+  --font-ui: "Vazirmatn", Tahoma, "Segoe UI", sans-serif;
   --bg: #f5f6f8;
   --ink: #17252e;
   --muted: #6e7c85;
@@ -17,7 +25,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: Tahoma, "Segoe UI", sans-serif;
+  font-family: var(--font-ui);
   font-size: 14px;
   line-height: 1.9;
 }
@@ -224,7 +232,7 @@ h3 {
 }
 .kpi strong {
   display: block;
-  font-family: "Segoe UI", Tahoma, sans-serif;
+  font-family: var(--font-ui);
   font-size: 29px;
   font-weight: 600;
   line-height: 1.5;
@@ -349,9 +357,7 @@ input[type="date"] {
   color: #fff;
   border-radius: 7px;
   padding: 8px 12px;
-  font:
-    12px "Segoe UI",
-    Tahoma;
+  font: 12px var(--font-ui);
   line-height: 1.7;
   z-index: 2;
   direction: rtl;
@@ -386,9 +392,7 @@ input[type="date"] {
   color: var(--muted);
 }
 .source strong {
-  font:
-    600 18px "Segoe UI",
-    Tahoma;
+  font: 600 18px var(--font-ui);
 }
 .table-wrap {
   overflow-x: auto;
@@ -511,7 +515,7 @@ summary {
   gap: 12px;
 }
 .phase-number {
-  font-family: "Segoe UI";
+  font-family: var(--font-ui);
   color: #b8c3ca;
   font-size: 24px;
   display: inline-block;

@@ -175,7 +175,16 @@ def running(ui):
 
 
 @pytest.mark.parametrize(
-    "endpoint", ["/", "/app.js", "/markdown.js", "/style.css", "/api/summary", "/api/status"]
+    "endpoint",
+    [
+        "/",
+        "/app.js",
+        "/markdown.js",
+        "/style.css",
+        "/api/summary",
+        "/api/status",
+        "/fonts/Vazirmatn-variable.woff2",
+    ],
 )
 def test_http_static_and_snapshot_headers(store, tmp_path, endpoint):
     with running(workspace(store, tmp_path)) as base, urlopen(base + endpoint) as response:

@@ -1,5 +1,5 @@
 import json
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
@@ -74,8 +74,9 @@ def test_corrupt_ledger_blocks_collection(tmp_path):
 def test_monthly_limit_counts_reserved_failures_before_network(tmp_path):
     folder = tmp_path / "attempts"
     folder.mkdir()
-    for day in range(1, 21):
-        stamp = f"2026-10-{day:02d}"
+    days = [date(2026, 11, 2) + timedelta(days=i) for i in range(26)]
+    for day in [d for d in days if d.weekday() < 5]:
+        stamp = day.isoformat()
         (folder / (stamp + ".json")).write_text(
             json.dumps(
                 dict(
@@ -88,5 +89,35 @@ def test_monthly_limit_counts_reserved_failures_before_network(tmp_path):
         )
     with pytest.raises(ValueError, match="monthly request budget"):
         capture_daily(
-            tmp_path, "fixture", lambda _: pytest.fail("network"), lambda: TIME.replace(day=30)
+            tmp_path,
+            "fixture",
+            lambda _: pytest.fail("network"),
+            lambda: TIME.replace(month=11, day=30),
         )
+
+
+@pytest.mark.parametrize(
+    "reserved",
+    [
+        "2026-10-13T13:00:00+00:00",
+        "2026-10-17T14:00:00+00:00",
+        "2026-10-12T14:00:00+00:00",
+        "2026-10-30T14:00:00+00:00",
+    ],
+)
+def test_admission_and_status_reject_same_invalid_reservation(tmp_path, reserved):
+    from gold_intelligence.daily_status import daily_status
+
+    folder = tmp_path / "attempts"
+    folder.mkdir()
+    day = reserved[:10]
+    (folder / (day + ".json")).write_text(
+        json.dumps(
+            dict(
+                utc_date=day, reserved_at=reserved, status="reserved_no_automatic_retry", attempts=1
+            )
+        )
+    )
+    with pytest.raises(ValueError, match="invalid local"):
+        capture_daily(tmp_path, "fixture", lambda _: pytest.fail("network"), lambda: TIME)
+    assert daily_status(tmp_path, TIME)["status"] == "unavailable"

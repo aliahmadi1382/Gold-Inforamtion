@@ -13,6 +13,35 @@ START_DATE = date(2026, 10, 13)
 MONTHLY_LIMIT = 20
 
 
+def read_reservations(root, time):
+    """Shared admission/read checks: an invalid ledger never grants extra quota."""
+    reservations = {}
+    for path in (Path(root) / "attempts").glob("*.json"):
+        try:
+            _, item = read_json(path)
+            if set(item) != {"utc_date", "reserved_at", "status", "attempts"}:
+                raise ValueError
+            reserved = aware(datetime.fromisoformat(item["reserved_at"])).astimezone(UTC)
+            day = reserved.date().isoformat()
+            if (
+                item["utc_date"] != day
+                or path.stem != day
+                or day in reservations
+                or type(item["attempts"]) is not int
+                or item["attempts"] != 1
+                or item["status"] != "reserved_no_automatic_retry"
+                or reserved > time
+                or reserved.date() < START_DATE
+                or reserved.weekday() >= 5
+                or reserved.hour != 14
+            ):
+                raise ValueError
+            reservations[day] = reserved
+        except (ValueError, KeyError, TypeError, AttributeError, OSError):
+            raise ValueError("invalid local request ledger; collection blocked") from None
+    return reservations
+
+
 def capture_daily(root, key, fetch=fetch_quote, now=lambda: datetime.now(UTC)):
     if not isinstance(key, str) or not key.strip() or any(c in key for c in "\r\n"):
         raise ValueError("configured key required")
@@ -25,22 +54,7 @@ def capture_daily(root, key, fetch=fetch_quote, now=lambda: datetime.now(UTC)):
     attempts.mkdir(exist_ok=True)
     with store_lock(root):
         # Invalid reservations block collection instead of resetting the budget.
-        prior = []
-        for path in attempts.glob("*.json"):
-            try:
-                _, item = read_json(path)
-                if set(item) != {"utc_date", "reserved_at", "status", "attempts"}:
-                    raise ValueError
-                reserved = aware(datetime.fromisoformat(item["reserved_at"])).astimezone(UTC)
-                if item["utc_date"] != reserved.date().isoformat() or path.stem != item["utc_date"]:
-                    raise ValueError
-                if type(item["attempts"]) is not int or item["attempts"] != 1:
-                    raise ValueError
-                if item["status"] != "reserved_no_automatic_retry":
-                    raise ValueError
-                prior.append(item["utc_date"])
-            except (ValueError, KeyError, TypeError, AttributeError, OSError):
-                raise ValueError("invalid local request ledger; collection blocked") from None
+        prior = read_reservations(root, time)
         day = time.date().isoformat()
         if day in prior:
             raise ValueError("today already reserved; no second request")

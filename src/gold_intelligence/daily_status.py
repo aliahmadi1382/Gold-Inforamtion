@@ -3,8 +3,8 @@
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from .daily_capture import MONTHLY_LIMIT, START_DATE
-from .forward_dataset import build_forward_dataset, read_json
+from .daily_capture import MONTHLY_LIMIT, START_DATE, read_reservations
+from .forward_dataset import build_forward_dataset
 from .models import aware
 
 
@@ -29,26 +29,7 @@ def daily_status(root, now):
         capture_allowed_now=False,
     )
     try:
-        reservations = {}
-        for path in (root / "attempts").glob("*.json"):
-            _, item = read_json(path)
-            reserved = aware(datetime.fromisoformat(item["reserved_at"])).astimezone(UTC)
-            day = reserved.date().isoformat()
-            if (
-                set(item) != {"utc_date", "reserved_at", "status", "attempts"}
-                or path.stem != day
-                or item["utc_date"] != day
-                or day in reservations
-                or type(item["attempts"]) is not int
-                or item["attempts"] != 1
-                or item["status"] != "reserved_no_automatic_retry"
-                or reserved > time
-                or reserved.date() < START_DATE
-                or reserved.weekday() >= 5
-                or reserved.hour != 14
-            ):
-                raise ValueError
-            reservations[day] = reserved
+        reservations = read_reservations(root, time)
         quotes = root / "quotes"
         dataset = build_forward_dataset(quotes) if quotes.exists() else None
         days = set()

@@ -173,3 +173,18 @@ JSON equality with all quotes, orders, fills, account states and synthetic flags
 No market-store writes occur. Receipts are private in `local/integration-v028/`
 and `local/paper-lab/v028/`. The scenario is fabricated; these checks establish
 trading mechanics, not market forecasting, real fills or live paper trading.
+# Forward spot evidence (0.29.0)
+
+Twelve source-review/capture tests cover service notices, schema changes, duplicate
+JSON keys, finite positive prices, strict source labels, non-naive local clocks,
+receipt ordering, immutable captures, false-only eligibility and one request
+without retries. The twelve tests and 32 local UI tests pass together. Ruff and
+offline package builds passed. One actual existing-account spot response was
+captured on 2026-10-12 and reviewed offline against its recorded raw SHA-256.
+No further live requests were needed to validate the parser or collector.
+
+The provider's timestamp lacks a timezone; price units, bid/ask and freshness
+remain unverified. Receipt time is local availability, not first publication.
+Private raw/receipt/review files are under `local/phase3-forward-quotes/`.
+No market-store records or simulated trade inputs were changed. Phase 3 remains
+active, with phase 4 evaluation and phase 6 market-connected paper trading pending.

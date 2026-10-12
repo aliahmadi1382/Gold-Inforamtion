@@ -23,6 +23,7 @@ from .monthly_stability import monthly_stability
 from .operations_health import build_operations_health
 from .paper_lab import LabSettings, simulate_lab, synthetic_quotes
 from .project_roadmap import load_project_roadmap
+from .real_paper import evaluate_real_paper
 from .report_comparison import verify_comparison
 from .research_report import load_verified_report
 from .storage import canonical, decode_record
@@ -301,6 +302,15 @@ class Workspace:
             str(cash): simulate_lab(synthetic_quotes(), LabSettings(initial_cash=cash))
             for cash in (1000, 10000, 50000)
         }
+        try:
+            self.real_paper = dict(
+                status="verified", report=evaluate_real_paper(self.root.parent / "goldapi-quotes")
+            )
+        except (ValueError, OSError):
+            self.real_paper = dict(
+                status="unavailable",
+                reason="مشاهدات واقعی موجود نیستند یا شواهد دریافت کامل و قابل تأیید نیستند.",
+            )
         self.summary = dict(
             paper_lab_presets=list(self.paper_labs),
             version=__version__,
@@ -442,6 +452,8 @@ def handler_for(workspace, port):
                     result = workspace.summary
                 elif path.path == "/api/paper-lab":
                     result = workspace.paper_labs[parse_qs(path.query).get("cash", ["10000"])[0]]
+                elif path.path == "/api/real-paper":
+                    result = workspace.real_paper
                 elif path.path == "/api/series":
                     query = parse_qs(path.query)
                     result = workspace.points(

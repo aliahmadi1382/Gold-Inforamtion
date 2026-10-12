@@ -187,7 +187,7 @@ const viewTitles = {
   reports: "گزارش‌های پژوهش",
   operations: "سلامت عملیات",
   roadmap: "مسیر و فازهای پروژه",
-  "paper-lab": "آزمایش معاملهٔ فرضی — دادهٔ مصنوعی",
+  "paper-lab": "حساب فرضی — مشاهدات واقعی و آزمایش مصنوعی",
 };
 function navigate(view) {
   if (!viewTitles[view]) return;
@@ -442,6 +442,7 @@ function chart(
 }
 let selectedPaperLab = null;
 async function renderPaperLab() {
+  renderRealPaper();
   selectedPaperLab = null;
   $("lab-export").disabled = true;
   const cash = $("lab-cash").value;
@@ -2027,3 +2028,32 @@ $("lab-export").onclick = () => {
     );
 };
 start();
+
+let realPaperReport = null;
+async function renderRealPaper() {
+  realPaperReport = null;
+  $("real-paper-export").disabled = true;
+  for (const id of ["real-paper-metrics", "real-paper-ledger", "real-paper-orders", "real-paper-fills"]) clear($(id));
+  try {
+    const result = await get("/api/real-paper");
+    if (result.status !== "verified") {
+      $("real-paper-status").textContent = result.reason;
+      return;
+    }
+    const r = result.report, d = r.input_shadow.input_dataset;
+    realPaperReport = r;
+    $("real-paper-export").disabled = false;
+    $("real-paper-status").textContent = `${fmt(d.observation_count)} مشاهدهٔ واقعی تأییدشده · حد تازگی ${fmt(r.input_shadow.settings.maximum_age_seconds)} ثانیه · ${fmt(r.ledger.filter(x => x.decision.signal === "blocked").length)} مشاهدهٔ مسدود · این نتیجه آزمون سودآوری نیست.`;
+    for (const [label,value] of [["نقد فرضی، دلار",r.final_cash],["دارایی فرضی، اونس",r.final_quantity],["سود تحقق‌یافتهٔ فرضی، دلار",r.realized_pnl],["کارمزد فرضی، دلار",r.fees],["اجراهای فرضی",r.fills.length],["بیشترین سن قیمت، ثانیه",d.age_seconds_max]]) {
+      const card = el("div",null,"kpi"); card.append(el("span",label),el("strong",fmt(value))); $("real-paper-metrics").append(card);
+    }
+    const reasons = {stale_quote:"قیمت قدیمی‌تر از حد مجاز",warming_up:"مشاهدات قبلی کافی نیست",nonadvancing_receipt:"زمان دریافت جلو نرفته",nonadvancing_source:"زمان منبع جلو نرفته",comparison_with_prior_observations:"مقایسه با میانگین قبلی"};
+    const signals = {blocked:"مسدود",wait:"انتظار",buy_candidate:"نامزد خرید",exit_candidate:"نامزد خروج",hold:"بدون تغییر"};
+    table($("real-paper-ledger"),["دریافت UTC","زمان قیمت UTC","سن، ثانیه","تصمیم","دلیل","نقد، دلار","مقدار، اونس"],r.ledger.map(x => [stamp(x.received_at),stamp(x.mark_source_at),fmt(x.mark_age_seconds),signals[x.decision.signal],reasons[x.decision.reason],fmt(x.cash),fmt(x.quantity)]));
+    table($("real-paper-orders"),["شناسه","سمت","تصمیم UTC","وضعیت"],r.orders.map(x => [x.id,x.side === "buy" ? "خرید" : "فروش",stamp(x.decision_at),({pending_next_observation:"در انتظار مشاهدهٔ بعد",cancelled_next_quote_ineligible:"لغو؛ مشاهدهٔ بعد نامعتبر",hypothetically_filled:"اجرای فرضی"})[x.status]]));
+    table($("real-paper-fills"),["سفارش","اجرا UTC","قیمت فرضی","مقدار","کارمزد"],r.fills.map(x => [x.order_id,stamp(x.filled_at),fmt(x.price),fmt(x.quantity),fmt(x.fee)]));
+  } catch (e) { $("real-paper-status").textContent = "گزارش واقعی قابل بارگذاری نیست: " + e.message; }
+}
+$("real-paper-export").onclick = () => {
+  if (realPaperReport) download("real-paper-report.json",JSON.stringify(realPaperReport,null,2),"application/json");
+};

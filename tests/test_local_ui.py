@@ -183,6 +183,7 @@ def running(ui):
         "/style.css",
         "/api/summary",
         "/api/status",
+        "/api/real-paper",
         "/fonts/Vazirmatn-variable.woff2",
     ],
 )
@@ -224,6 +225,24 @@ def test_paper_lab_is_synthetic_and_does_not_write_market_store(store, tmp_path)
     with running(ui) as base, pytest.raises(HTTPError) as error:
         urlopen(base + "/api/paper-lab?cash=arbitrary")
     assert error.value.code == 400
+
+
+def test_real_paper_verifies_capture_without_store_writes(store, tmp_path):
+    from test_real_shadow import add
+
+    root = store.root.parent / "goldapi-quotes"
+    add(root, 0, 2000, age=313)
+    before = digest(store.root / "market.sqlite3")
+    ui = workspace(store, tmp_path)
+    with running(ui) as base, urlopen(base + "/api/real-paper") as response:
+        result = json.load(response)
+    assert result["status"] == "verified"
+    assert result["report"]["input_shadow"]["input_dataset"]["observation_count"] == 1
+    assert result["report"]["ledger"][0]["decision"]["reason"] == "stale_quote"
+    assert result["report"]["fills"] == []
+    assert digest(store.root / "market.sqlite3") == before
+    (next(root.iterdir()) / "raw.json").write_text("{}")
+    assert workspace(store, tmp_path).real_paper["status"] == "unavailable"
 
 
 @pytest.mark.parametrize(

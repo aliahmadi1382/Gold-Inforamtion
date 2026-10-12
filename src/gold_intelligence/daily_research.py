@@ -31,7 +31,10 @@ def review_daily_research(root, now):
         )
         return result
     try:
-        comparison = compare_signal_profiles(Path(root) / "quotes")
+        comparison = compare_signal_profiles(
+            Path(root) / "quotes",
+            excluded_capture_ids=[f["capture_id"] for f in status["recorded_failures"]],
+        )
         profile = comparison["fixed_profiles"]["delayed_observation_research"]
         report = profile["report"]
         # Bind recomputation to the exact dataset already reviewed against reservations.

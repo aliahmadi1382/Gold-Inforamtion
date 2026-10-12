@@ -1,10 +1,12 @@
 """Read-only protocol status: local reservations never imply provider quota."""
 
+import hashlib
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from .daily_capture import MONTHLY_LIMIT, START_DATE, read_reservations
-from .forward_dataset import build_forward_dataset
+from .forward_dataset import build_forward_dataset, read_json
+from .goldapi_capture import ENDPOINT, LIMIT
 from .models import aware
 
 
@@ -27,11 +29,61 @@ def daily_status(root, now):
         reserved_without_verified_quote=None,
         next_manual_window_at=None,
         capture_allowed_now=False,
+        recorded_failure_count=None,
+        recorded_failures=[],
     )
     try:
         reservations = read_reservations(root, time)
         quotes = root / "quotes"
-        dataset = build_forward_dataset(quotes) if quotes.exists() else None
+        failures, capture_days = [], set()
+        for folder in sorted(p for p in quotes.iterdir() if p.is_dir()) if quotes.exists() else []:
+            receipt_bytes, receipt = read_json(folder / "receipt.json")
+            started = aware(datetime.fromisoformat(receipt["started_at"])).astimezone(UTC)
+            day = started.date().isoformat()
+            if (
+                day not in reservations
+                or started < reservations[day]
+                or started > time
+                or started.hour != 14
+                or day in capture_days
+                or receipt["endpoint"] != ENDPOINT
+                or receipt["trading_eligible"] is not False
+            ):
+                raise ValueError
+            capture_days.add(day)
+            if receipt["status"] == "failed":
+                if type(receipt["attempts"]) is not int or receipt["attempts"] != 1:
+                    raise ValueError
+                if (folder / "quote-review.json").exists():
+                    raise ValueError
+                if "received_at" in receipt:
+                    received = aware(datetime.fromisoformat(receipt["received_at"])).astimezone(UTC)
+                    if not started <= received <= time:
+                        raise ValueError
+                raw_path = folder / "raw.json"
+                if raw_path.exists():
+                    raw = raw_path.read_bytes()
+                    if len(raw) > LIMIT or hashlib.sha256(raw).hexdigest() != receipt["raw_sha256"]:
+                        raise ValueError
+                elif "raw_sha256" in receipt:
+                    raise ValueError
+                failures.append(
+                    dict(
+                        capture_id=folder.name,
+                        utc_date=day,
+                        receipt_sha256=hashlib.sha256(receipt_bytes).hexdigest(),
+                        raw_sha256=receipt.get("raw_sha256"),
+                        outcome="recorded_failed_capture",
+                    )
+                )
+            elif receipt["status"] != "metadata_checked_not_trading_eligible":
+                raise ValueError
+        excluded = [f["capture_id"] for f in failures]
+        dataset = (
+            build_forward_dataset(quotes, excluded_capture_ids=excluded)
+            if quotes.exists()
+            else None
+        )
         days = set()
         for row in (dataset or {}).get("observations", []):
             started = datetime.fromisoformat(row["request_started_at"])
@@ -54,6 +106,8 @@ def daily_status(root, now):
             verified_daily_observations=len(days),
             reserved_without_verified_quote=len(reservations) - len(days),
             coverage=dataset,
+            recorded_failure_count=len(failures),
+            recorded_failures=failures,
         )
         candidate_day = max(time.date(), START_DATE)
         for offset in range(70):

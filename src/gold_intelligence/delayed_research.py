@@ -3,7 +3,7 @@
 from .real_shadow import ShadowSettings, evaluate_shadow
 
 
-def compare_signal_profiles(root):
+def compare_signal_profiles(root, *, excluded_capture_ids=()):
     profiles = {
         "strict_execution_screen": ShadowSettings(),
         "delayed_observation_research": ShadowSettings(
@@ -12,7 +12,7 @@ def compare_signal_profiles(root):
     }
     results = {}
     for name, settings in profiles.items():
-        report = evaluate_shadow(root, settings)
+        report = evaluate_shadow(root, settings, excluded_capture_ids=excluded_capture_ids)
         decisions = report["decisions"]
         results[name] = dict(
             report=report,

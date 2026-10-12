@@ -18,9 +18,9 @@ class ShadowSettings(Contract):
     maximum_gap_seconds: int = Field(default=86400, gt=0, strict=True)
 
 
-def evaluate_shadow(root, settings=None):
+def evaluate_shadow(root, settings=None, *, excluded_capture_ids=()):
     settings = ShadowSettings.model_validate((settings or ShadowSettings()).model_dump())
-    dataset = build_forward_dataset(root)
+    dataset = build_forward_dataset(root, excluded_capture_ids=excluded_capture_ids)
     history, decisions = [], []
     previous_receipt, previous_source = None, None
     for row in dataset["observations"]:

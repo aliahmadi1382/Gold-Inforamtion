@@ -25,11 +25,16 @@ def read_json(path):
     return raw, json.loads(raw, object_pairs_hook=unique)
 
 
-def build_forward_dataset(root):
+def build_forward_dataset(root, *, excluded_capture_ids=()):
     """All capture folders must verify; sorting receipts grants no continuous coverage."""
     rows = []
     folders = sorted(p for p in Path(root).iterdir() if p.is_dir())
+    excluded = set(excluded_capture_ids)
+    if len(excluded) != len(excluded_capture_ids) or not excluded <= {p.name for p in folders}:
+        raise ValueError("invalid explicit capture exclusions")
     for folder in folders:
+        if folder.name in excluded:
+            continue
         try:
             receipt_bytes, receipt = read_json(folder / "receipt.json")
             saved_bytes, saved = read_json(folder / "quote-review.json")
@@ -100,5 +105,6 @@ def build_forward_dataset(root):
         missing_interval_count=None,
         cadence="not_declared",
         strategy_evaluation_status="not_run",
+        excluded_capture_ids=sorted(excluded),
         observations=rows,
     )

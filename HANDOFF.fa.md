@@ -1,3 +1,5 @@
+> **مطالعهٔ تأخیر:** مالک هیچ حساب demo ندارد؛ مستندات Gold-API.com/OANDA بررسی شد، هیچ حساب/API جدیدی استفاده نشد. delayed_research دو پروفایل سیگنال را جدا مقایسه می‌کند؛ دادهٔ فعلی در پژوهش warming_up و در اجرا مسدود می‌ماند. حد اجرای ۶۰ ثانیه تغییر نکرده. قدم بعد cadence و سهمیهٔ ثبت Spot؛ [روش](docs/source-methodology/delayed-research.fa.md).
+
 > **کشف منشأ تاریخچه:** سه dated quote سپتامبر از LBMA با واحد صریح و BidAsk تهی؛ Spot قبلی FOREXCOM بود. جمعه/شنبه/یکشنبه OHLC/price برابر ولی timestamp روزانه09:30Z؛ با carry-forward سازگار، نه تأیید انتشار آخر هفته. هش/epoch و تطبیق سه نقطه با range آفلاین تأیید شد. پس از شناسایی benchmark، دریافت بیشتر تاریخچه تا رفع مجوز/معنای زمان در انتظار؛ هیچ ادغامی با Spot انجام نشد. [شواهد](docs/source-methodology/goldapi-candidate.fa.md).
 
 > **بررسی تاریخچهٔ GoldAPI:** یک درخواست تاریخچهٔ سپتامبر HTTP 200؛ ۳۰ ردیف مرتب شامل ۸ تاریخ آخر هفته، بدون timestamp/BidAsk/واحد صریح. audit جدید و ۲۲ آزمون مرتبط موفق؛ raw/receipt/review در local/goldapi-history/20261012T082915160230Z. داده وارد موتور معامله نشد. گام بعد تعریف رسمی قیمت تاریخی/session و تأخیر؛ فاز ۳ باز. [شواهد](docs/source-methodology/goldapi-candidate.fa.md).

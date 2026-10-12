@@ -1,3 +1,5 @@
+> **تحویل ۰٫۳۵ — مطالعهٔ daily:** review_daily_research.py و /api/daily-research فقط quotes مرتبط به reservation معتبر را بررسی می‌کنند؛ کنترل ساعت پروتکل و future receipt تقویت شد. وضعیت واقعی awaiting_daily_observations، سابقه۰ و نیازحداقل۲۱ تا شروع مقایسه. pilotهای قبلی وارد نمی‌شوند؛ بدون سفارش/شبکه/scheduler. قدم وابسته به زمان: دریافت دستی۱۳اکتبر۱۴–۱۵UTC. [روش](docs/source-methodology/daily-capture.fa.md).
+
 > **تحویل ۰٫۳۴ — وضعیت daily در پنل:** /api/daily-status خواندنی با اتصال quote/reservation؛ صفر مشاهده/اولین پنجره۱۳اکتبر14Z، ظرفیت سقف محلی از سهمیهٔ provider جدا. نمایش در #paper-lab، snapshot زمان شروع سرور؛ بدون درخواست شبکه یا scheduler. قدم بعد دریافت دستی در پنجره و ارزیابی کیفیت مجموعهٔ جدید. [روش](docs/source-methodology/daily-capture.fa.md).
 
 > **تحویل ۰٫۳۳ — cadence دستی:** capture_daily_goldapi.py از ۱۳ اکتبر weekdays ساعت۱۴–۱۵ UTC، یک تلاش روزانه با reservation/lock و سقف محلی۲۰ماهانه؛ خطا نیز رزرو را حفظ می‌کند. local/goldapi-daily از pilot جدا؛ ledger مصرف کل provider نیست. ۱۷ آزمون مرتبط موفق؛ اجرای CLI امروز پیش از شبکه مسدود شد. هیچ scheduler یا daily quote فعال نیست. [روش](docs/source-methodology/daily-capture.fa.md).

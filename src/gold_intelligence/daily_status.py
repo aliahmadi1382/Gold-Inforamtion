@@ -43,6 +43,9 @@ def daily_status(root, now):
                 or item["attempts"] != 1
                 or item["status"] != "reserved_no_automatic_retry"
                 or reserved > time
+                or reserved.date() < START_DATE
+                or reserved.weekday() >= 5
+                or reserved.hour != 14
             ):
                 raise ValueError
             reservations[day] = reserved
@@ -52,7 +55,14 @@ def daily_status(root, now):
         for row in (dataset or {}).get("observations", []):
             started = datetime.fromisoformat(row["request_started_at"])
             day = started.date().isoformat()
-            if day not in reservations or started < reservations[day] or day in days:
+            received = datetime.fromisoformat(row["received_at"])
+            if (
+                day not in reservations
+                or started < reservations[day]
+                or day in days
+                or started.hour != 14
+                or received > time
+            ):
                 raise ValueError
             days.add(day)
         month = time.strftime("%Y-%m")

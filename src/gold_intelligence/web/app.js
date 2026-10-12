@@ -443,6 +443,7 @@ function chart(
 let selectedPaperLab = null;
 async function renderPaperLab() {
   renderDailyStatus();
+  renderDailyResearch();
   renderRealPaper();
   selectedPaperLab = null;
   $("lab-export").disabled = true;
@@ -2071,4 +2072,12 @@ async function renderDailyStatus() {
     }
     $("daily-status-window").textContent = "دوشنبه تا جمعه · ساعت " + r.window_tehran + " تهران · سقف محلی " + fmt(r.monthly_local_limit) + " تلاش ماهانه · پنجرهٔ بعدی UTC: " + (r.next_manual_window_at ? stamp(r.next_manual_window_at) : "ناموجود") + " · در زمان snapshot: " + (r.capture_allowed_now ? "داخل پنجرهٔ دریافت دستی" : "خارج از پنجرهٔ مجاز") + " · این صفحه درخواستی به منبع ارسال نمی‌کند.";
   } catch(e) { $("daily-status-notice").textContent = "وضعیت پروتکل قابل بارگذاری نیست: " + e.message; }
+}
+
+async function renderDailyResearch() {
+  try {
+    const r = await get("/api/daily-research");
+    const label = {awaiting_daily_observations:"در انتظار دادهٔ روزانه",gathering_history:"در حال تکمیل سابقهٔ واجد شرایط",signal_comparisons_available:"محاسبهٔ سیگنال پژوهشی ممکن است",unavailable:"شواهد روزانه قابل تأیید نیست"}[r.status];
+    $("daily-research-status").textContent = "مطالعهٔ روزانه: " + label + (r.current_eligible_history === null ? "" : " · سابقهٔ قابل استفاده: " + fmt(r.current_eligible_history) + " · حداقل مشاهدهٔ دیگر تا نخستین مقایسه: " + fmt(r.observations_needed_before_first_comparison)) + " · این شرط شروع محاسبه است؛ عملکرد راهبرد و صلاحیت معامله تأیید نشده‌اند.";
+  } catch(e) { $("daily-research-status").textContent = "مطالعهٔ روزانه قابل بارگذاری نیست: " + e.message; }
 }

@@ -1,4 +1,4 @@
-"""Manually collect one weekday quote inside the fixed 14:00 UTC hour."""
+"""Manually collect one weekday quote inside the date-specific UTC hour."""
 
 import argparse
 import os

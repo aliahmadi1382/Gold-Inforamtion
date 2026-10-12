@@ -5,7 +5,7 @@ import pytest
 
 from gold_intelligence.daily_capture import capture_daily
 
-TIME = datetime(2026, 10, 13, 14, 10, tzinfo=UTC)
+TIME = datetime(2026, 10, 13, 13, 10, tzinfo=UTC)
 
 
 def test_success_and_failed_attempt_each_block_second_request(tmp_path):
@@ -52,7 +52,7 @@ def test_failed_request_reservation_is_not_reset(tmp_path):
 @pytest.mark.parametrize(
     "clock",
     [
-        TIME.replace(hour=13),
+        TIME.replace(hour=12),
         TIME.replace(day=17),
         TIME.replace(day=11),
         TIME.replace(tzinfo=None),
@@ -81,7 +81,7 @@ def test_monthly_limit_counts_reserved_failures_before_network(tmp_path):
             json.dumps(
                 dict(
                     utc_date=stamp,
-                    reserved_at=stamp + "T14:00:00+00:00",
+                    reserved_at=stamp + "T13:00:00+00:00",
                     attempts=1,
                     status="reserved_no_automatic_retry",
                 )
@@ -99,7 +99,7 @@ def test_monthly_limit_counts_reserved_failures_before_network(tmp_path):
 @pytest.mark.parametrize(
     "reserved",
     [
-        "2026-10-13T13:00:00+00:00",
+        "2026-10-13T12:00:00+00:00",
         "2026-10-17T14:00:00+00:00",
         "2026-10-11T14:00:00+00:00",
         "2026-10-30T14:00:00+00:00",

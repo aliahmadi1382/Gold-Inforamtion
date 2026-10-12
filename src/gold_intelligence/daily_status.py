@@ -4,7 +4,7 @@ import hashlib
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from .daily_capture import MONTHLY_LIMIT, START_DATE, read_reservations
+from .daily_capture import MONTHLY_LIMIT, START_DATE, read_reservations, window_hour
 from .forward_dataset import build_forward_dataset, read_json
 from .goldapi_capture import ENDPOINT, LIMIT
 from .models import aware
@@ -17,8 +17,8 @@ def daily_status(root, now):
         schema_version="1.0.0",
         evaluated_at=time.isoformat(),
         start_date=START_DATE.isoformat(),
-        window_utc="14:00–15:00",
-        window_tehran="17:30–18:30",
+        window_utc="13:00–14:00",
+        window_tehran="16:30–17:30",
         monthly_local_limit=MONTHLY_LIMIT,
         provider_remaining_quota=None,
         scheduler_enabled=False,
@@ -44,7 +44,7 @@ def daily_status(root, now):
                 day not in reservations
                 or started < reservations[day]
                 or started > time
-                or started.hour != 14
+                or started.hour != window_hour(started.date())
                 or day in capture_days
                 or receipt["endpoint"] != ENDPOINT
                 or receipt["trading_eligible"] is not False
@@ -93,7 +93,7 @@ def daily_status(root, now):
                 day not in reservations
                 or started < reservations[day]
                 or day in days
-                or started.hour != 14
+                or started.hour != window_hour(started.date())
                 or received > time
             ):
                 raise ValueError
@@ -112,7 +112,7 @@ def daily_status(root, now):
         candidate_day = max(time.date(), START_DATE)
         for offset in range(70):
             day = candidate_day + timedelta(days=offset)
-            beginning = datetime(day.year, day.month, day.day, 14, tzinfo=UTC)
+            beginning = datetime(day.year, day.month, day.day, window_hour(day), tzinfo=UTC)
             end = beginning + timedelta(hours=1)
             consumed = sum(d.startswith(day.strftime("%Y-%m")) for d in reservations)
             if (

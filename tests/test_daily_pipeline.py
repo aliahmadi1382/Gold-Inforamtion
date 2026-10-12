@@ -10,7 +10,7 @@ from gold_intelligence.daily_research import review_daily_research
 
 
 def test_twenty_one_weekday_receipts_cross_month_and_enable_only_signal_comparison(tmp_path):
-    start = datetime(2026, 10, 13, 14, 10, tzinfo=UTC)
+    start = datetime(2026, 10, 13, 13, 10, tzinfo=UTC)
     days = [start + timedelta(days=i) for i in range(45)]
     times = [d for d in days if d.weekday() < 5][:21]
     calls = []
@@ -54,7 +54,7 @@ def test_twenty_one_weekday_receipts_cross_month_and_enable_only_signal_comparis
 
 
 def test_failed_response_remains_accounted_for_while_next_day_can_be_reviewed(tmp_path):
-    first = datetime(2026, 10, 13, 14, 10, tzinfo=UTC)
+    first = datetime(2026, 10, 13, 13, 10, tzinfo=UTC)
     with pytest.raises(ValueError):
         capture_daily(tmp_path, "fixture", lambda _: (b'{"error":"quota"}', 200), lambda: first)
     failed = next((tmp_path / "quotes").iterdir())

@@ -13,6 +13,11 @@ START_DATE = date(2026, 10, 12)
 MONTHLY_LIMIT = 20
 
 
+def window_hour(day):
+    """Keep the October 12 receipt valid; apply the new hour from October 13."""
+    return 14 if day <= date(2026, 10, 12) else 13
+
+
 def read_reservations(root, time):
     """Shared admission/read checks: an invalid ledger never grants extra quota."""
     reservations = {}
@@ -33,7 +38,7 @@ def read_reservations(root, time):
                 or reserved > time
                 or reserved.date() < START_DATE
                 or reserved.weekday() >= 5
-                or reserved.hour != 14
+                or reserved.hour != window_hour(reserved.date())
             ):
                 raise ValueError
             reservations[day] = reserved
@@ -46,8 +51,8 @@ def capture_daily(root, key, fetch=fetch_quote, now=lambda: datetime.now(UTC)):
     if not isinstance(key, str) or not key.strip() or any(c in key for c in "\r\n"):
         raise ValueError("configured key required")
     time = aware(now()).astimezone(UTC)
-    if time.date() < START_DATE or time.weekday() >= 5 or time.hour != 14:
-        raise ValueError("outside protocol: weekdays 14:00–14:59 UTC from 2026-10-12")
+    if time.date() < START_DATE or time.weekday() >= 5 or time.hour != window_hour(time.date()):
+        raise ValueError("outside protocol: outside the date-specific weekday UTC window")
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
     attempts = root / "attempts"

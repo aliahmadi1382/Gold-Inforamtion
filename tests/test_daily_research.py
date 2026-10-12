@@ -5,7 +5,7 @@ from gold_intelligence.daily_capture import capture_daily
 from gold_intelligence.daily_research import review_daily_research
 from gold_intelligence.goldapi_capture import capture_goldapi
 
-TIME = datetime(2026, 10, 13, 14, 10, tzinfo=UTC)
+TIME = datetime(2026, 10, 13, 13, 10, tzinfo=UTC)
 
 
 def test_no_daily_collection_never_imports_pilot_or_writes_root(tmp_path):
@@ -38,7 +38,7 @@ def test_valid_protocol_quote_warms_research_but_not_execution(tmp_path):
     assert r["observations_needed_before_first_comparison"] == 20
     assert r["comparison"]["fixed_profiles"]["strict_execution_screen"]["blocked_count"] == 1
     assert not r["orders_enabled"] and not r["market_validation"]
-    assert review_daily_research(tmp_path, TIME.replace(hour=13))["status"] == "unavailable"
+    assert review_daily_research(tmp_path, TIME.replace(hour=12))["status"] == "unavailable"
 
 
 def test_reservation_outside_protocol_is_not_usable_research(tmp_path):
@@ -48,7 +48,7 @@ def test_reservation_outside_protocol_is_not_usable_research(tmp_path):
         json.dumps(
             dict(
                 utc_date="2026-10-13",
-                reserved_at="2026-10-13T13:00:00+00:00",
+                reserved_at="2026-10-13T12:00:00+00:00",
                 status="reserved_no_automatic_retry",
                 attempts=1,
             )

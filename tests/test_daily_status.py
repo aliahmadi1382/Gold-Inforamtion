@@ -23,7 +23,7 @@ def test_corrupt_ledger_never_shows_zero_usage(tmp_path):
 
 def test_weekend_and_window_end_skip_to_next_weekday(tmp_path):
     r = daily_status(tmp_path, datetime(2026, 10, 16, 15, tzinfo=UTC))
-    assert r["next_manual_window_at"] == "2026-10-19T14:00:00+00:00"
+    assert r["next_manual_window_at"] == "2026-10-19T13:00:00+00:00"
 
 
 def test_reserved_without_quote_is_not_reported_as_success(tmp_path):
@@ -33,7 +33,7 @@ def test_reserved_without_quote_is_not_reported_as_success(tmp_path):
         json.dumps(
             dict(
                 utc_date="2026-10-13",
-                reserved_at="2026-10-13T14:00:00+00:00",
+                reserved_at="2026-10-13T13:00:00+00:00",
                 status="reserved_no_automatic_retry",
                 attempts=1,
             )
@@ -43,4 +43,4 @@ def test_reserved_without_quote_is_not_reported_as_success(tmp_path):
     assert r["monthly_reserved_attempts"] == 1 and r["local_remaining"] == 19
     assert r["reserved_without_verified_quote"] == 1 and r["verified_daily_observations"] == 0
     assert not r["capture_allowed_now"]
-    assert r["next_manual_window_at"] == "2026-10-14T14:00:00+00:00"
+    assert r["next_manual_window_at"] == "2026-10-14T13:00:00+00:00"

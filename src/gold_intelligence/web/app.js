@@ -442,6 +442,7 @@ function chart(
 }
 let selectedPaperLab = null;
 async function renderPaperLab() {
+  renderDailyStatus();
   renderRealPaper();
   selectedPaperLab = null;
   $("lab-export").disabled = true;
@@ -2057,3 +2058,17 @@ async function renderRealPaper() {
 $("real-paper-export").onclick = () => {
   if (realPaperReport) download("real-paper-report.json",JSON.stringify(realPaperReport,null,2),"application/json");
 };
+
+async function renderDailyStatus() {
+  clear($("daily-status-metrics"));
+  $("daily-status-window").textContent = "";
+  try {
+    const r = await get("/api/daily-status");
+    if (r.status !== "verified") { $("daily-status-notice").textContent = r.reason; return; }
+    $("daily-status-notice").textContent = r.verified_daily_observations === 0 ? "هنوز مشاهده‌ای در پروتکل روزانه ثبت نشده؛ نمونه‌های آزمایشی قبلی جدا هستند." : "شواهد مجموعهٔ روزانه تأیید شد؛ تعداد مشاهده به معنی آمادگی راهبرد نیست.";
+    for (const [label,value] of [["تلاش رزروشده در ماه UTC",r.monthly_reserved_attempts],["ظرفیت باقی‌ماندهٔ سقف محلی",r.local_remaining],["مشاهدهٔ روزانهٔ تأییدشده",r.verified_daily_observations],["رزرو بدون دریافت تأییدشده",r.reserved_without_verified_quote]]) {
+      const card=el("div",null,"kpi");card.append(el("span",label),el("strong",fmt(value)));$("daily-status-metrics").append(card);
+    }
+    $("daily-status-window").textContent = "دوشنبه تا جمعه · ساعت " + r.window_tehran + " تهران · سقف محلی " + fmt(r.monthly_local_limit) + " تلاش ماهانه · پنجرهٔ بعدی UTC: " + (r.next_manual_window_at ? stamp(r.next_manual_window_at) : "ناموجود") + " · در زمان snapshot: " + (r.capture_allowed_now ? "داخل پنجرهٔ دریافت دستی" : "خارج از پنجرهٔ مجاز") + " · این صفحه درخواستی به منبع ارسال نمی‌کند.";
+  } catch(e) { $("daily-status-notice").textContent = "وضعیت پروتکل قابل بارگذاری نیست: " + e.message; }
+}

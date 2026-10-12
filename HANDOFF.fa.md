@@ -1,3 +1,5 @@
+> **تحویل ۰٫۳۴ — وضعیت daily در پنل:** /api/daily-status خواندنی با اتصال quote/reservation؛ صفر مشاهده/اولین پنجره۱۳اکتبر14Z، ظرفیت سقف محلی از سهمیهٔ provider جدا. نمایش در #paper-lab، snapshot زمان شروع سرور؛ بدون درخواست شبکه یا scheduler. قدم بعد دریافت دستی در پنجره و ارزیابی کیفیت مجموعهٔ جدید. [روش](docs/source-methodology/daily-capture.fa.md).
+
 > **تحویل ۰٫۳۳ — cadence دستی:** capture_daily_goldapi.py از ۱۳ اکتبر weekdays ساعت۱۴–۱۵ UTC، یک تلاش روزانه با reservation/lock و سقف محلی۲۰ماهانه؛ خطا نیز رزرو را حفظ می‌کند. local/goldapi-daily از pilot جدا؛ ledger مصرف کل provider نیست. ۱۷ آزمون مرتبط موفق؛ اجرای CLI امروز پیش از شبکه مسدود شد. هیچ scheduler یا daily quote فعال نیست. [روش](docs/source-methodology/daily-capture.fa.md).
 
 > **مطالعهٔ تأخیر:** مالک هیچ حساب demo ندارد؛ مستندات Gold-API.com/OANDA بررسی شد، هیچ حساب/API جدیدی استفاده نشد. delayed_research دو پروفایل سیگنال را جدا مقایسه می‌کند؛ دادهٔ فعلی در پژوهش warming_up و در اجرا مسدود می‌ماند. حد اجرای ۶۰ ثانیه تغییر نکرده. قدم بعد cadence و سهمیهٔ ثبت Spot؛ [روش](docs/source-methodology/delayed-research.fa.md).

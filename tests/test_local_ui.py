@@ -184,6 +184,7 @@ def running(ui):
         "/api/summary",
         "/api/status",
         "/api/real-paper",
+        "/api/daily-status",
         "/fonts/Vazirmatn-variable.woff2",
     ],
 )

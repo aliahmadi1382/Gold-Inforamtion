@@ -16,6 +16,7 @@ from uuid import uuid4
 from . import __version__
 from .acquisition import AcquisitionRun
 from .daily_readiness import build_daily_readiness
+from .daily_status import daily_status
 from .event_study_plan import build_event_study_plan
 from .evidence_synthesis import build_synthesis
 from .monthly_robustness import monthly_robustness
@@ -302,6 +303,7 @@ class Workspace:
             str(cash): simulate_lab(synthetic_quotes(), LabSettings(initial_cash=cash))
             for cash in (1000, 10000, 50000)
         }
+        self.daily_status = daily_status(self.root.parent / "goldapi-daily", generated)
         try:
             self.real_paper = dict(
                 status="verified", report=evaluate_real_paper(self.root.parent / "goldapi-quotes")
@@ -454,6 +456,8 @@ def handler_for(workspace, port):
                     result = workspace.paper_labs[parse_qs(path.query).get("cash", ["10000"])[0]]
                 elif path.path == "/api/real-paper":
                     result = workspace.real_paper
+                elif path.path == "/api/daily-status":
+                    result = workspace.daily_status
                 elif path.path == "/api/series":
                     query = parse_qs(path.query)
                     result = workspace.points(

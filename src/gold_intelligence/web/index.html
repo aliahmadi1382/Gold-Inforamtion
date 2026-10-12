@@ -20,7 +20,10 @@
         ><button data-view="explore">⌁ <span>کاوش داده</span></button
         ><button data-view="reports">▤ <span>گزارش پژوهش</span></button
         ><button data-view="operations">◷ <span>سلامت عملیات</span></button
-        ><button data-view="roadmap">◉ <span>مسیر پروژه</span></button>
+        ><button data-view="roadmap">◉ <span>مسیر پروژه</span></button
+        ><button data-view="paper-lab">
+          ◇ <span>آزمایش معاملهٔ فرضی</span>
+        </button>
       </nav>
       <div class="sidebar-foot">
         <span class="local-dot"></span> فقط روی این دستگاه<small id="version"
@@ -205,13 +208,47 @@
           <p id="runtime-note" class="muted"></p>
         </article>
       </section>
+      <section id="paper-lab" class="view" hidden>
+        <article class="panel">
+          <h2>آزمایش فنی با دادهٔ مصنوعی</h2>
+          <p class="notice neutral">
+            قیمت‌ها ساختگی‌اند؛ این اجرا صحت موتور را می‌سنجد و نتیجهٔ تحلیل
+            بازار طلا نیست. دادهٔ واقعی و کارگزار متصل نیستند.
+          </p>
+          <div class="controls">
+            <label for="lab-cash">سرمایهٔ فرضی، دلار</label
+            ><select id="lab-cash">
+              <option value="1000">۱٬۰۰۰</option>
+              <option value="10000" selected>۱۰٬۰۰۰</option>
+              <option value="50000">۵۰٬۰۰۰</option></select
+            ><button id="lab-export" class="secondary" disabled>
+              دریافت دفتر کامل JSON
+            </button>
+          </div>
+          <p id="lab-rules" class="muted"></p>
+          <div id="lab-metrics" class="kpis"></div>
+          <h3>ارزش خالص فرضی حساب</h3>
+          <div id="lab-chart"></div>
+          <h3>خریدوفروشهای شبیه‌سازی‌شده</h3>
+          <div id="lab-fills" class="table-wrap"></div>
+          <details>
+            <summary>تمام تصمیم‌ها و وضعیت سفارش</summary>
+            <div id="lab-orders" class="table-wrap"></div>
+          </details>
+          <p class="muted">
+            پوزیشن باز احتمالی در پایان نمونه به‌اجبار بسته نمی‌شود؛ ارزش حساب،
+            برآورد فروش با هزینهٔ خروج است. تاریخ‌ها تقویم ساختگی ساعتی‌اند. صف
+            سفارش، نقدشوندگی و هزینهٔ نگهداری مدل نشده‌اند.
+          </p>
+        </article>
+      </section>
       <section id="roadmap" class="view" hidden>
         <div id="roadmap-notice" class="notice"></div>
         <div id="phase-list" class="phase-list"></div>
       </section>
       <footer>
         نمایش نسخهٔ آخر هر مشاهده تا زمان شروع پنل · سابقهٔ نسخه‌ها محفوظ است ·
-        پژوهش توصیفی؛ قواعد تصمیم و معامله فعال نیستند
+        پژوهش توصیفی و آزمایش مصنوعی؛ معامله روی بازار واقعی فعال نیست
       </footer>
     </main>
   </body>

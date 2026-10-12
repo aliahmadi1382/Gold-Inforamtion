@@ -187,6 +187,7 @@ const viewTitles = {
   reports: "گزارش‌های پژوهش",
   operations: "سلامت عملیات",
   roadmap: "مسیر و فازهای پروژه",
+  "paper-lab": "آزمایش معاملهٔ فرضی — دادهٔ مصنوعی",
 };
 function navigate(view) {
   if (!viewTitles[view]) return;
@@ -438,6 +439,108 @@ function chart(
       "chart-note",
     ),
   );
+}
+let selectedPaperLab = null;
+async function renderPaperLab() {
+  selectedPaperLab = null;
+  $("lab-export").disabled = true;
+  const cash = $("lab-cash").value;
+  try {
+    const lab = await get("/api/paper-lab?cash=" + encodeURIComponent(cash));
+    if ($("lab-cash").value !== cash) return;
+    selectedPaperLab = lab;
+    $("lab-export").disabled = false;
+    const m = lab.metrics,
+      s = lab.settings;
+    $("lab-rules").textContent =
+      "قاعدهٔ آزمایشی: عبور قیمت میانی از میانگین " +
+      fmt(s.lookback) +
+      " مشاهدهٔ قبلی برای ورود؛ زیر میانگین یا افت " +
+      fmt(s.stop_fraction * 100) +
+      "٪ برای خروج. فقط خرید با " +
+      fmt(s.allocation * 100) +
+      "٪ وجه نقد؛ بدون اهرم. اجرای سفارش در مشاهدهٔ بعدی، کارمزد " +
+      fmt(s.fee_bps) +
+      " و لغزش " +
+      fmt(s.slippage_bps) +
+      " واحد پایه در هر سمت. تفاوت Bid/Ask نیز در قیمت‌ها منظور است.";
+    const box = $("lab-metrics");
+    clear(box);
+    for (const [label, value] of [
+      ["سرمایهٔ آغاز، دلار", s.initial_cash],
+      ["ارزش خالص مصنوعی، دلار", m.final_equity],
+      ["سود/زیان مصنوعی، دلار", m.total_pnl],
+      ["بیشترین افت مصنوعی، درصد", m.maximum_drawdown_fraction * 100],
+      ["وجه نقد پایانی، دلار", m.final_cash],
+      ["پوزیشن باز، واحد فرضی", m.final_quantity],
+      ["کارمزد کل، دلار", m.fees],
+      ["معاملات بسته‌شده", m.completed_trades],
+    ]) {
+      const card = el("div", null, "kpi");
+      card.append(el("span", label), el("strong", fmt(value)));
+      box.append(card);
+    }
+    chart(
+      $("lab-chart"),
+      lab.equity.map((a) => ({
+        observed_at: a.time,
+        date: a.time.slice(0, 16),
+        value: a.net_liquidation_equity,
+      })),
+      {
+        kind: "lab_equity",
+        series: "حساب مصنوعی",
+        unit: "دلار فرضی",
+        source: "شبیه‌ساز فنی",
+      },
+    );
+    const side = (a) => (a === "buy" ? "خرید" : "فروش");
+    table(
+      $("lab-fills"),
+      [
+        "سفارش",
+        "سمت",
+        "زمان تصمیم UTC",
+        "زمان اجرا UTC",
+        "قیمت فرضی",
+        "تعداد فرضی",
+        "کارمزد",
+        "سود/زیان تحقق‌یافته",
+        "نقد پس از اجرا",
+      ],
+      lab.fills.map((a) => [
+        a.order_id,
+        side(a.side),
+        stamp(a.decision_at),
+        stamp(a.filled_at),
+        fmt(a.price),
+        fmt(a.quantity),
+        fmt(a.fee),
+        fmt(a.realized_pnl),
+        fmt(a.cash_after),
+      ]),
+    );
+    const reasons = {
+      above_prior_mean: "بالاتر از میانگین قبلی",
+      below_prior_mean: "پایین‌تر از میانگین قبلی",
+      stop_observed: "افت از قیمت ورود",
+    };
+    table(
+      $("lab-orders"),
+      ["شناسه", "سمت", "زمان تصمیم UTC", "علت", "وضعیت"],
+      lab.orders.map((a) => [
+        a.id,
+        side(a.side),
+        stamp(a.decision_at),
+        reasons[a.reason],
+        a.status === "filled"
+          ? "اجراشده"
+          : "لغو در پایان نمونه؛ مشاهدهٔ بعدی وجود ندارد",
+      ]),
+    );
+  } catch (e) {
+    error(e.message);
+  }
 }
 function overview() {
   const last = data.sources.reduce(
@@ -1831,6 +1934,7 @@ async function start() {
     overview();
     operations();
     roadmap();
+    renderPaperLab();
     setupComparisons();
     fillSeries(
       data.series.find(
@@ -1911,4 +2015,15 @@ $("download-report").onclick = () => {
     );
 };
 $("run-filter").onchange = renderRuns;
+$("lab-cash").onchange = renderPaperLab;
+$("lab-export").onclick = () => {
+  if (selectedPaperLab)
+    download(
+      "synthetic-paper-lab-" +
+        selectedPaperLab.fingerprint.slice(0, 8) +
+        ".json",
+      JSON.stringify(selectedPaperLab, null, 2),
+      "application/json",
+    );
+};
 start();

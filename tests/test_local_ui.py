@@ -203,6 +203,20 @@ def test_no_arbitrary_file_routes(store, tmp_path, endpoint, code):
     assert error.value.code == code
 
 
+def test_paper_lab_is_synthetic_and_does_not_write_market_store(store, tmp_path):
+    before = digest(store.root / "market.sqlite3")
+    ui = workspace(store, tmp_path)
+    with running(ui) as base, urlopen(base + "/api/paper-lab?cash=1000") as response:
+        lab = json.load(response)
+    assert lab["settings"]["initial_cash"] == 1000
+    assert lab["scope"] == "synthetic_mechanics_only" and not lab["market_validation"]
+    assert not lab["live_paper_trading"] and not lab["broker_connected"]
+    assert digest(store.root / "market.sqlite3") == before
+    with running(ui) as base, pytest.raises(HTTPError) as error:
+        urlopen(base + "/api/paper-lab?cash=arbitrary")
+    assert error.value.code == 400
+
+
 @pytest.mark.parametrize(
     "headers", [{"Host": "attacker.test"}, {"Origin": "https://attacker.test"}]
 )

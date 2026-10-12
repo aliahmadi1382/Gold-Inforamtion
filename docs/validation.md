@@ -157,3 +157,19 @@ displayed the draft response definitions and unexecuted status; its exported JSO
 matched the offline draft exactly and the source report SHA-256 matched its bytes.
 Private evidence is under `local/phase4-event-plan/` and `local/integration-v027/`.
 No event windows or event responses were calculated; readiness remains false.
+# Synthetic paper lab (0.28.0)
+
+The full suite passed 700 tests, with one Windows symlink skip. After adding input
+quotes to the exported ledger, all 42 targeted engine/UI tests passed again.
+Ruff/format, JavaScript syntax and offline wheel/source builds passed. Independent
+Decimal arithmetic reconciled all 180 account states and four fills, including
+entry budgets, bid/ask execution, both fees, cash and realized/unrealized P&L.
+Tests also cover next-quote fills, prefix invariance, final unfilled-order
+cancellation, constant quotes, open-position net liquidation, invalid temporal
+ordering and revalidation of copied input contracts.
+
+Browser checks verified the 10,000-to-50,000 capital transition and exported
+JSON equality with all quotes, orders, fills, account states and synthetic flags.
+No market-store writes occur. Receipts are private in `local/integration-v028/`
+and `local/paper-lab/v028/`. The scenario is fabricated; these checks establish
+trading mechanics, not market forecasting, real fills or live paper trading.

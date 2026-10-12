@@ -25,11 +25,11 @@ from .monthly_stability import monthly_stability
 from .operations_health import build_operations_health
 from .paper_lab import LabSettings, simulate_lab, synthetic_quotes
 from .project_roadmap import load_project_roadmap
-from .real_paper import evaluate_real_paper
 from .report_comparison import verify_comparison
 from .research_report import load_verified_report
 from .storage import canonical, decode_record
 from .store_lock import store_lock
+from .strategy_evaluation import evaluate_strategy
 
 
 def series_identity(record):
@@ -307,14 +307,36 @@ class Workspace:
         self.daily_status = daily_status(self.root.parent / "goldapi-daily", generated)
         self.daily_research = review_daily_research(self.root.parent / "goldapi-daily", generated)
         try:
+            daily_quotes = self.root.parent / "goldapi-daily" / "quotes"
+            evaluation_root = self.root.parent / "goldapi-quotes"
+            excluded = []
+            scope = "pilot_only"
+            if daily_quotes.exists():
+                if self.daily_status["status"] != "verified":
+                    raise ValueError("daily evidence not verified")
+                evaluation_root, scope = daily_quotes, "daily_protocol"
+                excluded = [f["capture_id"] for f in self.daily_status["recorded_failures"]]
+            evaluation = evaluate_strategy(evaluation_root, excluded_capture_ids=excluded)
+            if (
+                scope == "daily_protocol"
+                and evaluation["account"]["input_shadow"]["input_dataset"]
+                != self.daily_status["coverage"]
+            ):
+                raise ValueError("daily evidence changed")
+            self.strategy_evaluation = dict(
+                status="verified", report=evaluation, dataset_scope=scope
+            )
             self.real_paper = dict(
-                status="verified", report=evaluate_real_paper(self.root.parent / "goldapi-quotes")
+                status="verified",
+                report=self.strategy_evaluation["report"]["account"],
+                dataset_scope=scope,
             )
         except (ValueError, OSError):
             self.real_paper = dict(
                 status="unavailable",
                 reason="مشاهدات واقعی موجود نیستند یا شواهد دریافت کامل و قابل تأیید نیستند.",
             )
+            self.strategy_evaluation = self.real_paper
         self.summary = dict(
             paper_lab_presets=list(self.paper_labs),
             version=__version__,
@@ -462,6 +484,8 @@ def handler_for(workspace, port):
                     result = workspace.daily_status
                 elif path.path == "/api/daily-research":
                     result = workspace.daily_research
+                elif path.path == "/api/strategy-evaluation":
+                    result = workspace.strategy_evaluation
                 elif path.path == "/api/series":
                     query = parse_qs(path.query)
                     result = workspace.points(

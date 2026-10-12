@@ -435,7 +435,7 @@ function chart(
   container.append(
     el(
       "p",
-      `${fmt(points.length)} ${domain ? "پنجره" : "مشاهده"} · ${fmt(points.filter((p) => p.value == null).length)} مقدار ناموجود · ${unitLabel(identity)} · ${domain ? "محور عمودی ثابت −۱ تا +۱" : "محور عمودی متناسب با بازه"}؛ null و شکاف‌های بزرگ به هم وصل نمی‌شوند.`,
+      `${fmt(points.length)} ${domain ? "پنجره" : "مشاهده"} · ${fmt(points.filter((p) => p.value == null).length)} مقدار ناموجود · ${unitLabel(identity)} · ${domain ? `محور عمودی ثابت از ${fmt(domain[0])} تا ${fmt(domain[1])}` : "محور عمودی متناسب با بازه"}؛ null و شکاف‌های بزرگ به هم وصل نمی‌شوند.`,
       "chart-note",
     ),
   );
@@ -444,6 +444,7 @@ let selectedPaperLab = null;
 async function renderPaperLab() {
   renderDailyStatus();
   renderDailyResearch();
+  renderStrategyEvaluation();
   renderRealPaper();
   selectedPaperLab = null;
   $("lab-export").disabled = true;
@@ -2044,15 +2045,16 @@ async function renderRealPaper() {
     }
     const r = result.report, d = r.input_shadow.input_dataset;
     realPaperReport = r;
+    $("real-risk-rules").textContent = `کنترل آزمایشی ریسک: سقف سرمایهٔ درگیر ${fmt(r.risk.maximum_exposure_fraction*100)}٪، توقف ورود پس از زیان روز UTC ${fmt(r.risk.maximum_daily_loss_fraction*100)}٪ یا افت سرمایه ${fmt(r.risk.maximum_drawdown_fraction*100)}٪؛ خروج در مشاهدهٔ بعدیِ مجاز است و قیمت آن تضمین نمی‌شود. کارمزد ${fmt(r.costs.fee_bps)} و لغزش ${fmt(r.costs.slippage_bps)} واحد پایه در هر سمت. این حدود فرض پژوهشی‌اند.`;
     $("real-paper-export").disabled = false;
-    $("real-paper-status").textContent = `${fmt(d.observation_count)} مشاهدهٔ واقعی تأییدشده · حد تازگی ${fmt(r.input_shadow.settings.maximum_age_seconds)} ثانیه · ${fmt(r.ledger.filter(x => x.decision.signal === "blocked").length)} مشاهدهٔ مسدود · این نتیجه آزمون سودآوری نیست.`;
-    for (const [label,value] of [["نقد فرضی، دلار",r.final_cash],["دارایی فرضی، اونس",r.final_quantity],["سود تحقق‌یافتهٔ فرضی، دلار",r.realized_pnl],["کارمزد فرضی، دلار",r.fees],["اجراهای فرضی",r.fills.length],["بیشترین سن قیمت، ثانیه",d.age_seconds_max]]) {
+    $("real-paper-status").textContent = `${fmt(d.observation_count)} مشاهده از ${result.dataset_scope === "daily_protocol" ? "پروتکل روزانهٔ واقعی" : "نمونه‌های اولیهٔ واقعی"} · حد تازگی ${fmt(r.input_shadow.settings.maximum_age_seconds)} ثانیه · ${fmt(r.ledger.filter(x => x.decision.signal === "blocked").length)} مشاهدهٔ مسدود · این نتیجه آزمون سودآوری نیست.`;
+    for (const [label,value] of [["نقد فرضی، دلار",r.final_cash],["دارایی فرضی، اونس",r.final_quantity],["سود تحقق‌یافتهٔ فرضی، دلار",r.realized_pnl],["کارمزد فرضی، دلار",r.fees],["اجراهای فرضی",r.fills.length],["بیشترین سن هنگام دریافت، ثانیه",d.age_seconds_max]]) {
       const card = el("div",null,"kpi"); card.append(el("span",label),el("strong",fmt(value))); $("real-paper-metrics").append(card);
     }
     const reasons = {stale_quote:"قیمت قدیمی‌تر از حد مجاز",warming_up:"مشاهدات قبلی کافی نیست",nonadvancing_receipt:"زمان دریافت جلو نرفته",nonadvancing_source:"زمان منبع جلو نرفته",comparison_with_prior_observations:"مقایسه با میانگین قبلی"};
     const signals = {blocked:"مسدود",wait:"انتظار",buy_candidate:"نامزد خرید",exit_candidate:"نامزد خروج",hold:"بدون تغییر"};
-    table($("real-paper-ledger"),["دریافت UTC","زمان قیمت UTC","سن، ثانیه","تصمیم","دلیل","نقد، دلار","مقدار، اونس"],r.ledger.map(x => [stamp(x.received_at),stamp(x.mark_source_at),fmt(x.mark_age_seconds),signals[x.decision.signal],reasons[x.decision.reason],fmt(x.cash),fmt(x.quantity)]));
-    table($("real-paper-orders"),["شناسه","سمت","تصمیم UTC","وضعیت"],r.orders.map(x => [x.id,x.side === "buy" ? "خرید" : "فروش",stamp(x.decision_at),({pending_next_observation:"در انتظار مشاهدهٔ بعد",cancelled_next_quote_ineligible:"لغو؛ مشاهدهٔ بعد نامعتبر",hypothetically_filled:"اجرای فرضی"})[x.status]]));
+    table($("real-paper-ledger"),["دریافت UTC","زمان قیمت UTC","سن، ثانیه","تصمیم","دلیل","نقد، دلار","مقدار، اونس","وضعیت ریسک"],r.ledger.map(x => [stamp(x.received_at),stamp(x.mark_source_at),fmt(x.mark_age_seconds),signals[x.decision.signal],reasons[x.decision.reason],fmt(x.cash),fmt(x.quantity),x.risk.entry_halted ? [x.risk.kill_switch ? "توقف دستی" : "",x.risk.daily_loss_halt ? "سقف زیان روز" : "",x.risk.drawdown_halt ? "سقف افت سرمایه" : "",x.risk.exposure_limit_breached ? "سقف سرمایهٔ درگیر" : ""].filter(Boolean).join("، ") : x.risk.mark_eligible ? "حدود برقرار" : "قیمت واجد شرایط نیست"]));
+    table($("real-paper-orders"),["شناسه","سمت","تصمیم UTC","وضعیت"],r.orders.map(x => [x.id,x.side === "buy" ? "خرید" : "فروش",stamp(x.decision_at),({pending_next_observation:"در انتظار مشاهدهٔ بعد",cancelled_next_quote_ineligible:"لغو؛ مشاهدهٔ بعد نامعتبر",hypothetically_filled:"اجرای فرضی",cancelled_risk_limit:"لغو به علت حد ریسک"})[x.status]]));
     table($("real-paper-fills"),["سفارش","اجرا UTC","قیمت فرضی","مقدار","کارمزد"],r.fills.map(x => [x.order_id,stamp(x.filled_at),fmt(x.price),fmt(x.quantity),fmt(x.fee)]));
   } catch (e) { $("real-paper-status").textContent = "گزارش واقعی قابل بارگذاری نیست: " + e.message; }
 }
@@ -2080,4 +2082,20 @@ async function renderDailyResearch() {
     const label = {awaiting_daily_observations:"در انتظار دادهٔ روزانه",gathering_history:"در حال تکمیل سابقهٔ واجد شرایط",signal_comparisons_available:"محاسبهٔ سیگنال پژوهشی ممکن است",unavailable:"شواهد روزانه قابل تأیید نیست"}[r.status];
     $("daily-research-status").textContent = "مطالعهٔ روزانه: " + label + (r.current_eligible_history === null ? "" : " · سابقهٔ قابل استفاده: " + fmt(r.current_eligible_history) + " · حداقل مشاهدهٔ دیگر تا نخستین مقایسه: " + fmt(r.observations_needed_before_first_comparison)) + " · این شرط شروع محاسبه است؛ عملکرد راهبرد و صلاحیت معامله تأیید نشده‌اند.";
   } catch(e) { $("daily-research-status").textContent = "مطالعهٔ روزانه قابل بارگذاری نیست: " + e.message; }
+}
+
+async function renderStrategyEvaluation() {
+  for (const id of ["real-equity-chart","real-drawdown-chart","real-fee-chart"]) clear($(id));
+  $("evaluation-controls").textContent = "";
+  try {
+    const result = await get("/api/strategy-evaluation");
+    if (result.status !== "verified") { $("evaluation-status").textContent=result.reason; return; }
+    const r=result.report;
+    $("evaluation-status").textContent = r.status === "insufficient_observations" ? `داده کافی نیست: ${fmt(r.observation_count)} مشاهده؛ برنامهٔ ثابت ${fmt(r.plan.training_observations)} مشاهدهٔ نخست برای سابقه و حداقل ${fmt(r.plan.minimum_test_observations)} مشاهدهٔ بعدی برای آزمون است. هیچ پارامتری براساس این داده‌ها برازش نشده.` : r.status === "holdout_no_eligible_quotes" ? "پنجرهٔ آزمون هیچ قیمت واجد شرایطی ندارد؛ عملکرد قابل ارزیابی نیست." : "محاسبات پنجرهٔ آزمون انجام شد؛ این نتیجه هنوز اعتبار بازار یا سودآوری آینده را تأیید نمی‌کند.";
+    const m=r.whole_sample_metrics;
+    $("evaluation-controls").textContent = r.holdout ? `مقایسه در یک پنجره و با هزینه‌های مشابه: سود خالص راهبرد ${fmt(r.holdout.strategy.net_pnl)} دلار، نگهداری با تخصیص سرمایهٔ مشابه ${fmt(r.holdout.allocation_matched_hold.net_pnl)} دلار، وجه نقد ${fmt(r.holdout.cash_control.net_pnl)} دلار. نمودارهای زیر کل حساب را توصیف می‌کنند؛ نتیجهٔ آزمون جداست.` : "معیارهای آماده: بازده خالص، افت سرمایه، تعداد معاملات بسته و مقایسه با وجه نقد و نگهداری طلا با تخصیص مشابه. نمودار زیر فقط وضعیت کل حساب را نشان می‌دهد؛ دادهٔ تأخیردار قیمت جاری اجرای معامله نیست.";
+    for (const [id,key,label,unit,multiplier] of [["real-equity-chart","equity","حساب واقعی، اجرای فرضی","دلار",1],["real-drawdown-chart","drawdown_fraction","افت سرمایهٔ فرضی","درصد",100],["real-fee-chart","cumulative_fees","کارمزد ثبت‌شدهٔ فرضی","دلار",1]]) {
+      chart($(id),m.curve.map(x=>({observed_at:x.time,date:x.time.slice(0,16),value:x[key]*multiplier})),{kind:"paper_account",series:label,unit,source:result.dataset_scope === "daily_protocol" ? "پروتکل روزانهٔ واقعی، مدل فرضی" : "نمونه‌های اولیهٔ واقعی، مدل فرضی"},false,null,key==="drawdown_fraction"?[0,100]:key==="cumulative_fees"?[0,Math.max(1,...m.curve.map(x=>x.cumulative_fees))*1.1]:null);
+    }
+  } catch(e) { $("evaluation-status").textContent="ارزیابی قابل بارگذاری نیست: "+e.message; }
 }

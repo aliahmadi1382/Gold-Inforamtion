@@ -186,6 +186,7 @@ def running(ui):
         "/api/real-paper",
         "/api/daily-status",
         "/api/daily-research",
+        "/api/strategy-evaluation",
         "/fonts/Vazirmatn-variable.woff2",
     ],
 )
@@ -244,6 +245,45 @@ def test_real_paper_verifies_capture_without_store_writes(store, tmp_path):
     assert result["report"]["fills"] == []
     assert digest(store.root / "market.sqlite3") == before
     (next(root.iterdir()) / "raw.json").write_text("{}")
+    assert workspace(store, tmp_path).real_paper["status"] == "unavailable"
+
+
+def test_verified_daily_collection_replaces_pilot_without_merging(store, tmp_path, monkeypatch):
+    from test_real_shadow import add
+
+    import gold_intelligence.local_ui as ui_module
+    from gold_intelligence.daily_capture import capture_daily
+
+    time = datetime(2026, 10, 12, 14, 10, tzinfo=UTC)
+
+    class Clock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return time + timedelta(minutes=10)
+
+    monkeypatch.setattr(ui_module, "datetime", Clock)
+    add(store.root.parent / "goldapi-quotes", 0, 3000)
+    root = store.root.parent / "goldapi-daily"
+    raw = json.dumps(
+        dict(
+            timestamp=int(time.timestamp()),
+            datetime=time.isoformat(),
+            metal="XAU",
+            currency="USD",
+            unit="troy_ounce",
+            exchange="FOREXCOM",
+            symbol="FOREXCOM:XAUUSD",
+            price=2000,
+            bid=1999,
+            ask=2001,
+        )
+    ).encode()
+    folder = capture_daily(root, "fixture", lambda _: (raw, 200), lambda: time)
+    ui = workspace(store, tmp_path)
+    assert ui.real_paper["dataset_scope"] == "daily_protocol"
+    quotes = ui.real_paper["report"]["input_shadow"]["input_dataset"]
+    assert quotes["observation_count"] == 1 and quotes["observations"][0]["price"] == 2000
+    (folder / "raw.json").write_text("{}")
     assert workspace(store, tmp_path).real_paper["status"] == "unavailable"
 
 

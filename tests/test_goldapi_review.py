@@ -39,6 +39,7 @@ def test_checked_declarations_and_known_age_never_promote_candidate():
         {"unit": "gram"},
         {"currency": "EUR"},
         {"exchange": "OANDA"},
+        {"exchange": "LBMA", "symbol": None, "bid": None, "ask": None},
         {"symbol": "OTHER:XAUUSD"},
         {"timestamp": True},
         {"timestamp": TIME.timestamp()},

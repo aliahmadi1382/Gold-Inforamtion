@@ -1,6 +1,6 @@
 # Draft questions for Alpha Vantage support
 
-Prepared for the project owner. This document has not been sent. Do not include API keys, account credentials, downloaded price tables or screenshots containing secrets.
+Prepared for the project owner. On 2026-10-12 the owner confirmed an email to support@alphavantage.co remains unanswered; the sending date and exact body are unknown. This file is a draft, not proof that its exact contents were sent. Do not include API keys, account credentials, downloaded price tables or screenshots containing secrets.
 
 Subject: GOLD_SILVER_HISTORY daily GOLD/XAUUSD methodology
 

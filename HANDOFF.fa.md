@@ -1,3 +1,5 @@
+> **بررسی منبع — ۱۲ اکتبر ۲۰۲۶:** مالک ارسال ایمیل به support@alphavantage.co و نبود پاسخ را تأیید کرد؛ تاریخ و متن ارسال نامعلوم‌اند. GoldAPI نامزد جایگزین است؛ کنترل آفلاین واحد صریح، توافق زمان Unix/ISO و Bid/Ask آماده شد، ولی کلید و نمونهٔ زنده موجود نیست. قدم بعد ایجاد Sandbox توسط مالک و نگهداری GOLDAPI_API_KEY در local/credentials.env است. فاز ۳ باز و آمادگی معامله false باقی است. [شواهد و محدودیت‌ها](docs/source-methodology/goldapi-candidate.fa.md).
+
 # سند تحویل کامل پروژه هوشمندی بازار طلا
 
 > **تحویل ۰٫۲۹٫۰ — ۱۲ اکتبر:** یک Spot واقعی Alpha با زمان درخواست/دریافت و هش خام ثبت و آفلاین بررسی شد؛ برچسب زمان بدون timezone، واحد استنباطی و Bid/Ask ناموجود، همهٔ eligibilityها false. collector دستی با یک درخواست/بدون retry و receipt شکست اضافه شد؛ وارد store/حساب فرضی نشده است. فاز ۳ فعال و ترتیب ۳→۴→۶ حفظ است. [روش](docs/source-methodology/forward-quotes.fa.md).

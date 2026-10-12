@@ -9,7 +9,7 @@ def test_missing_collection_is_zero_local_not_provider_quota_and_no_write(tmp_pa
     r = daily_status(root, datetime(2026, 10, 12, 9, tzinfo=UTC))
     assert r["verified_daily_observations"] == 0 and r["local_remaining"] == 20
     assert r["provider_remaining_quota"] is None and not r["scheduler_enabled"]
-    assert r["next_manual_window_at"] == "2026-10-13T14:00:00+00:00"
+    assert r["next_manual_window_at"] == "2026-10-12T14:00:00+00:00"
     assert not root.exists()
 
 

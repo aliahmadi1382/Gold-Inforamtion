@@ -5,7 +5,7 @@ from gold_intelligence.daily_cycle import run_daily_cycle
 
 
 def test_closed_window_reviews_without_network_or_collection_writes(tmp_path):
-    time = datetime(2026, 10, 12, 14, tzinfo=UTC)
+    time = datetime(2026, 10, 12, 13, tzinfo=UTC)
 
     def fetch(key):
         raise AssertionError("unexpected network")
@@ -18,7 +18,7 @@ def test_closed_window_reviews_without_network_or_collection_writes(tmp_path):
 
 
 def test_cycle_success_then_same_day_reentry_uses_only_one_request(tmp_path):
-    time = datetime(2026, 10, 13, 14, 10, tzinfo=UTC)
+    time = datetime(2026, 10, 12, 14, 10, tzinfo=UTC)
     calls = []
 
     def fetch(key):

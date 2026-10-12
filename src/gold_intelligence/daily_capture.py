@@ -9,7 +9,7 @@ from .goldapi_capture import capture_goldapi, fetch_quote
 from .models import aware
 from .store_lock import store_lock
 
-START_DATE = date(2026, 10, 13)
+START_DATE = date(2026, 10, 12)
 MONTHLY_LIMIT = 20
 
 
@@ -47,7 +47,7 @@ def capture_daily(root, key, fetch=fetch_quote, now=lambda: datetime.now(UTC)):
         raise ValueError("configured key required")
     time = aware(now()).astimezone(UTC)
     if time.date() < START_DATE or time.weekday() >= 5 or time.hour != 14:
-        raise ValueError("outside protocol: weekdays 14:00–14:59 UTC from 2026-10-13")
+        raise ValueError("outside protocol: weekdays 14:00–14:59 UTC from 2026-10-12")
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
     attempts = root / "attempts"

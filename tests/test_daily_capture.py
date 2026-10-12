@@ -54,7 +54,7 @@ def test_failed_request_reservation_is_not_reset(tmp_path):
     [
         TIME.replace(hour=13),
         TIME.replace(day=17),
-        TIME.replace(day=12),
+        TIME.replace(day=11),
         TIME.replace(tzinfo=None),
     ],
 )
@@ -101,7 +101,7 @@ def test_monthly_limit_counts_reserved_failures_before_network(tmp_path):
     [
         "2026-10-13T13:00:00+00:00",
         "2026-10-17T14:00:00+00:00",
-        "2026-10-12T14:00:00+00:00",
+        "2026-10-11T14:00:00+00:00",
         "2026-10-30T14:00:00+00:00",
     ],
 )

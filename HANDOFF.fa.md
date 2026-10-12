@@ -1,3 +1,5 @@
+> **عملیات دستی یکپارچه:** scripts/run_daily_cycle.py دریافت مجاز→گزارش پژوهشی را در یک اجرا انجام می‌دهد و نتیجهٔ خصوصی یکتا می‌نویسد. ۲۴آزمون مرتبط موفق؛ اجرای امروز not_completed/awaiting_daily_observations و بدون شبکه، در local/daily-cycles/20261012T092611Z-35786dbc. گام بعد اجرای دستی۱۳اکتبر۱۴–۱۵UTC؛ خودکارسازی فعال نیست. [روش](docs/source-methodology/daily-capture.fa.md).
+
 > **اصلاح ۰٫۳۵٫۲:** daily_status شکست دارای رسید معتبر را با هش‌ها ثبت می‌کند؛ exclusions صریح فقط پس از تطبیق رسید/raw به پژوهش داده می‌شود، بنابراین موفقیت روز بعد قابل بررسی است. دادهٔ خراب/ناقص همچنان fail-closed و reservation شکست همچنان مصرف سقف است. آزمون شکست→موفقیت و tamper انجام شد؛ daily واقعی صفر، شبکه/سفارش/scheduler فعال نشد. [روش](docs/source-methodology/daily-capture.fa.md).
 
 > **اصلاح ۰٫۳۵٫۱:** read_reservations کنترل مشترک admission/status است؛ رزرو خارج پروتکل/آینده پیش از شبکه رد می‌شود. آزمون سرتاسری۲۱روز ساختگی و عبور ماه، سیگنال پژوهشی را پس از warmup بررسی کرد؛ بدون سفارش و بدون واردکردن fixture به دادهٔ واقعی. دو pilot مجدداً تأیید شدند، daily صفر. قدم بعد دریافت دستی طبق پنجره؛ فازهای مادر باز. [روش](docs/source-methodology/daily-capture.fa.md).
